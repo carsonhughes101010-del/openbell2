@@ -6824,7 +6824,7 @@ async function doJoinFundStripe() {
 
     if (!usingSaved) {
       var email = document.getElementById('jm-email-input')?.value || sessionStorage.getItem('sd_useremail') || '';
-      var setupRes = await fetch('/.netlify/functions/setup-intent', {
+      var setupRes = await fetch('/functions/setup-intent', {
         method: 'POST', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ email })
       }).catch(() => null);
@@ -6855,7 +6855,7 @@ async function doJoinFundStripe() {
 
     // Charge
     var custId = localStorage.getItem('sd_stripe_customer_id');
-    var chargeRes = await fetch('/.netlify/functions/charge-card', {
+    var chargeRes = await fetch('/functions/charge-card', {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ customerId: custId, amount: _pendingLeagueFee || 0, fundName: _pendingLeagueName || 'Fund', fundId: _pendingLeagueId || '' })
     }).catch(() => null);
@@ -6929,7 +6929,7 @@ async function confirmPaymentAndJoin() {
       }
 
       var email = sessionStorage.getItem('sd_useremail') || '';
-      var setupRes = await fetch('/.netlify/functions/setup-intent', {
+      var setupRes = await fetch('/functions/setup-intent', {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ email })
@@ -6969,7 +6969,7 @@ async function confirmPaymentAndJoin() {
 
     // Now charge via Netlify function
     var customerId2 = localStorage.getItem('sd_stripe_customer_id');
-    var chargeRes = await fetch('/.netlify/functions/charge-card', {
+    var chargeRes = await fetch('/functions/charge-card', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
