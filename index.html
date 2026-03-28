@@ -5067,11 +5067,6 @@ function doSignup() {
   // Store locally so login works offline
   allUsers.push(userData);
   // Write to Google Sheet Users tab so login can pull from sheet on any device
-  fetch('/functions/send-confirmation', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email, firstName })
-}).catch(() => {});
   submitToSheets('Users', {
     uid, email, firstName, lastName, passwordHash, phone, dob, state,
     age: userAge, isRestricted, registered: userData.registered
@@ -5848,12 +5843,14 @@ async function createPublicSlate() {
 // IMPROVEMENT 1: DARK MODE
 // ══════════════════════════════════════════════════
 function toggleDark() {
+  if (!document.body) return;
   document.body.classList.toggle('dark');
   const on = document.body.classList.contains('dark');
   localStorage.setItem('sd_dark', on ? '1' : '0');
-  // Icon always stays as sun — never changes to moon
 }
-if (localStorage.getItem('sd_dark') === '1') toggleDark();
+document.addEventListener('DOMContentLoaded', function() {
+  if (localStorage.getItem('sd_dark') === '1') toggleDark();
+});
 
 // ══════════════════════════════════════════════════
 // IMPROVEMENT 2: GLOBAL SEARCH
@@ -6738,8 +6735,9 @@ var _stripeCardEl = null;
 function getStripe() {
   if (!_stripeInstance) {
     try {
-      _stripeInstance = Stripe('pk_live_51RMnVZHFcLgaCCRxhPcFGhqiT8AJb2kDvFXVoSNBLMFBrERv1HjUoQnCTc3cjFbkPv41QEa6ixK8xMW3E5xAsBM009F04r9Ro');
-    } catch(e) { console.warn('Stripe.js not loaded'); return null; }
+      if (typeof Stripe === 'undefined') { console.warn('[Openbell] Stripe.js not loaded yet'); return null; }
+      _stripeInstance = Stripe('pk_test_51RMnVZHFcLgaCCRxhPcFGhqiT8AJb2kDvFXVoSNBLMFBrERv1HjUoQnCTc3cjFbkPv41QEa6ixK8xMW3E5xAsBM009F04r9Ro');
+    } catch(e) { console.warn('[Openbell] Stripe init error:', e); return null; }
   }
   return _stripeInstance;
 }
@@ -9747,7 +9745,6 @@ nt.trim();
 
 
   <!-- Stripe.js -->
-  <script src="https://js.stripe.com/v3/"></script>
   <!-- Firebase Modular SDK -->
   <script type="module">
     import { initializeApp }       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
