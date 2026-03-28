@@ -5067,6 +5067,11 @@ function doSignup() {
   // Store locally so login works offline
   allUsers.push(userData);
   // Write to Google Sheet Users tab so login can pull from sheet on any device
+  fetch('/functions/send-confirmation', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email, firstName })
+}).catch(() => {});
   submitToSheets('Users', {
     uid, email, firstName, lastName, passwordHash, phone, dob, state,
     age: userAge, isRestricted, registered: userData.registered
