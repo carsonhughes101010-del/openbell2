@@ -36,7 +36,7 @@
     try { gtag('event', event, params || {}); } catch(e) {}
   };
 </script>
-  <link rel="manifest" href="data:application/json;charset=utf-8,{%22name%22:%22Openbell%22,%22short_name%22:%22Openbell%22,%22description%22:%22Fantasy%20stock%20drafting%20with%20real%20money%22,%22start_url%22:%22/%22,%22display%22:%22standalone%22,%22background_color%22:%22%230a0a0f%22,%22theme_color%22:%2200c087%22,%22icons%22:[{%22src%22:%22openbell-logo-transparent.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]}">
+  <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22Openbell%22%2C%22short_name%22%3A%22Openbell%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230a0a0f%22%2C%22theme_color%22%3A%22%2300c087%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='none' stroke='%2300c087' stroke-width='8'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%2300c087' stroke-width='8'/%3E%3Crect x='41' y='78' width='18' height='12' fill='%2300c087'/%3E%3Ccircle cx='50' cy='94' r='7' fill='%2300c087'/%3E%3C/svg%3E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
   <meta name="theme-color" content="#00c087">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6747,6 +6747,8 @@ function getStripe() {
 function mountStripeCard() {
   var stripe = getStripe();
   if (!stripe) return;
+  // Unmount jm card first to avoid duplicate selector warning
+  if (_jmCardEl) { try { _jmCardEl.unmount(); _jmCardEl = null; } catch(e){} }
   if (_stripeCardEl) { try { _stripeCardEl.unmount(); } catch(e){} }
   _stripeElements = stripe.elements();
   _stripeCardEl = _stripeElements.create('card', {
@@ -6792,6 +6794,8 @@ function initJmCard() {
 function mountJmCard() {
   var stripe = getStripe();
   if (!stripe) return;
+  // Unmount pay card first to avoid duplicate selector warning
+  if (_stripeCardEl) { try { _stripeCardEl.unmount(); _stripeCardEl = null; } catch(e){} }
   if (_jmCardEl) { try { _jmCardEl.unmount(); } catch(e){} }
   var elements = stripe.elements();
   _jmCardEl = elements.create('card', {
@@ -9881,7 +9885,7 @@ nt.trim();
     try { gtag('event', event, params || {}); } catch(e) {}
   };
 </script>
-  <link rel="manifest" href="data:application/json;charset=utf-8,{%22name%22:%22Openbell%22,%22short_name%22:%22Openbell%22,%22description%22:%22Fantasy%20stock%20drafting%20with%20real%20money%22,%22start_url%22:%22/%22,%22display%22:%22standalone%22,%22background_color%22:%22%230a0a0f%22,%22theme_color%22:%2200c087%22,%22icons%22:[{%22src%22:%22openbell-logo-transparent.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]}">
+  <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22Openbell%22%2C%22short_name%22%3A%22Openbell%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230a0a0f%22%2C%22theme_color%22%3A%22%2300c087%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='none' stroke='%2300c087' stroke-width='8'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%2300c087' stroke-width='8'/%3E%3Crect x='41' y='78' width='18' height='12' fill='%2300c087'/%3E%3Ccircle cx='50' cy='94' r='7' fill='%2300c087'/%3E%3C/svg%3E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
   <meta name="theme-color" content="#00c087">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11514,7 +11518,6 @@ body.dark .pub-card { background:var(--surface) !important; border-color:var(--b
 body.dark .pub-card:hover { border-color:var(--accent) !important; }
 body.dark select.fi option { background:var(--surface2) !important; color:var(--ink) !important; }
 </style>
-<script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
 
