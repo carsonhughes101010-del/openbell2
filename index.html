@@ -36,11 +36,8 @@
     try { gtag('event', event, params || {}); } catch(e) {}
   };
 </script>
-  <link rel="manifest" href='data:application/json,{"name":"Openbell","short_name":"Openbell","start_url":"/","display":"standalone","background_color":"#0a0a0f","theme_color":"#00c087"}'>
-  <meta name="theme-color" content="#00c087">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#00c087">
+      <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Openbell">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Openbell — Competitive Stock Pools</title>
@@ -6922,85 +6919,71 @@ async function confirmPaymentAndJoin() {
 
   try {
     var stripe = getStripe();
-    var savedCustomer = localStorage.getItem('sd_stripe_customer_id');
-    var usingSaved = savedCustomer && document.getElementById('pay-saved-card')?.style.display !== 'none';
-
-    if (!usingSaved) {
-      // New card — need Netlify function to create SetupIntent
-      if (!stripe || !_stripeCardEl) {
-        // Netlify not deployed yet — fall through to simulation
-        await new Promise(r => setTimeout(r, 800));
-        cm('payment');
-        if (btn) { btn.disabled = false; btn.textContent = 'Pay & Enter →'; }
-        if (_pendingPaymentAction) { await _pendingPaymentAction(); _pendingPaymentAction = null; }
-        return;
-      }
-
-      var email = sessionStorage.getItem('sd_useremail') || '';
-      var setupRes = await fetch('/functions/setup-intent', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ email })
-      }).catch(() => null);
-
-      if (!setupRes || !setupRes.ok) {
-        // Netlify not deployed — simulate payment and warn
-        console.warn('[Openbell] Netlify function not available — simulating payment');
-        await new Promise(r => setTimeout(r, 800));
-        toast('⚠ Payment simulated — deploy Netlify functions for live payments');
-        cm('payment');
-        if (btn) { btn.disabled = false; btn.textContent = 'Pay & Enter →'; }
-        if (_pendingPaymentAction) { await _pendingPaymentAction(); _pendingPaymentAction = null; }
-        return;
-      }
-
-      var { clientSecret, customerId } = await setupRes.json();
-
-      var { setupIntent, error } = await stripe.confirmCardSetup(clientSecret, {
-        payment_method: { card: _stripeCardEl }
-      });
-
-      if (error) {
-        if (errEl) errEl.textContent = error.message;
-        if (btn) { btn.disabled = false; btn.textContent = 'Pay & Enter →'; }
-        return;
-      }
-
-      // Save card details locally
-      localStorage.setItem('sd_stripe_customer_id', customerId);
-      var pm = setupIntent.payment_method;
-      if (pm && pm.card) {
-        localStorage.setItem('sd_stripe_last4', pm.card.last4 || '');
-        localStorage.setItem('sd_stripe_exp', (pm.card.exp_month||'') + '/' + (pm.card.exp_year||'').toString().slice(-2));
-      }
+    if (!stripe) {
+      if (errEl) errEl.textContent = 'Stripe not loaded — please refresh';
+      if (btn) { btn.disabled = false; btn.textContent = 'Pay & Enter →'; }
+      return;
     }
 
-    // Now charge via Netlify function
-    var customerId2 = localStorage.getItem('sd_stripe_customer_id');
+    // Use Stripe.js token creation — works without any server-side code
+    var cardEl = _stripeCardEl;
+    if (!cardEl) {
+      if (errEl) errEl.textContent = 'Card input not ready — please try again';
+      if (btn) { btn.disabled = false; btn.textContent = 'Pay & Enter →'; }
+      return;
+    }
+
+    var email = sessionStorage.getItem('sd_useremail') || '';
+    var result = await stripe.createToken(cardEl, { name: sessionStorage.getItem('sd_username') || email });
+
+    if (result.error) {
+      if (errEl) errEl.textContent = result.error.message;
+      if (btn) { btn.disabled = false; btn.textContent = 'Pay & Enter →'; }
+      return;
+    }
+
+    // Token created successfully — charge via Cloudflare function
+    var token = result.token;
+    console.log('[Openbell] Stripe token created:', token.id, 'card:', token.card.last4);
+
+    // Save card info locally for display
+    localStorage.setItem('sd_stripe_last4', token.card.last4);
+    localStorage.setItem('sd_stripe_exp', token.card.exp_month + '/' + String(token.card.exp_year).slice(-2));
+
+    // Call charge function
     var chargeRes = await fetch('/functions/charge-card', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
-        customerId: customerId2,
+        token: token.id,
         amount: _pendingLeagueFee || 0,
+        email: email,
         fundName: _pendingLeagueName || 'Fund',
         fundId: _pendingLeagueId || ''
       })
     }).catch(() => null);
 
     if (!chargeRes || !chargeRes.ok) {
-      console.warn('[Openbell] Charge function not available — simulating');
-      toast('⚠ Charge simulated — deploy Netlify functions for live payments');
-    } else {
-      var charge = await chargeRes.json();
-      if (!charge.success) {
-        if (errEl) errEl.textContent = charge.error || 'Payment failed — please try again';
-        if (btn) { btn.disabled = false; btn.textContent = 'Pay & Enter →'; }
-        return;
+      var status = chargeRes ? chargeRes.status : 0;
+      console.warn('[Openbell] Charge failed:', status);
+      if (status === 405) {
+        if (errEl) errEl.textContent = 'Payment function not deployed — upload functions/charge-card.js to GitHub';
+      } else {
+        if (errEl) errEl.textContent = 'Payment failed ('+status+') — check Cloudflare functions';
       }
+      if (btn) { btn.disabled = false; btn.textContent = 'Pay & Enter →'; }
+      return;
     }
 
-    // Payment succeeded (or simulated)
+    var charge = await chargeRes.json();
+    if (!charge.success) {
+      if (errEl) errEl.textContent = charge.error || 'Payment declined';
+      if (btn) { btn.disabled = false; btn.textContent = 'Pay & Enter →'; }
+      return;
+    }
+
+    // Success
+    console.log('[Openbell] Payment success:', charge);
     cm('payment');
     if (btn) { btn.disabled = false; btn.textContent = 'Pay & Enter →'; }
     if (_pendingPaymentAction) { await _pendingPaymentAction(); _pendingPaymentAction = null; }
