@@ -11,7 +11,6 @@ const headers = {
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': '*'
 };
-
 export async function onRequest(context) {
   if (context.request.method === 'OPTIONS') {
     return new Response(null, { headers: { ...headers, 'Access-Control-Allow-Methods': 'POST', 'Access-Control-Allow-Headers': 'Content-Type' } });
