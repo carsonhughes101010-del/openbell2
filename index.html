@@ -36,8 +36,8 @@
     try { gtag('event', event, params || {}); } catch(e) {}
   };
 </script>
-  <link rel="manifest" href="data:application/json;charset=utf-8,{&quot;name&quot;:&quot;Openbell&quot;,&quot;short_name&quot;:&quot;Openbell&quot;,&quot;description&quot;:&quot;Fantasy stock drafting with real money&quot;,&quot;start_url&quot;:&quot;/&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%23fafaf7&quot;,&quot;theme_color&quot;:&quot;%23e63946&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;circle cx='50' cy='50' r='50' fill='%23e63946'/%3E&lt;/svg&gt;&quot;,&quot;sizes&quot;:&quot;any&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;}]}">
-  <meta name="theme-color" content="#e63946">
+  <link rel="manifest" href="data:application/json;charset=utf-8,{%22name%22:%22Openbell%22,%22short_name%22:%22Openbell%22,%22description%22:%22Fantasy%20stock%20drafting%20with%20real%20money%22,%22start_url%22:%22/%22,%22display%22:%22standalone%22,%22background_color%22:%22%230a0a0f%22,%22theme_color%22:%2200c087%22,%22icons%22:[{%22src%22:%22openbell-logo-transparent.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]}">
+  <meta name="theme-color" content="#00c087">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -4206,10 +4206,11 @@ async function submitDraft() {
     picks: userPicks.join(', ')
   });
 
+  // Resolve league name BEFORE using it
+  const _lName = activeDraftLeagueId ? (getLeagues().find(l=>l.id===activeDraftLeagueId)||getPublicLeagues().find(l=>l.id===activeDraftLeagueId)||{name:activeDraftLeagueId}).name : 'Free Draft';
   // Show confirmation modal
   showDraftConfirmModal(userPicks, _lName);
   // Log activity
-  const _lName = activeDraftLeagueId ? (getLeagues().find(l=>l.id===activeDraftLeagueId)||getPublicLeagues().find(l=>l.id===activeDraftLeagueId)||{name:activeDraftLeagueId}).name : 'Free Draft';
   logActivity('draft', { msg: 'Submitted picks for "' + _lName + '": ' + userPicks.join(', ') });
   renderDashboard();
   setTimeout(()=>go('leaderboard'), 1600);
@@ -4945,8 +4946,8 @@ document.querySelectorAll('.ov').forEach(o=>{ if(o) o.addEventListener('click',e
 let toastTimer;
 function toast(msg) {
   const el = document.getElementById('toastEl');
-  if (el) { el.textContent = msg; el.classList.add('on'); }
-  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('on'),3200);
+  if (el && el.classList) { el.textContent = msg; el.classList.add('on'); }
+  clearTimeout(toastTimer); if(el&&el.classList) toastTimer=setTimeout(()=>el.classList.remove('on'),3200);
 }
 
 // ══════════════════════════════════════════════════
@@ -8666,7 +8667,7 @@ function openAddPayment() {
   setTimeout(function() {
     try {
       if (!window._stripeInstance && window.Stripe) {
-        window._stripeInstance = Stripe('pk_live_51RMnVZHFcLgaCCRxhPcFGhqiT8AJb2kDvFXVoSNBLMFBrERv1HjUoQnCTc3cjFbkPv41QEa6ixK8xMW3E5xAsBM009F04r9Ro');
+        window._stripeInstance = Stripe('pk_test_51RMnVZHFcLgaCCRxhPcFGhqiT8AJb2kDvFXVoSNBLMFBrERv1HjUoQnCTc3cjFbkPv41QEa6ixK8xMW3E5xAsBM009F04r9Ro');
       }
       if (window._stripeInstance && !window._stripeCardMounted) {
         var elements = window._stripeInstance.elements();
