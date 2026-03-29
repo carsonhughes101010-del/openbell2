@@ -1,29 +1,44 @@
 export async function onRequest(context) {
-  const { STRIPE_SECRET_KEY } = context.env;
-  const { customerId, amount, fundName } = await context.request.json();
-
-  const stripe = (await import('https://esm.sh/stripe@13')).default(STRIPE_SECRET_KEY);
-
-  const methods = await stripe.paymentMethods.list({
-    customer: customerId,
-    type: 'card'
-  });
-
-  if (!methods.data.length) {
-    return new Response(JSON.stringify({ error: 'No card saved' }), { status: 400 });
+  if (context.request.method === 'OPTIONS') {
+    return new Response(null, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      }
+    });
   }
 
-  const intent = await stripe.paymentIntents.create({
-    amount: amount * 100,
+  const { STRIPE_SECRET_KEY } = context.env;
+  const { token, amount, email, fundName } = await context.request.json();
+
+  const body = new URLSearchParams({
+    amount: String(Math.round(amount * 100)),
     currency: 'usd',
-    customer: customerId,
-    payment_method: methods.data[0].id,
-    confirm: true,
-    off_session: true,
-    description: 'Openbell — ' + fundName
+    source: token,
+    receipt_email: email,
+    description: 'Openbell — ' + fundName,
   });
 
-  return new Response(JSON.stringify({ success: true, id: intent.id }), {
+  const res = await fetch('https://api.stripe.com/v1/charges', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Basic ' + btoa(STRIPE_SECRET_KEY + ':'),
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: body.toString()
+  });
+
+  const charge = await res.json();
+
+  if (!res.ok) {
+    return new Response(JSON.stringify({ success: false, error: charge.error?.message || 'Charge failed' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+    });
+  }
+
+  return new Response(JSON.stringify({ success: true, id: charge.id }), {
     headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
   });
 }
