@@ -1,0 +1,18 @@
+name = "openbell"
+compatibility_date = "2024-01-01"
+```
+
+---
+
+## If that doesn't work — use a direct Cloudflare Worker instead
+
+1. Go to **dash.cloudflare.com → Workers & Pages → Create → Worker**
+2. Name it `openbell-db`
+3. Paste the entire `db.js` code into the editor
+4. Click **Save and deploy**
+5. Go to **Settings → Variables** and add `SUPABASE_URL` and `SUPABASE_KEY`
+6. Copy the worker URL — it'll look like `https://openbell-db.yourname.workers.dev`
+
+Then in your `index.html` find every `/functions/db` and replace with your worker URL:
+```
+https://openbell-db.carsonhughes101010.workers.dev
