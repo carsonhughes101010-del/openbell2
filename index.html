@@ -5079,7 +5079,7 @@ function doSignup() {
   localStorage.setItem('sd_all_users', JSON.stringify(allUsers));
   // Write to Supabase
   console.log('[Openbell] Saving to Supabase:', email);
-  fetch('/functions/db', {
+  fetch('/db', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
@@ -5164,7 +5164,7 @@ async function doLogin() {
 
     // 2. Not in Supabase
   try {
-    const dbRes = await fetch('/functions/db', {
+    const dbRes = await fetch('/db', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ action: 'login', data: { email } })
@@ -6855,7 +6855,7 @@ async function doJoinFundStripe() {
 
     if (!usingSaved) {
       var email = document.getElementById('jm-email-input')?.value || sessionStorage.getItem('sd_useremail') || '';
-      var setupRes = await fetch('/functions/setup-intent', {
+      var setupRes = await fetch('/setup-intent', {
         method: 'POST', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ email })
       }).catch(() => null);
@@ -6886,7 +6886,7 @@ async function doJoinFundStripe() {
 
     // Charge
     var custId = localStorage.getItem('sd_stripe_customer_id');
-    var chargeRes = await fetch('/functions/charge-card', {
+    var chargeRes = await fetch('/charge-card', {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ customerId: custId, amount: _pendingLeagueFee || 0, fundName: _pendingLeagueName || 'Fund', fundId: _pendingLeagueId || '' })
     }).catch(() => null);
@@ -6977,7 +6977,7 @@ async function confirmPaymentAndJoin() {
     localStorage.setItem('sd_stripe_exp', token.card.exp_month + '/' + String(token.card.exp_year).slice(-2));
 
     // Call charge function
-    var chargeRes = await fetch('/functions/charge-card', {
+    var chargeRes = await fetch('/charge-card', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
