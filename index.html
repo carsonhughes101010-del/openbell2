@@ -2026,7 +2026,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
       </div>
       <div class="hero-stats">
         <div class="hst"><div class="hst-n" id="stat-funds">9</div><div class="hst-l">Game modes</div></div>
-        <div class="hst"><div class="hst-n">$10</div><div class="hst-l">Min. entry</div></div>
+        <div class="hst"><div class="hst-n">$5</div><div class="hst-l">Min. entry</div></div>
         <div class="hst"><div class="hst-n">5%</div><div class="hst-l">Only fee ever</div></div>
         <div class="hst"><div class="hst-n">Fri</div><div class="hst-l">Results drop</div></div>
       </div>
@@ -2046,7 +2046,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
     <div class="section" style="padding-top:56px;padding-bottom:56px">
       <div class="s-eye">How It Works</div>
       <div class="steps">
-        <div class="step"><div class="step-n">01</div><div class="step-t">CREATE A FUND</div><div class="step-b">Set your entry fee, invite your group with an access code, and choose your payout structure.</div></div>
+        <div class="step"><div class="step-n">01</div><div class="step-t">CREATE OR JOIN A POOL</div><div class="step-b">Create a private pool and invite friends with a code, or browse public pools to jump in instantly.</div></div>
         <div class="step"><div class="step-n">02</div><div class="step-t">DRAFT 5 PICKS</div><div class="step-b">Choose five stocks or ETFs before Monday market open. Each position carries equal 20% weight.</div></div>
         <div class="step"><div class="step-n">03</div><div class="step-t">LIVE STANDINGS</div><div class="step-b">Real-time leaderboard during market hours, Monday through Friday close.</div></div>
         <div class="step"><div class="step-n">04</div><div class="step-t">GET PAID</div><div class="step-b">Top 1 or top 3 paid out within 24 hours of Friday's close. 5% platform fee only.</div></div>
@@ -2816,6 +2816,76 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
   </div>
 </div>
 
+<!-- ══ CHART VIEW ══ -->
+<div id="chart-view" class="view" style="display:none">
+  <div style="max-width:1100px;margin:0 auto;padding:0 24px 40px">
+    <!-- Back button + header -->
+    <div style="display:flex;align-items:center;gap:16px;padding:20px 0 18px;border-bottom:1px solid var(--border);margin-bottom:20px">
+      <button onclick="history.back()||go('dashboard')" style="display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);font-family:Figtree,sans-serif" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+        ← Back
+      </button>
+      <div style="display:flex;align-items:center;gap:12px;flex:1">
+        <div>
+          <div id="cv-sym" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:26px;letter-spacing:-.02em">SPY</div>
+          <div id="cv-name" style="font-size:12px;color:var(--muted);margin-top:1px">SPDR S&P 500 ETF</div>
+        </div>
+        <div style="padding:6px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">
+          <div id="cv-price" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:20px">—</div>
+          <div id="cv-chg" style="font-family:IBM Plex Mono,monospace;font-size:11px;margin-top:1px">—</div>
+        </div>
+      </div>
+      <!-- Ticker switcher -->
+      <div style="display:flex;gap:6px">
+        <button onclick="_renderChartView('SPY')" id="cv-btn-SPY" style="font-family:IBM Plex Mono,monospace;font-size:12px;font-weight:700;padding:6px 14px;border:1.5px solid var(--accent);border-radius:7px;cursor:pointer;background:var(--accent);color:#000">SPY</button>
+        <button onclick="_renderChartView('QQQ')" id="cv-btn-QQQ" style="font-family:IBM Plex Mono,monospace;font-size:12px;font-weight:700;padding:6px 14px;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;background:transparent;color:var(--muted)">QQQ</button>
+        <button onclick="_renderChartView('IWM')" id="cv-btn-IWM" style="font-family:IBM Plex Mono,monospace;font-size:12px;font-weight:700;padding:6px 14px;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;background:transparent;color:var(--muted)">IWM</button>
+        <button onclick="_renderChartView('DIA')" id="cv-btn-DIA" style="font-family:IBM Plex Mono,monospace;font-size:12px;font-weight:700;padding:6px 14px;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;background:transparent;color:var(--muted)">DIA</button>
+      </div>
+      <!-- Period filters -->
+      <div style="display:flex;gap:3px;background:var(--surface2);border-radius:8px;padding:3px;border:1px solid var(--border)">
+        <button onclick="setChartPeriod('1D',this)" class="chart-period-btn" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:4px 10px;border:none;border-radius:5px;cursor:pointer;background:#00c087;color:#000">1D</button>
+        <button onclick="setChartPeriod('1W',this)" class="chart-period-btn" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:4px 10px;border:none;border-radius:5px;cursor:pointer;background:transparent;color:var(--muted)">1W</button>
+        <button onclick="setChartPeriod('1M',this)" class="chart-period-btn" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:4px 10px;border:none;border-radius:5px;cursor:pointer;background:transparent;color:var(--muted)">1M</button>
+        <button onclick="setChartPeriod('3M',this)" class="chart-period-btn" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:4px 10px;border:none;border-radius:5px;cursor:pointer;background:transparent;color:var(--muted)">3M</button>
+        <button onclick="setChartPeriod('1Y',this)" class="chart-period-btn" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:4px 10px;border:none;border-radius:5px;cursor:pointer;background:transparent;color:var(--muted)">1Y</button>
+        <button onclick="setChartPeriod('5Y',this)" class="chart-period-btn" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:4px 10px;border:none;border-radius:5px;cursor:pointer;background:transparent;color:var(--muted)">5Y</button>
+      </div>
+    </div>
+    <!-- Chart -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px">
+      <div id="cv-loading" style="height:500px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px">
+        <div style="width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite"></div>
+        <div style="font-size:12px;color:var(--muted)">Loading chart…</div>
+      </div>
+      <div id="cv-chart-wrap" style="min-height:500px"></div>
+    </div>
+    <!-- Stats row -->
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
+      <div class="card" style="padding:14px 16px;text-align:center">
+        <div style="font-family:IBM Plex Mono,monospace;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);margin-bottom:5px">Day %</div>
+        <div id="cv-day" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:18px">—</div>
+      </div>
+      <div class="card" style="padding:14px 16px;text-align:center">
+        <div style="font-family:IBM Plex Mono,monospace;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);margin-bottom:5px">Week %</div>
+        <div id="cv-week" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:18px">—</div>
+      </div>
+      <div class="card" style="padding:14px 16px;text-align:center">
+        <div style="font-family:IBM Plex Mono,monospace;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);margin-bottom:5px">YTD %</div>
+        <div id="cv-ytd" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:18px">—</div>
+      </div>
+      <div class="card" style="padding:14px 16px;text-align:center">
+        <div style="font-family:IBM Plex Mono,monospace;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);margin-bottom:5px">Beta</div>
+        <div id="cv-beta" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:18px">—</div>
+      </div>
+      <div class="card" style="padding:14px 16px;text-align:center">
+        <div style="font-family:IBM Plex Mono,monospace;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);margin-bottom:5px">Price</div>
+        <div id="cv-price2" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:18px">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!-- ══ PUBLIC FUND DETAIL ══ -->
 <div class="ov" id="ov-pub-detail">
   <div class="modal" style="width:480px;padding:0;overflow:hidden">
@@ -2858,6 +2928,555 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 </div>
 
 <!-- ══ TERMS OF SERVICE ══ -->
+<div class="ov" id="ov-tos">
+  <div class="modal" style="width:640px;max-height:85vh;overflow-y:auto;padding:0">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:800;font-size:18px;letter-spacing:-.02em">Terms of Service</div>
+      <button onclick="cm('tos')" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px 8px">✕</button>
+    </div>
+    <div style="padding:24px;font-size:13px;line-height:1.8;color:var(--ink3)">
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">Last updated: March 2026</strong></p>
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">1. Skill-Based Competition</strong><br>Openbell is a skill-based stock drafting competition platform. Participants select publicly traded securities and compete based on portfolio performance over a defined weekly period. This is not gambling. Outcomes are determined by participants' knowledge and skill, not chance.</p>
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">2. Eligibility</strong><br>You must be 18 years of age or older. Residents of Arizona, Iowa, Louisiana, Montana, and Washington are not eligible to enter paid competitions. It is your responsibility to ensure participation is legal in your jurisdiction.</p>
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">3. Entry Fees & Payouts</strong><br>Entry fees are non-refundable once picks are submitted. Openbell retains a 5% administrative fee from each pool. Remaining funds are distributed to winners per the published payout structure. Payouts are processed within 1–3 business days of Friday market close.</p>
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">4. Price Data</strong><br>Prices are sourced from Google Finance via Google Sheets and may be delayed up to 20 minutes. Openbell is not responsible for data delays, errors, or API outages. Final standings are calculated at Friday 4:00 PM ET using the last available price.</p>
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">5. Not Investment Advice</strong><br>Nothing on Openbell constitutes investment advice, financial advice, or a recommendation to buy or sell any security. Past performance does not guarantee future results.</p>
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">6. Account Responsibility</strong><br>You are responsible for maintaining the security of your account. Openbell reserves the right to suspend or terminate accounts for violation of these terms, suspected fraud, or suspicious activity.</p>
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">7. Openbell+ Subscription</strong><br>The Openbell+ subscription is billed at $5.00/month. You may cancel at any time. Cancellation takes effect at the end of the current billing period. No refunds for partial months.</p>
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">8. Disputes</strong><br>Any disputes shall be resolved by binding arbitration in accordance with the rules of the American Arbitration Association. Governing law: State of Delaware.</p>
+      <p style="color:var(--muted)">By using Openbell you agree to these terms in full. Openbell, Inc. reserves the right to modify these terms with 30 days notice.</p>
+    </div>
+    <div style="padding:16px 24px;border-top:1px solid var(--border)"><button onclick="cm('tos')" class="btn btn-primary" style="width:100%">I Understand →</button></div>
+  </div>
+</div>
+
+<!-- ══ PRIVACY POLICY ══ -->
+<div class="ov" id="ov-privacy">
+  <div class="modal" style="width:640px;max-height:85vh;overflow-y:auto;padding:0">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:800;font-size:18px;letter-spacing:-.02em">Privacy Policy</div>
+      <button onclick="cm('privacy')" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px 8px">✕</button>
+    </div>
+    <div style="padding:24px;font-size:13px;line-height:1.8;color:var(--ink3)">
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">Last updated: March 2026</strong></p>
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">Information We Collect</strong><br>We collect your name, email address, and gameplay data (picks, results, balances) necessary to operate the platform. We use Firebase for authentication and Google Sheets for price data.</p>
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">How We Use Your Information</strong><br>Your data is used to operate your account, process payouts, send competition results, and improve the platform. We do not sell your personal data to third parties.</p>
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">Data Storage</strong><br>Competition data is stored in your browser's localStorage and in our Google Sheets backend. Email addresses are stored via Formspree. Authentication is handled by Firebase.</p>
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">Cookies</strong><br>We use localStorage and sessionStorage (not traditional cookies) to maintain your session and preferences. We use Google Analytics to understand site usage — this may set analytics cookies.</p>
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">Your Rights</strong><br>You may request deletion of your account and associated data by emailing <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2f5f5d46594e4c566f405f4a414d4a4343014640">[email&#160;protected]</a>. We will process requests within 30 days.</p>
+      <p style="margin-bottom:14px"><strong style="color:var(--ink)">Payment Data</strong><br>Payment processing is handled by Stripe. Openbell does not store full card numbers. Stripe's privacy policy applies to payment data.</p>
+      <p style="color:var(--muted)">Questions? Contact <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cdbdbfa4bbacaeb48da2bda8a3afa8a1a1e3a4a2">[email&#160;protected]</a></p>
+    </div>
+    <div style="padding:16px 24px;border-top:1px solid var(--border)"><button onclick="cm('privacy')" class="btn btn-primary" style="width:100%">Close</button></div>
+  </div>
+</div>
+
+<!-- ══ UPGRADE MODAL ══ -->
+<div class="ov" id="ov-upgrade">
+  <div class="modal" style="width:460px;padding:0;overflow:hidden;border-radius:14px">
+    <div style="background:var(--ink);padding:26px 28px 22px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><span style="width:8px;height:8px;background:#00c087;border-radius:50%;display:inline-block"></span><span style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4)">Openbell Pro</span></div>
+      <div style="font-weight:900;font-size:30px;color:#fff;line-height:.95;letter-spacing:-.03em;margin-bottom:10px">Unlock the<br><span style="color:#00c087">full edge.</span></div>
+      <div style="font-size:13px;color:rgba(255,255,255,.48);line-height:1.6">Sentiment, analytics, alpha signals — everything to win consistently.</div>
+    </div>
+    <div style="padding:18px 28px;border-bottom:1px solid var(--border)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="display:flex;align-items:center;gap:7px"><span style="color:#00c087;font-size:13px">✓</span><span style="font-size:12px;color:var(--muted)">Retail Sentiment Index</span></div>
+        <div style="display:flex;align-items:center;gap:7px"><span style="color:#00c087;font-size:13px">✓</span><span style="font-size:12px;color:var(--muted)">Draft Analytics</span></div>
+        <div style="display:flex;align-items:center;gap:7px"><span style="color:#00c087;font-size:13px">✓</span><span style="font-size:12px;color:var(--muted)">Alpha Signal</span></div>
+        <div style="display:flex;align-items:center;gap:7px"><span style="color:#00c087;font-size:13px">✓</span><span style="font-size:12px;color:var(--muted)">Leaderboard History</span></div>
+        <div style="display:flex;align-items:center;gap:7px"><span style="color:#00c087;font-size:13px">✓</span><span style="font-size:12px;color:var(--muted)">Cancel anytime</span></div>
+      </div>
+    </div>
+    <div style="padding:18px 28px">
+      <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:14px"><span style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:34px;letter-spacing:-.03em">$5</span><span style="font-size:13px;color:var(--muted)">/ month</span></div>
+      <button onclick="openStripeCheckout()" style="width:100%;background:#00c087;color:#000;font-weight:700;font-size:14px;border:none;border-radius:8px;padding:12px;cursor:pointer;margin-bottom:8px">Subscribe — $5/mo →</button><button onclick="activateProAccess()" style="width:100%;background:transparent;color:var(--faint);border:none;font-size:10px;padding:6px;cursor:pointer;font-family:IBM Plex Mono,monospace">Already paid? Click to activate</button>
+      <button onclick="cm('upgrade')" style="width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);font-size:12px;border-radius:8px;padding:9px;cursor:pointer">Maybe later</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DRAFT CONFIRMED MODAL ══ -->
+<div class="ov" id="ov-draft-confirm">
+  <div class="modal" style="width:420px;padding:0;overflow:hidden;border-radius:16px">
+    <!-- Green top bar -->
+    <div style="height:6px;background:var(--accent,#00c087)"></div>
+    <div style="padding:28px 28px 20px;text-align:center">
+      <div style="width:52px;height:52px;background:rgba(0,192,135,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:2px solid var(--accent,#00c087)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#00c087" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="font-family:Figtree,sans-serif;font-weight:900;font-size:26px;letter-spacing:-.03em;margin-bottom:6px">Picks Locked In</div>
+      <div style="font-size:12px;color:var(--muted)" id="dc-fund-name">Your selections are confirmed.</div>
+    </div>
+    <!-- Pick chips -->
+    <div id="dc-picks-row" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:0 24px 16px"></div>
+    <!-- Stats -->
+    <div style="margin:0 24px;background:var(--surface2);border-radius:10px;padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:20px">
+      <div style="text-align:center;border-right:1px solid var(--border)">
+        <div style="font-family:IBM Plex Mono,monospace;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);margin-bottom:4px">Portfolio</div>
+        <div style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:20px" id="dc-ret">—</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:IBM Plex Mono,monospace;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);margin-bottom:4px">Locks</div>
+        <div style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:14px;color:var(--muted)">Sun 11:59 PM</div>
+      </div>
+    </div>
+    <div style="padding:0 24px 24px;display:flex;gap:10px">
+      <button class="btn btn-outline" style="flex:1;font-size:13px" onclick="cm('draft-confirm');go('dashboard')">Dashboard</button>
+      <button class="btn" style="flex:1;background:#00c087;color:#000;font-weight:700;border:none;border-radius:8px;padding:11px;cursor:pointer;font-size:13px" onclick="cm('draft-confirm');openLeague(activeDraftLeagueId||'')">View Standings →</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ EDIT PROFILE MODAL ══ -->
+<div class="ov" id="ov-edit-profile">
+  <div class="modal" style="width:420px;padding:0;overflow:hidden">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <div style="font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:24px">Edit Profile</div>
+      <div onclick="cm('edit-profile')" style="cursor:pointer;font-size:18px;color:var(--muted)">✕</div>
+    </div>
+    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px">
+
+      <!-- Avatar upload -->
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="position:relative;cursor:pointer" onclick="document.getElementById('avatar-upload').click()">
+          <div id="ep-avatar-preview" style="width:64px;height:64px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:28px;color:#fff;background-size:cover;background-position:center;overflow:hidden">J</div>
+          <div style="position:absolute;bottom:0;right:0;width:20px;height:20px;background:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;border:2px solid var(--white)">📷</div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:600;margin-bottom:3px">Profile Photo</div>
+          <div style="font-size:11px;color:var(--muted)">Click to upload (JPG, PNG)</div>
+          <input type="file" id="avatar-upload" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)">
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px">Username</div>
+        <input class="fi" id="ep-username" placeholder="@yourhandle" style="width:100%;box-sizing:border-box;font-family:monospace;font-size:13px">
+        <div style="font-size:10px;color:var(--muted);margin-top:4px">Shown publicly instead of your name on leaderboards</div>
+      </div>
+
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px">Display Name</div>
+        <input class="fi" id="ep-display-name" placeholder="Your name" style="width:100%;box-sizing:border-box">
+      </div>
+
+    </div>
+    <div style="padding:0 24px 20px;display:flex;gap:10px">
+      <button class="btn btn-outline" style="flex:1" onclick="cm('edit-profile')">Cancel</button>
+      <button class="btn btn-primary" style="flex:2" onclick="saveEditProfile()">Save Profile →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ H2H CHALLENGE MODAL ══ -->
+<div class="ov" id="ov-h2h">
+  <div class="modal" style="width:440px;padding:0;overflow:hidden">
+    <div style="padding:22px 24px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-family:monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--orange);margin-bottom:4px">1v1 Battle</div>
+        <div style="font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:28px">⚔️ Challenge a Friend</div>
+      </div>
+      <div onclick="cm('h2h')" style="cursor:pointer;font-size:18px;color:var(--muted);padding:4px 8px;border-radius:6px">✕</div>
+    </div>
+    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px">
+      <div style="background:var(--paper);border-radius:10px;padding:14px;font-size:12px;color:var(--muted);line-height:1.6">
+        Send your friend a challenge link. You each pick 5 stocks, highest return wins. Winner takes 95% of the combined pot.
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Entry fee (each)</div>
+        <input class="fi" id="h2h-fee" type="number" min="5" value="25" placeholder="$25" style="width:100%;box-sizing:border-box;font-family:monospace;font-size:16px;font-weight:700">
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Opponent's name (optional)</div>
+        <input class="fi" id="h2h-opponent" type="text" placeholder="Leave blank for open challenge" style="width:100%;box-sizing:border-box">
+      </div>
+      <div id="h2h-error" style="display:none;background:var(--red-bg);color:var(--red);border-radius:8px;padding:10px 14px;font-size:12px"></div>
+    </div>
+    <div style="padding:0 24px 20px;display:flex;gap:10px">
+      <button class="btn btn-outline" style="flex:1" onclick="cm('h2h')">Cancel</button>
+      <button class="btn btn-primary" style="flex:2" onclick="doCreateH2H()">Create Challenge & Copy Link →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="ov" id="ov-create">
+  <div class="modal">
+    <div class="mt">New Pool</div>
+    <div class="ms">Private — share the access code with your group.</div>
+    <div class="field"><label>Your Name</label><input class="fi" id="c-name" placeholder="Jake Morrison" type="text"></div>
+    <div class="field"><label>Pool Name</label><input class="fi" id="c-league" placeholder="Finance 301 Portfolio Challenge" type="text"></div>
+    <div class="field-row">
+      <div class="field"><label>Entry Fee ($)</label><input class="fi" id="c-fee" placeholder="20" type="number" min="10" value="20"></div>
+      <div class="field"><label>Max Participants</label><input class="fi" id="c-max" placeholder="8" type="number" min="2" value="8"></div>
+    </div>
+    <!-- SLATE OPTIONS -->
+    <div style="border:1.5px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:14px">
+      <div style="padding:10px 14px;background:var(--paper);border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--ink2);display:flex;align-items:center;gap:7px">
+        <span>⚙</span> Pool Options
+      </div>
+      <div style="padding:14px">
+        <div class="field" style="margin-bottom:10px"><label>Payout Structure</label>
+          <select class="fi" id="c-payout" onchange="updatePayoutPreview()">
+            <option value="winner">Winner Takes All — 1st gets 95% of pool</option>
+            <option value="top3">Top 3 Split — 1st 60% · 2nd 20% · 3rd 15%</option>
+          </select>
+        </div>
+      <div class="field"><label>Game Mode</label>
+        <select class="fi" id="c-gamemode">
+          <option value="standard">Standard — Pick 5 stocks</option>
+          <option value="onepick">The One Pick — 1 stock only</option>
+          <option value="contrarian">Contrarian — lowest return wins</option>
+          <option value="beater">Beat the Market — beat SPY to split pot</option>
+        </select>
+      </div>
+        <div id="c-payout-preview" style="background:var(--paper);border-radius:7px;padding:10px 12px;font-family:monospace;font-size:10px;color:var(--muted);line-height:2">
+          <span id="cprev-1st">1st: 95%</span> &nbsp;·&nbsp; <span style="opacity:.4">After 5% platform fee</span>
+        </div>
+        <div class="field" style="margin-top:10px;margin-bottom:0"><label>Draft Week</label>
+          <select class="fi" id="c-week">
+            <option value="current">This week (Week <span id="c-week-cur"></span>)</option>
+            <option value="next">Next week</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="field"><label>Email (for notifications)</label><input class="fi" id="c-email" placeholder="jake@university.edu" type="email"></div>
+    <div id="c-result" style="display:none"></div>
+    <div class="ma">
+      <button class="btn btn-outline" onclick="cm('create')">Cancel</button>
+      <button class="btn btn-primary" id="c-submit-btn" onclick="createLeague()">Create Pool →</button>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="ov-join">
+  <div class="modal" style="width:420px;padding:0;overflow:hidden;border-radius:14px">
+    <div style="height:4px;background:var(--accent)"></div>
+    <div style="padding:22px 24px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:5px">Private Pool</div>
+        <div style="font-family:Figtree,sans-serif;font-weight:800;font-size:24px;letter-spacing:-.03em">Join a Pool</div>
+      </div>
+      <div onclick="cm('join')" style="cursor:pointer;font-size:18px;color:var(--muted);padding:4px 8px;border-radius:6px" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">✕</div>
+    </div>
+    <div style="padding:18px 24px;display:flex;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Your Name</div>
+        <input class="fi" id="j-name" placeholder="Jake Morrison" type="text" style="width:100%;box-sizing:border-box">
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Email Address</div>
+        <input class="fi" id="j-email" placeholder="jake@email.com" type="email" style="width:100%;box-sizing:border-box">
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Access Code</div>
+        <input class="fi" id="j-code" placeholder="e.g. ALPHA-4821" style="width:100%;box-sizing:border-box;font-family:IBM Plex Mono,monospace;font-weight:700;letter-spacing:.05em;text-transform:uppercase" onkeyup="this.value=this.value.toUpperCase()">
+      </div>
+      <div id="j-preview" style="display:none;background:var(--accent-bg);border:1px solid var(--accent-bd);border-radius:8px;padding:10px 14px">
+        <div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">Pool Found ✓</div>
+        <div id="j-prev-title" style="font-weight:700;font-size:14px"></div>
+        <div id="j-prev-body" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
+      </div>
+      <div id="j-error" style="display:none;background:var(--red-bg);border:1px solid var(--red-bd);border-radius:8px;padding:10px 14px">
+        <div style="font-size:12px;color:var(--neg)">⚠ Code not recognised — check it and try again.</div>
+      </div>
+    </div>
+    <div style="padding:0 24px 20px;display:flex;gap:10px">
+      <button class="btn btn-outline" style="flex:1" onclick="cm('join')">Cancel</button>
+      <button class="btn" id="j-submit-btn" onclick="joinLeague()" style="flex:2;background:#00c087;color:#000;font-weight:700;border:none;border-radius:8px;padding:11px;cursor:pointer;font-size:14px">Confirm Entry →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE PUBLIC SLATE MODAL -->
+<div class="ov" id="ov-create-public">
+  <div class="modal">
+    <div class="mt">Create Public Pool</div>
+    <div class="ms">Anyone on Openbell can see and join this pool. Set your parameters and it goes live immediately.</div>
+    <div class="field"><label>Your Name</label><input class="fi" id="cp-name" placeholder="Jake Morrison" type="text"></div>
+    <div class="field"><label>Pool Name</label><input class="fi" id="cp-league" placeholder="e.g. The Big Board Week 12" type="text"></div>
+    <div class="field"><label>Description <span style="color:var(--muted);font-weight:400">(optional)</span></label><input class="fi" id="cp-desc" placeholder="e.g. Open to all — top return wins" type="text"></div>
+    <div class="field-row">
+      <div class="field"><label>Entry Fee ($)</label><input class="fi" id="cp-fee" placeholder="20" type="number" min="10" value="20"></div>
+      <div class="field"><label>Max Players</label><input class="fi" id="cp-max" placeholder="50" type="number" min="2" value="50">
+        <div style="font-size:10px;color:var(--muted);margin-top:4px">2–100 players</div>
+      </div>
+    </div>
+    <div class="field"><label>Email (for notifications)</label><input class="fi" id="cp-email" placeholder="jake@university.edu" type="email"></div>
+    <div id="cp-result" style="display:none"></div>
+    <div class="ma">
+      <button class="btn btn-outline" onclick="cm('create-public')">Cancel</button>
+      <button class="btn btn-primary" id="cp-submit-btn" onclick="createPublicSlate()">Go Live →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SIGN IN MODAL -->
+<!-- ══ LOGIN MODAL ══ -->
+<div class="ov" id="ov-login">
+  <div class="modal" style="width:420px;padding:0;overflow:hidden">
+    <div style="padding:28px 28px 20px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent,#00c087);margin-bottom:5px">Welcome back</div>
+          <div style="font-family:Figtree,sans-serif;font-weight:900;font-size:28px;line-height:1;letter-spacing:-.03em">Log In</div>
+        </div>
+        <div onclick="cm('login')" style="cursor:pointer;font-size:18px;color:var(--muted);padding:4px 8px;border-radius:6px" onmouseover="this.style.background='var(--paper)'" onmouseout="this.style.background='transparent'">✕</div>
+      </div>
+    </div>
+    
+    <div style="padding:16px 28px 0">
+      <button onclick="loginWithGoogle()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink);transition:border-color .15s" onmouseover="this.style.borderColor='var(--accent,#00c087)'" onmouseout="this.style.borderColor='var(--border)'">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </button>
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0 0">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span style="font-size:11px;color:var(--muted)">or</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+    </div>
+    <div style="padding:14px 28px 16px;display:flex;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Email address</div>
+        <input class="fi" id="li-email" type="email" placeholder="jake@university.edu" style="width:100%;box-sizing:border-box" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Password</div>
+        <input class="fi" id="li-password" type="password" placeholder="••••••••" style="width:100%;box-sizing:border-box" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div id="li-error" style="display:none;background:var(--red-bg);color:var(--red);border-radius:8px;padding:10px 14px;font-size:12px"></div>
+    </div>
+    <div style="padding:0 28px 14px;display:flex;gap:10px">
+      <button class="btn btn-outline" style="flex:1" onclick="cm('login')">Cancel</button>
+      <button class="btn btn-primary" style="flex:2" onclick="doLogin()">Log In →</button>
+    </div>
+    <div style="padding:0 28px 22px;text-align:center;font-size:12px;color:var(--muted)">
+      No account? <span style="color:var(--accent,#00c087);font-weight:600;cursor:pointer" onclick="cm('login');openSignup()">Sign up for free</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SIGNUP MODAL ══ -->
+<div class="ov" id="ov-signup">
+  <div class="modal" style="width:460px;padding:0;overflow:hidden">
+    <div style="padding:28px 28px 20px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-family:monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--orange);margin-bottom:5px">Create account</div>
+          <div style="font-family:Figtree,sans-serif;font-weight:900;font-size:28px;line-height:1;letter-spacing:-.03em">Sign Up</div>
+        </div>
+        <div onclick="cm('signup')" style="cursor:pointer;font-size:18px;color:var(--muted);padding:4px 8px;border-radius:6px" onmouseover="this.style.background='var(--paper)'" onmouseout="this.style.background='transparent'">✕</div>
+      </div>
+    </div>
+    <div style="padding:16px 28px 0">
+      <button onclick="loginWithGoogle()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink);transition:border-color .15s" onmouseover="this.style.borderColor='var(--accent,#00c087)'" onmouseout="this.style.borderColor='var(--border)'">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </button>
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0 0">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span style="font-size:11px;color:var(--muted)">or</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+    </div>
+    <div style="padding:12px 28px;display:flex;flex-direction:column;gap:12px;max-height:60vh;overflow-y:auto">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">First name</div>
+          <input class="fi" id="su-first" type="text" placeholder="Jake" style="width:100%;box-sizing:border-box">
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Last name</div>
+          <input class="fi" id="su-last" type="text" placeholder="Morrison" style="width:100%;box-sizing:border-box">
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Email address</div>
+        <input class="fi" id="su-email" type="email" placeholder="jake@university.edu" style="width:100%;box-sizing:border-box">
+      </div>
+            <div>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Password</div>
+        <input class="fi" id="su-password" type="password" placeholder="At least 8 characters" style="width:100%;box-sizing:border-box" autocomplete="new-password">
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Phone number</div>
+        <input class="fi" id="su-phone" type="tel" placeholder="+1 (555) 000-0000" style="width:100%;box-sizing:border-box"
+          oninput="this.value=this.value.replace(/[^0-9+()\-\s]/g,'')">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Date of birth</div>
+          <input class="fi" id="su-dob" type="date" style="width:100%;box-sizing:border-box" max="">
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">State</div>
+          <select class="fi" id="su-state" style="width:100%;box-sizing:border-box" onchange="checkStateRestriction(this.value)">
+            <option value="">Select state…</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona" data-restricted=true>Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa" data-restricted=true>Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana" data-restricted=true>Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana" data-restricted=true>Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington" data-restricted=true>Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option>
+          </select>
+        </div>
+      </div>
+      <div id="su-state-warning" style="display:none;background:#fffbeb;border:1px solid rgba(217,119,6,.3);border-radius:8px;padding:10px 14px;font-size:11px;color:#92400e;line-height:1.6">
+        ⚠️ <strong>Paid competitions are currently unavailable in your state.</strong> You can still browse public pools and practice drafting, but you cannot enter paid competitions from this location.
+      </div>
+      <div id="su-error" style="display:none;background:var(--red-bg);color:var(--red);border-radius:8px;padding:10px 14px;font-size:12px"></div>
+      <div style="background:var(--paper);border-radius:8px;padding:12px 14px">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+          <input type="checkbox" id="su-terms" style="margin-top:2px;accent-color:var(--orange);flex-shrink:0">
+          <span style="font-size:11px;color:var(--muted);line-height:1.65">I am 18 years of age or older, and I agree to Openbell's <span style="color:var(--orange);font-weight:600">Terms of Service</span> and <span style="color:var(--orange);font-weight:600">Privacy Policy</span>. I understand this is a skill-based competition, not gambling.</span>
+        </label>
+      </div>
+    </div>
+    <div style="padding:0 28px 14px;display:flex;gap:10px">
+      <button class="btn btn-outline" style="flex:1" onclick="cm('signup')">Cancel</button>
+      <button class="btn btn-primary" style="flex:2" id="su-btn" onclick="doSignup()">Create Account →</button>
+    </div>
+    <div style="padding:0 28px 22px;text-align:center;font-size:12px;color:var(--muted)">
+      Already have an account? <span style="color:var(--accent,#00c087);font-weight:600;cursor:pointer" onclick="cm('signup');openLogin()">Log in</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ACCOUNT MODAL (logged-in view) ══ -->
+<div class="ov" id="ov-account">
+  <div class="modal" style="width:380px;padding:0;overflow:hidden">
+    <div style="padding:24px 24px 18px;border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:center">
+      <div id="acc-av" style="width:44px;height:44px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:18px;color:#fff;flex-shrink:0">J</div>
+      <div>
+        <div style="font-weight:700;font-size:15px" id="acc-name">Jake Morrison</div>
+        <div style="font-size:11px;color:var(--muted)" id="acc-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d8b2b9b3bd98adb6b1aebdaaabb1aca1f6bdbcad">[email&#160;protected]</a></div>
+        <div style="font-family:monospace;font-size:9px;color:var(--muted);margin-top:2px" id="acc-uid">ID: OB-—</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px" id="acc-state-age"></div>
+      </div>
+      <div onclick="cm('account')" style="margin-left:auto;cursor:pointer;font-size:18px;color:var(--muted);padding:4px 8px;border-radius:6px" onmouseover="this.style.background='var(--paper)'" onmouseout="this.style.background='transparent'">✕</div>
+    </div>
+    <div style="padding:16px 24px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px">
+      <div style="font-family:monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:4px">Stats</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center">
+        <div><div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:18px" id="acc-funds">0</div><div style="font-size:10px;color:var(--muted)">Funds</div></div>
+        <div><div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:18px" id="acc-drafts">0</div><div style="font-size:10px;color:var(--muted)">Drafts</div></div>
+        <div><div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:18px;color:var(--green)" id="acc-wins">$0</div><div style="font-size:10px;color:var(--muted)">Winnings</div></div>
+      </div>
+    </div>
+    <div id="acc-restricted-bar" style="display:none;padding:8px 24px;background:#fffbeb;border-top:1px solid rgba(217,119,6,.2)">
+      <div style="font-size:11px;color:#92400e">⚠️ Paid funds are restricted in your state.</div>
+    </div>
+    <div style="padding:16px 24px">
+      <button class="btn btn-outline" style="width:100%;color:var(--red);border-color:var(--red)" onclick="doSignOut()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EMAIL CONFIRMATION ══ -->
+<div class="ov" id="ov-email-confirm">
+  <div class="modal" style="width:400px;padding:0;overflow:hidden">
+    <div style="padding:28px 28px 20px;text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">📬</div>
+      <div style="font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:28px;margin-bottom:8px">Check your inbox</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.65" id="ec-msg">We sent a confirmation link to your email. Click it to activate your account.</div>
+    </div>
+    <div style="padding:0 28px;margin-bottom:16px">
+      <div style="background:var(--paper);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px">
+        <div style="width:36px;height:36px;background:var(--orange-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><rect x="1" y="1" width="16" height="12" rx="2" stroke="var(--orange)" stroke-width="1.3"/><path d="M1 4l8 5 8-5" stroke="var(--orange)" stroke-width="1.3"/></svg>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--ink)" id="ec-email-display"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="95ecfae0e7d5f0f8f4fcf9bbf6faf8">[email&#160;protected]</a></div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Confirmation email sent</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:0 28px;margin-bottom:16px;font-size:11px;color:var(--muted);text-align:center;line-height:1.6">
+      Didn't get it? Check your spam folder.<br>
+      <span style="color:var(--orange);cursor:pointer;font-weight:600" onclick="toast('Resent! Check your inbox.')">Resend confirmation email</span>
+    </div>
+    <div style="padding:0 28px 24px">
+      <button class="btn btn-primary" style="width:100%" onclick="cm('email-confirm');toast('Welcome to Openbell, ' + (sessionStorage.getItem('sd_username')||'').split(' ')[0] + '!')">Continue to Dashboard →</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS MODAL -->
+<div class="ov" id="ov-how">
+  <div class="modal" style="width:580px;max-height:88vh;overflow-y:auto;padding:0;border-radius:14px">
+    <div style="height:4px;background:var(--accent)"></div>
+    <div style="padding:24px 28px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:5px">Openbell</div>
+        <div style="font-family:Figtree,sans-serif;font-weight:800;font-size:26px;letter-spacing:-.03em">How It Works</div>
+      </div>
+      <div onclick="cm('how')" style="cursor:pointer;font-size:18px;color:var(--muted);padding:4px 8px;border-radius:6px" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">✕</div>
+    </div>
+    <div style="padding:24px 28px;display:flex;flex-direction:column;gap:20px">
+
+      <!-- Step 1 -->
+      <div style="display:flex;gap:16px;align-items:flex-start">
+        <div style="width:36px;height:36px;background:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:IBM Plex Mono,monospace;font-weight:700;font-size:15px;color:var(--bg);flex-shrink:0">1</div>
+        <div>
+          <div style="font-weight:700;font-size:15px;margin-bottom:4px">Deposit & Join a Pool</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.65">Add cash to your Openbell balance, then join a public pool or create a private one. Entry fees start at $5. Your entry fee comes out of your balance.</div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border)"></div>
+
+      <!-- Step 2 -->
+      <div style="display:flex;gap:16px;align-items:flex-start">
+        <div style="width:36px;height:36px;background:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:IBM Plex Mono,monospace;font-weight:700;font-size:15px;color:var(--bg);flex-shrink:0">2</div>
+        <div>
+          <div style="font-weight:700;font-size:15px;margin-bottom:4px">Draft 5 Stocks</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.65">Pick any 5 stocks or ETFs before the pool locks Sunday at 11:59 PM ET. Each pick carries equal 20% weight — no multipliers, no luck.</div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border)"></div>
+
+      <!-- Step 3 -->
+      <div style="display:flex;gap:16px;align-items:flex-start">
+        <div style="width:36px;height:36px;background:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:IBM Plex Mono,monospace;font-weight:700;font-size:15px;color:var(--bg);flex-shrink:0">3</div>
+        <div>
+          <div style="font-weight:700;font-size:15px;margin-bottom:4px">Watch & Win</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.65">Live standings update throughout the week. At Friday 4:00 PM ET close, the player with the highest average portfolio return wins. Winnings are credited to your balance instantly.</div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border)"></div>
+
+      <!-- Rules summary -->
+      <div style="background:var(--surface2);border-radius:10px;padding:16px 18px">
+        <div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);margin-bottom:12px">Key Rules</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span><span><strong>Equal weight:</strong> All 5 picks weighted 20% each. Return = simple average.</span></div>
+          <div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span><span><strong>Picks lock</strong> Sunday 11:59 PM ET. No changes after submission.</span></div>
+          <div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span><span><strong>Prices</strong> sourced from Yahoo Finance / Google Finance. Mon open to Fri close.</span></div>
+          <div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span><span><strong>Platform fee:</strong> 5% of the total pool. 95% goes to winners.</span></div>
+          <div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span><span><strong>Ties</strong> split the payout for their position equally.</span></div>
+          <div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span><span><strong>18+</strong> only. Not available in AZ, IA, LA, MT, or WA.</span></div>
+        </div>
+      </div>
+
+      <!-- Payout structures -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:var(--surface2);border-radius:9px;padding:14px 16px">
+          <div style="font-weight:700;font-size:13px;margin-bottom:6px">🥇 Top 3 Split</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.7">1st — 60%<br>2nd — 20%<br>3rd — 15%<br>Platform — 5%</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:9px;padding:14px 16px">
+          <div style="font-weight:700;font-size:13px;margin-bottom:6px">🏆 Winner Takes All</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.7">1st — 95%<br>Platform — 5%<br><br>&nbsp;</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding-top:4px">
+        <button onclick="cm('how');om('tos')" style="font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline">Read full Terms of Service →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="ov" id="ov-tos">
   <div class="modal" style="width:640px;max-height:85vh;overflow-y:auto;padding:0">
     <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;display:flex;justify-content:space-between;align-items:center">
@@ -3723,9 +4342,39 @@ var _chartNames = {SPY:'S&P 500 ETF',QQQ:'Nasdaq 100 ETF',IWM:'Russell 2000 ETF'
 
 function openChart(sym) {
   _chartSym = sym || 'SPY';
-  var el = document.getElementById('ov-chart');
-  if (!el) { console.warn('ov-chart not found'); return; }
-  el.style.display = 'flex';
+  // Navigate to chart view instead of modal
+  go('chart-view');
+  _renderChartView(sym);
+}
+
+function _renderChartView(sym) {
+  _chartSym = sym || 'SPY';
+  // Update all view elements
+  var names = {SPY:'SPDR S&P 500 ETF',QQQ:'Invesco QQQ Trust',IWM:'iShares Russell 2000',DIA:'SPDR Dow Jones ETF'};
+  var symEl = document.getElementById('cv-sym');
+  var nameEl = document.getElementById('cv-name');
+  if (symEl) symEl.textContent = _chartSym;
+  if (nameEl) nameEl.textContent = names[_chartSym] || _chartSym;
+  // Ticker buttons
+  ['SPY','QQQ','IWM','DIA'].forEach(function(t) {
+    var b = document.getElementById('cv-btn-'+t);
+    if (!b) return;
+    var on = t === _chartSym;
+    b.style.background = on ? 'var(--accent)' : 'transparent';
+    b.style.color = on ? '#000' : 'var(--muted)';
+    b.style.borderColor = on ? 'var(--accent)' : 'var(--border)';
+  });
+  // Stats
+  var d = LD[_chartSym] || FALLBACK[_chartSym] || {};
+  var fmt = function(v){ return v!=null?(v>=0?'+':'')+v.toFixed(2)+'%':'—'; };
+  var clr = function(v){ return v!=null?(v>=0?'var(--pos)':'var(--neg)'):'var(--muted)'; };
+  var priceEl=document.getElementById('cv-price'); if(priceEl) priceEl.textContent=d.price?'$'+d.price.toFixed(2):'—';
+  var chgEl=document.getElementById('cv-chg'); if(chgEl){chgEl.textContent=fmt(d.pct);chgEl.style.color=clr(d.pct);}
+  var price2El=document.getElementById('cv-price2'); if(price2El) price2El.textContent=d.price?'$'+d.price.toFixed(2):'—';
+  [{id:'cv-day',v:d.pct},{id:'cv-week',v:d.weekPct},{id:'cv-ytd',v:d.ytdPct}].forEach(function(x){
+    var el=document.getElementById(x.id); if(el){el.textContent=fmt(x.v);el.style.color=clr(x.v);}
+  });
+  var betaEl=document.getElementById('cv-beta'); if(betaEl) betaEl.textContent=d.beta!=null?d.beta.toFixed(2):'—';
 
   // Header
   var symEl = document.getElementById('chart-sym');
@@ -3786,8 +4435,8 @@ function setChartPeriod(p, btn) {
 }
 
 function loadTVChart() {
-  var wrap = document.getElementById('chart-canvas-wrap');
-  var loading = document.getElementById('chart-loading');
+  var wrap = document.getElementById('cv-chart-wrap');
+  var loading = document.getElementById('cv-loading');
   if (!wrap) return;
   if (loading) loading.style.display = 'flex';
   wrap.innerHTML = '';
@@ -4963,8 +5612,14 @@ async function joinLeague() {
     cm('join'); setTimeout(()=>go('draft'),800); return;
   }
 
+  // Check balance before payment modal
+  if (getBalance() < league.fee) {
+    cm('join');
+    toast('Insufficient balance — deposit funds to join this pool');
+    setTimeout(function(){ openDeposit(); }, 400);
+    return;
+  }
   cm('join');
-  // Show payment modal before completing join
   showPaymentModal(league, async () => {
     // Deduct entry fee from balance
     var _bal = parseFloat(localStorage.getItem(_uidKey('sd_balance'))||'0');
@@ -5823,15 +6478,20 @@ async function doLogin() {
 
 function doSignOut() {
   try { firebase.auth().signOut(); } catch(e){}
-  sessionStorage.removeItem('sd_mydata');
-  sessionStorage.removeItem('sd_username');
-  sessionStorage.removeItem('sd_useremail');
-  sessionStorage.removeItem('sd_uid');
-  // Do NOT remove localStorage uid — it belongs to the account
+  try { if(window._googleSignOut) window._googleSignOut(); } catch(e){}
+  // Clear ALL session data
+  sessionStorage.clear();
+  // Clear display-only localStorage items (not account data, just session display)
+  ['sd_username','sd_useremail','sd_uid','sd_mydata'].forEach(function(k){
+    localStorage.removeItem(k);
+  });
+  // Reset UI state
+  userPicks = [];
+  activeDraftLeagueId = null;
   cm('account');
   updateNavUser();
-  renderDashboard();
-  toast('Signed out');
+  go('landing');
+  toast('Signed out successfully');
 }
 
 // Legacy stub so any old openLogin() calls still work
@@ -6672,7 +7332,7 @@ function getMyRank(league) {
 // ══════════════════════════════════════════════════
 // IMPROVEMENT 11: PAGE TITLE UPDATER
 // ══════════════════════════════════════════════════
-const PAGE_TITLES = {landing:'Openbell — Competitive Stock Pools',dashboard:'Dashboard — Openbell',draft:'Draft Room — Openbell',leaderboard:'Standings — Openbell',earnings:'Earnings Calendar — Openbell',resources:'Resources — Openbell',public:'Public Pools — Openbell'};
+const PAGE_TITLES = {landing:'Openbell — Competitive Stock Pools',dashboard:'Dashboard — Openbell',draft:'Draft Room — Openbell',leaderboard:'Standings — Openbell',earnings:'Earnings Calendar — Openbell',resources:'Resources — Openbell',public:'Public Pools — Openbell','chart-view':'Market Chart — Openbell'};
 function updatePageTitle(view) {
   document.title = PAGE_TITLES[view] || 'Openbell';
 }
@@ -8736,6 +9396,7 @@ if (_origSbNav) {
   sbNav = function(el, target) {
     _origSbNav(el, target);
     if (target === 'dash-picks') renderPicksHistory();
+  if (view === 'chart-view') { /* handled by _renderChartView */ }
   };
 }
 
