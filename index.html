@@ -1902,6 +1902,73 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 /* Selection color */
 ::selection { background:rgba(0,192,135,.2); color:var(--ink); }
 </style>
+
+<style>
+/* ── Extra polish ── */
+
+/* Breadth bar ticker hover glow */
+#market-breadth-bar { position:relative; overflow:hidden; }
+#market-breadth-bar::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg, #111 0%, transparent 5%, transparent 95%, #111 100%);
+  pointer-events:none;
+  z-index:1;
+}
+
+/* Chart modal overlay */
+#ov-chart { background:rgba(0,0,0,.75) !important; backdrop-filter:blur(12px); }
+
+/* Animate chart modal */
+#ov-chart > div { animation:modalIn .28s cubic-bezier(.34,1.2,.64,1) both; }
+
+/* Period button transitions */
+.chart-period-btn { transition:background .15s,color .15s !important; }
+
+/* Social panel */
+#dash-social .card { transition:box-shadow .2s ease; }
+#dash-social .card:hover { box-shadow:0 4px 20px rgba(0,0,0,.08) !important; }
+
+/* Draft banner polish */
+#draft-fund-banner {
+  background: linear-gradient(135deg, #0d0d12 0%, #141420 100%) !important;
+  border: 1px solid rgba(0,192,135,.15) !important;
+}
+
+/* Pick slots animation */
+@keyframes pickSlide { from{opacity:0;transform:translateX(-6px)} to{opacity:1;transform:translateX(0)} }
+.pk-slot { animation: pickSlide .18s ease both; }
+
+/* Pool cards in public view */
+.pub-card { position:relative; overflow:hidden; }
+.pub-card::after {
+  content:'';
+  position:absolute;
+  top:0;left:-100%;
+  width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent);
+  transition:left .4s ease;
+  pointer-events:none;
+}
+.pub-card:hover::after { left:150%; }
+
+/* Leaderboard rank badges */
+.lbrn.g { background:linear-gradient(135deg,#f59e0b,#d97706) !important; }
+.lbrn.s { background:linear-gradient(135deg,#94a3b8,#64748b) !important; }
+.lbrn.b { background:linear-gradient(135deg,#b45309,#92400e) !important; }
+
+/* Message/challenge card hover */
+#messages-list > div { transition:transform .15s ease, box-shadow .15s ease; }
+#messages-list > div:hover { transform:translateY(-1px); box-shadow:0 4px 16px rgba(0,0,0,.08); }
+
+/* Friend request pulse */
+#friend-req-count { animation:livePulse 2s ease-in-out infinite; }
+
+/* Submission ticket hover */
+#picks-history > div > div { transition:transform .18s ease, box-shadow .18s ease; }
+#picks-history > div > div:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.1) !important; }
+</style>
 </head>
 <body>
 
@@ -2040,6 +2107,10 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
         <div class="sb-it on" onclick="sbNav(this,'dash-main')">Overview</div>
         <div class="sb-it" onclick="sbNav(this,'dash-picks');renderPicksHistory()">My Submissions</div>
         <div class="sb-it" onclick="sbNav(this,'dash-perf');renderDashPerf()">Performance</div>
+        <div class="sb-it" onclick="sbNav(this,'dash-social');renderSocial()" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Messages</span>
+          <span id="msg-badge" style="display:none;background:var(--neg);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;font-family:IBM Plex Mono,monospace">●</span>
+        </div>
       </div>
       <div class="sb-div"></div>
       <div class="sb-sec">
@@ -2048,13 +2119,14 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
       </div>
       <div class="sb-div"></div>
       <div class="sb-sec">
-        <div class="sb-lbl">Balance & Payment</div>
-        <!-- Balance row -->
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:11px;color:var(--muted)">Available balance</span>
-          <span style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:16px;color:var(--green)" id="sb-wins">$0</span>
+        <div class="sb-lbl">Balance</div>
+        <!-- Balance display -->
+        <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;margin-bottom:8px">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.06em">Available</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:26px;color:var(--pos)" id="sb-wins">$0.00</div>
         </div>
-        <button class="btn btn-outline btn-sm" style="width:100%;font-size:10px;padding:5px;color:var(--green);border-color:var(--green);margin-bottom:10px" onclick="event.stopPropagation();openWithdraw()">↑ Withdraw funds</button>
+        <button class="btn" onclick="openDeposit()" style="width:100%;background:#00c087;color:#000;font-weight:700;font-size:12px;border:none;border-radius:8px;padding:9px;cursor:pointer;margin-bottom:6px">+ Deposit Cash</button>
+        <button class="btn btn-outline btn-sm" style="width:100%;font-size:10px;padding:5px;color:var(--muted);margin-bottom:10px" onclick="openWithdraw()">↑ Withdraw</button>
         <!-- Card row -->
         <div id="sb-payment-method" style="padding:8px 10px;border-radius:8px;background:var(--paper);margin-bottom:8px">
           <div style="display:flex;align-items:center;gap:9px" id="sb-card-display">
@@ -2209,6 +2281,37 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 
         </div>
       </div>
+
+      <!-- SOCIAL / MESSAGES PANEL -->
+      <div id="dash-social" style="display:none">
+        <!-- Search Players -->
+        <div class="card" style="padding:16px 18px;margin-bottom:14px">
+          <div style="font-weight:700;font-size:14px;margin-bottom:12px">🔍 Find Players</div>
+          <div style="position:relative;margin-bottom:12px">
+            <input class="fi" id="player-search" placeholder="Search by name or username…" oninput="searchPlayers(this.value)" style="width:100%;box-sizing:border-box;padding-left:36px">
+            <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%)" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="var(--muted)" stroke-width="1.2"/><path d="M10 10l2 2" stroke="var(--muted)" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </div>
+          <div id="player-search-results" style="max-height:200px;overflow-y:auto"></div>
+        </div>
+
+        <!-- Friends -->
+        <div class="card" style="padding:16px 18px;margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div style="font-weight:700;font-size:14px">👥 Friends</div>
+            <span id="friend-req-count" style="display:none;background:var(--neg);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px"></span>
+          </div>
+          <div id="friend-requests" style="margin-bottom:10px"></div>
+          <div id="friends-list"><div style="font-size:12px;color:var(--muted);font-style:italic;padding:6px 0">No friends yet — search to add someone</div></div>
+        </div>
+
+        <!-- Messages / Challenges -->
+        <div class="card" style="padding:16px 18px">
+          <div style="font-weight:700;font-size:14px;margin-bottom:12px">💬 Messages & Challenges</div>
+          <div id="messages-list" style="max-height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:12px;color:var(--muted);font-style:italic;padding:6px 0">No messages yet</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -2327,10 +2430,13 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
       <div id="draft-fund-banner" style="background:var(--ink);border-radius:8px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:20px">
         <div style="flex:1">
           <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.4);margin-bottom:6px">Drafting For</div>
-          <select id="draft-fund-select-top" onchange="var _p=this.value.split('__');switchDraftLeague(_p[0],_p[1]);updateDraftFundBanner()" style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.2);color:#fff;cursor:pointer;padding:4px 0;outline:none;appearance:none;-webkit-appearance:none">
-            <option value="" style="background:#141414;color:#fff">— Select a pool to draft for —</option>
-          </select>
-          <div id="draft-active-fund-label" style="font-family:'DM Serif Display',Georgia,serif;font-size:22px;font-weight:400;color:rgba(255,255,255,.9);margin-top:6px;letter-spacing:-.01em;line-height:1.1">No pool selected</div>
+          <div style="position:relative">
+            <select id="draft-fund-select-top" onchange="var _p=this.value.split('__');if(_p[0])switchDraftLeague(_p[0],_p[1]);updateDraftFundBanner()" style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;width:100%;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);color:#fff;cursor:pointer;padding:10px 36px 10px 14px;outline:none;appearance:none;-webkit-appearance:none;border-radius:8px;transition:border-color .15s" onmouseover="this.style.borderColor='rgba(0,192,135,.5)'" onmouseout="this.style.borderColor='rgba(255,255,255,.2)'">
+              <option value="" style="background:#141414;color:#fff">— Select a pool to draft for —</option>
+            </select>
+            <svg style="position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none" width="12" height="8" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="rgba(255,255,255,.5)" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          </div>
+          <div id="draft-active-fund-label" style="font-family:Figtree,sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,.5);margin-top:8px;letter-spacing:-.01em;line-height:1.2">No pool selected — choose above to start drafting</div>
         </div>
         <div id="draft-fund-info" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(255,255,255,.5);text-align:right;flex-shrink:0;line-height:1.8"></div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
@@ -2723,7 +2829,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
     <div style="padding:10px 22px;background:var(--surface2);border-bottom:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted)" id="pd-countdown"></div>
     <div style="padding:14px 22px;display:flex;gap:8px">
       <button class="btn btn-outline" style="flex:1" onclick="cm('pub-detail')">Cancel</button>
-      <button class="btn btn-primary" style="flex:2" onclick="cm('pub-detail');directJoin(_pdCurrentId||'')">Join for $<span id="pd-fee-inline">0</span> →</button>
+      <button class="btn btn-primary" style="flex:2" onclick="cm('pub-detail');directJoin(_pdCurrentId||'')">Join — $<span id="pd-fee-inline">0</span> →</button>
     </div>
   </div>
 </div>
@@ -3551,7 +3657,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
     </div>
     <div style="padding:14px 24px;display:flex;gap:10px">
       <button class="btn btn-outline" style="flex:1" onclick="cm('join-pool')">Cancel</button>
-      <button class="btn" id="jm-pay-btn" style="flex:2;background:#00c087;color:#000;font-weight:700;font-size:13px;border:none;border-radius:8px;padding:11px;cursor:pointer" onclick="doJoinFundStripe()">Pay & Join →</button>
+      <button class="btn" id="jm-pay-btn" style="flex:2;background:#00c087;color:#000;font-weight:700;font-size:13px;border:none;border-radius:8px;padding:11px;cursor:pointer" onclick="doJoinFundStripe()">Join — Use Balance →</button>
     </div>
   </div>
 </div>
@@ -4381,10 +4487,18 @@ function renderDraftSidebar() {
 }
 
 function doPick(sym) {
+  if (!activeDraftLeagueId) { toast('Select a pool first before picking stocks'); return; }
   if (userPicks.includes(sym)) return;
-  if (userPicks.length>=5) { toast('Maximum of 5 securities per draft'); return; }
+  // Check if already submitted for this pool
+  var _dks = getDrafts();
+  var _lgDP = [...getLeagues(),...getPublicLeagues()].find(function(l){return l.id===activeDraftLeagueId;});
+  var _wkDP = _lgDP ? _lgDP.week : getWN();
+  var _dkDP = activeDraftLeagueId + '_' + _wkDP;
+  if (_dks[_dkDP] && _dks[_dkDP].length > 0) { toast('Picks already locked for this pool'); return; }
+  var _mxDP = _lgDP && _lgDP.maxPicks ? _lgDP.maxPicks : 5;
+  if (userPicks.length >= _mxDP) { toast('Maximum of ' + _mxDP + ' pick' + (_mxDP===1?'':'s') + ' for this pool'); return; }
   userPicks.push(sym); renderPickSlots(); renderDraftList();
-  toast(`${sym} added to portfolio`);
+  toast(sym + ' added to portfolio');
   playPick();
   autoSavePicks();
 }
@@ -6045,7 +6159,7 @@ function pubCard(l, myName, isFeat) {
       ? '<div style="text-align:center;padding:9px;background:var(--paper);border-radius:8px;font-size:12px;color:var(--muted)">This pool is full</div>'
       : isMine
         ? '<div style="text-align:center;padding:9px;background:var(--green-bg);border-radius:8px;font-size:12px;color:var(--green);font-weight:600">✓ Enrolled — picks due Sunday</div>'
-        : `<button class="btn btn-primary" style="width:100%;padding:10px" onclick="event.stopPropagation();directJoin('${l.id}')">Join for $${l.fee} →</button>`}
+        : `<button class="btn btn-primary" style="width:100%;padding:10px" onclick="event.stopPropagation();directJoin('${l.id}')">Join — $${l.fee} →</button>`}
   </div>`;
 }
 
@@ -7078,29 +7192,79 @@ var _pendingLeagueName = '';
 var _pendingLeagueId = '';
 
 function showPaymentModal(league, onConfirm) {
+  const bal = getBalance();
+  const fee = league.fee || 0;
+  const canAfford = bal >= fee;
   const isTop3 = league.payoutStructure === 'top3';
   const filled = league.participants?.length || 0;
-  const pool   = (filled + 1) * league.fee;
-  const net    = pool * 0.95;
-  const pay1   = isTop3 ? (pool * 0.60).toFixed(0) : net.toFixed(0);
+  const pool = (filled + 1) * fee;
+  const net = pool * 0.95;
+  const pay1 = isTop3 ? (pool * 0.60).toFixed(0) : net.toFixed(0);
 
-  // Store for charge function
-  _pendingLeagueFee = league.fee;
+  _pendingLeagueFee = fee;
   _pendingLeagueName = league.name;
   _pendingLeagueId = league.id;
-
-  setText('pay-fund-name', league.name);
-  setText('pay-fee', '$' + league.fee);
-  setText('pay-pool', '$' + pool);
-  setText('pay-prize', '$' + pay1);
-  var ptEl = document.getElementById('pay-payout-type');
-  if (ptEl) ptEl.textContent = isTop3 ? 'TOP 3 SPLIT' : 'WINNER TAKES ALL';
-  setText('pay-subtitle', league.name + ' · ' + (filled+1) + ' players');
   _pendingPaymentAction = onConfirm;
-  om('payment');
-  // Init card UI after modal is visible
-  setTimeout(initPaymentModal, 150);
+
+  // Build a balance-based confirm modal (no card needed)
+  var existing = document.getElementById('ov-balance-confirm');
+  if (existing) existing.remove();
+
+  var html = '<div class="ov" id="ov-balance-confirm" style="z-index:600">' +
+    '<div class="modal" style="width:400px;padding:0;overflow:hidden;border-radius:14px">' +
+      '<div style="height:4px;background:' + (canAfford ? 'var(--accent)' : 'var(--neg)') + '"></div>' +
+      '<div style="padding:24px 24px 18px">' +
+        '<div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:6px">Join Pool</div>' +
+        '<div style="font-family:Figtree,sans-serif;font-weight:800;font-size:22px;letter-spacing:-.02em;margin-bottom:4px">' + league.name + '</div>' +
+        '<div style="font-size:12px;color:var(--muted)">Week ' + league.week + ' · ' + (filled+1) + ' players</div>' +
+      '</div>' +
+      '<div style="margin:0 24px;background:var(--surface2);border-radius:10px;padding:14px 16px;margin-bottom:18px">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+          '<span style="font-size:12px;color:var(--muted)">Entry fee</span>' +
+          '<span style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:16px">$' + fee + '</span>' +
+        '</div>' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+          '<span style="font-size:12px;color:var(--muted)">Your balance</span>' +
+          '<span style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:16px;color:' + (canAfford ? 'var(--pos)' : 'var(--neg)') + '">$' + bal.toFixed(2) + '</span>' +
+        '</div>' +
+        '<div style="height:1px;background:var(--border);margin:8px 0"></div>' +
+        '<div style="display:flex;justify-content:space-between;align-items:center">' +
+          '<span style="font-size:12px;color:var(--muted)">Balance after</span>' +
+          '<span style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:16px;color:var(--ink)">$' + Math.max(0, bal - fee).toFixed(2) + '</span>' +
+        '</div>' +
+        (canAfford ? '' :
+          '<div style="margin-top:10px;background:var(--red-bg);border:1px solid var(--red-bd);border-radius:7px;padding:9px 12px;font-size:11px;color:var(--neg)">' +
+            '⚠ Insufficient balance — deposit $' + (fee - bal).toFixed(2) + ' more to join' +
+          '</div>') +
+      '</div>' +
+      '<div style="padding:0 24px 20px;display:flex;gap:10px">' +
+        '<button onclick="var _bc=document.getElementById(\'ov-balance-confirm\');if(_bc)_bc.remove()" class="btn btn-outline" style="flex:1">Cancel</button>' +
+        (canAfford
+          ? '<button id="bal-confirm-btn" onclick="confirmBalanceJoin()" style="flex:2;background:#00c087;color:#000;font-weight:700;border:none;border-radius:8px;padding:11px;cursor:pointer;font-size:14px">Confirm Join →</button>'
+          : '<button onclick="var _bc2=document.getElementById(\'ov-balance-confirm\');if(_bc2)_bc2.remove();openDeposit()" style="flex:2;background:var(--ink);color:#fff;font-weight:700;border:none;border-radius:8px;padding:11px;cursor:pointer;font-size:14px">+ Deposit Cash</button>') +
+      '</div>' +
+    '</div>' +
+  '</div>';
+
+  document.body.insertAdjacentHTML('beforeend', html);
+  document.getElementById('ov-balance-confirm').style.display = 'flex';
 }
+
+function confirmBalanceJoin() {
+  var btn = document.getElementById('bal-confirm-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Joining…'; }
+  // Deduct from balance and run the pending action
+  var newBal = Math.max(0, getBalance() - (_pendingLeagueFee || 0));
+  localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
+  updateBalanceDisplay();
+  var overlay = document.getElementById('ov-balance-confirm');
+  if (overlay) overlay.remove();
+  if (typeof _pendingPaymentAction === 'function') {
+    _pendingPaymentAction();
+    _pendingPaymentAction = null;
+  }
+}
+
 
 // ── STRIPE ELEMENTS INIT ──
 var _stripeInstance = null;
@@ -7194,72 +7358,43 @@ function showJmNewCard() {
   if (newEl) { newEl.style.display = 'block'; mountJmCard(); }
 }
 
-async function doJoinFundStripe() {
-  var btn = document.getElementById('jm-pay-btn');
-  var errEl = document.getElementById('jm-stripe-card-errors');
-  if (btn) { btn.disabled = true; btn.textContent = 'Processing…'; }
-
-  try {
-    var stripe = getStripe();
-    var savedCustomer = localStorage.getItem('sd_stripe_customer_id');
-    var usingSaved = savedCustomer && document.getElementById('jm-saved-card')?.style.display !== 'none';
-
-    if (!usingSaved) {
-      var email = document.getElementById('jm-email-input')?.value || sessionStorage.getItem('sd_useremail') || '';
-      var setupRes = await fetch('/setup-intent', {
-        method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ email })
-      }).catch(() => null);
-
-      if (!setupRes || !setupRes.ok) {
-        // Netlify not deployed — simulate
-        console.warn('[Openbell] Netlify not deployed — simulating payment');
-        toast('⚠ Deploy Netlify functions for live payments — simulating now');
-        if (btn) { btn.disabled = false; btn.textContent = 'Pay & Join →'; }
-        doJoinFund(); // fall through to existing join logic
-        return;
+function doJoinFundStripe() {
+  // Now balance-based — open confirm modal
+  if (!_pendingLeagueId) { toast('No pool selected'); return; }
+  var all = [...getLeagues(), ...getPublicLeagues()];
+  var league = all.find(function(l){ return l.id === _pendingLeagueId; });
+  if (!league) { toast('Pool not found'); return; }
+  // Close the old join-pool modal first
+  cm('join-pool');
+  showPaymentModal(league, function() {
+    // Add user to participants
+    var myName = getMyData().name || sessionStorage.getItem('sd_username') || 'Player';
+    var myEmail = sessionStorage.getItem('sd_useremail') || '';
+    var myUid = getUserId();
+    var stored = getLeagues();
+    var sIdx = stored.findIndex(function(l){ return l.id === league.id; });
+    if (sIdx >= 0) {
+      if (!stored[sIdx].participants) stored[sIdx].participants = [];
+      if (!stored[sIdx].participants.find(function(p){ return p.uid === myUid || p.name === myName; })) {
+        stored[sIdx].participants.push({name: myName, email: myEmail, uid: myUid, joined: new Date().toISOString()});
+        saveLeagues(stored);
       }
-
-      var { clientSecret, customerId } = await setupRes.json();
-      var { setupIntent, error } = await stripe.confirmCardSetup(clientSecret, { payment_method: { card: _jmCardEl } });
-      if (error) {
-        if (errEl) errEl.textContent = error.message;
-        if (btn) { btn.disabled = false; btn.textContent = 'Pay & Join →'; }
-        return;
-      }
-      localStorage.setItem('sd_stripe_customer_id', customerId);
-      if (setupIntent.payment_method?.card) {
-        var card = setupIntent.payment_method.card;
-        localStorage.setItem('sd_stripe_last4', card.last4 || '');
-        localStorage.setItem('sd_stripe_exp', (card.exp_month||'')+'/'+(card.exp_year||'').toString().slice(-2));
-      }
-    }
-
-    // Charge
-    var custId = localStorage.getItem('sd_stripe_customer_id');
-    var chargeRes = await fetch('/charge-card', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ customerId: custId, amount: _pendingLeagueFee || 0, fundName: _pendingLeagueName || 'Pool', fundId: _pendingLeagueId || '' })
-    }).catch(() => null);
-
-    if (!chargeRes || !chargeRes.ok) {
-      toast('⚠ Charge simulated — deploy Netlify functions for live payments');
     } else {
-      var charge = await chargeRes.json();
-      if (!charge.success) {
-        if (errEl) errEl.textContent = charge.error || 'Payment failed';
-        if (btn) { btn.disabled = false; btn.textContent = 'Pay & Join →'; }
-        return;
+      var copy = Object.assign({}, league);
+      if (!copy.participants) copy.participants = [];
+      if (!copy.participants.find(function(p){ return p.uid === myUid; })) {
+        copy.participants.push({name: myName, email: myEmail, uid: myUid, joined: new Date().toISOString()});
       }
+      stored.push(copy);
+      saveLeagues(stored);
     }
-
-    if (btn) { btn.disabled = false; btn.textContent = 'Pay & Join →'; }
-    doJoinFund(); // complete the join
-  } catch(err) {
-    if (errEl) errEl.textContent = 'Something went wrong — please try again';
-    if (btn) { btn.disabled = false; btn.textContent = 'Pay & Join →'; }
-  }
+    logEvent('Pool_Joins', {player: myName, email: myEmail, pool_name: league.name, entry_fee: league.fee});
+    renderDashboard();
+    toast('✓ Joined ' + league.name + '! Now head to Draft Room.');
+    setTimeout(function(){ activeDraftLeagueId = league.id; go('draft'); }, 1200);
+  });
 }
+
 
 function showNewCardForm() {
   var savedEl = document.getElementById('pay-saved-card');
@@ -9124,8 +9259,18 @@ function updateDraftFundBanner() {
   // Show fund info
   var all = [...getLeagues(), ...getPublicLeagues()];
   var league = all.find(l => l.id === activeDraftLeagueId);
-  if (league && info) {
-    info.innerHTML = '$' + league.fee + ' entry<br>' + league.participants.length + '/' + league.maxPlayers + ' players';
+  var labelEl = document.getElementById('draft-active-fund-label');
+  if (league) {
+    if (info) info.innerHTML = '$' + league.fee + ' entry · ' + league.participants.length + '/' + league.maxPlayers + ' players';
+    if (labelEl) {
+      var gameTag = league.maxPicks === 1 ? ' <span style="font-size:10px;font-family:IBM Plex Mono,monospace;background:#7c3aed;color:#fff;padding:2px 7px;border-radius:4px;vertical-align:middle">1-PICK</span>' :
+        league.contrarian ? ' <span style="font-size:10px;font-family:IBM Plex Mono,monospace;background:#dc2626;color:#fff;padding:2px 7px;border-radius:4px;vertical-align:middle">CONTRARIAN</span>' :
+        league.payoutStructure === 'beater' ? ' <span style="font-size:10px;font-family:IBM Plex Mono,monospace;background:#0284c7;color:#fff;padding:2px 7px;border-radius:4px;vertical-align:middle">BEAT INDEX</span>' :
+        (league.id && league.id.includes('pub_etf')) ? ' <span style="font-size:10px;font-family:IBM Plex Mono,monospace;background:#059669;color:#fff;padding:2px 7px;border-radius:4px;vertical-align:middle">ETF ONLY</span>' : '';
+      labelEl.innerHTML = '<span style="color:#fff;font-weight:700;font-size:16px;font-family:Figtree,sans-serif">' + league.name + '</span>' + gameTag + ' <span style="color:rgba(255,255,255,.4);font-size:12px">· Week ' + league.week + '</span>';
+    }
+  } else {
+    if (labelEl) labelEl.textContent = 'No pool selected — choose above to start drafting';
   }
 }
 
@@ -9880,23 +10025,26 @@ function renderBreadthBar() {
   if (!el) return;
 
   const symbols = [
-    {sym:'SPY', label:'S&P 500'},
-    {sym:'QQQ', label:'NASDAQ'},
-    {sym:'IWM', label:'RUSSELL'},
-    {sym:'GLD', label:'GOLD'},
-    {sym:'USO', label:'OIL'},
+    {sym:'SPY', label:'S&P 500', chart:true},
+    {sym:'QQQ', label:'NASDAQ',  chart:true},
+    {sym:'IWM', label:'RUSSELL', chart:true},
+    {sym:'DIA', label:'DOW',     chart:true},
+    {sym:'GLD', label:'GOLD',    chart:false},
   ];
 
-  el.innerHTML = symbols.map(({sym, label}) => {
-    const d = LD[sym] || FALLBACK[sym];
+  el.innerHTML = symbols.map(function(s) {
+    var sym=s.sym, label=s.label, hasChart=s.chart;
+    var d = LD[sym] || FALLBACK[sym];
     if (!d) return '';
-    const pos = (d.pct || 0) >= 0;
-    const pct = (d.pct || 0).toFixed(2);
-    const price = d.price ? '$' + d.price.toFixed(2) : '—';
-    return '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">' +
-      '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;font-weight:600;color:rgba(255,255,255,.35);letter-spacing:.04em">' + label + '</span>' +
-      '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;font-weight:700;color:rgba(255,255,255,.75)">' + price + '</span>' +
-      '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;font-weight:700;color:' + (pos ? '#22c55e' : '#f87171') + '">' + (pos?'+':'') + pct + '%</span>' +
+    var pos = (d.pct || 0) >= 0;
+    var pct = (d.pct || 0).toFixed(2);
+    var price = d.price ? '$' + d.price.toFixed(2) : '—';
+    var base = 'display:flex;align-items:center;gap:6px;flex-shrink:0;padding:3px 6px;border-radius:5px;transition:background .15s;';
+    var onclick = hasChart ? ' onclick="openChart(\'' + sym + '\')" style="' + base + 'cursor:pointer" onmouseover="this.style.background=\'rgba(0,192,135,.1)\'" onmouseout="this.style.background=\'transparent\'"' : ' style="' + base + '"';
+    return '<div' + onclick + '>' +
+      '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;font-weight:600;color:rgba(255,255,255,.4)">' + label + '</span>' +
+      '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;font-weight:700;color:rgba(255,255,255,.85)">' + price + '</span>' +
+      '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;font-weight:700;color:' + (pos ? '#2dd4a0' : '#f87171') + '">' + (pos?'+':'') + pct + '%</span>' +
     '</div>';
   }).join('<span style="color:rgba(255,255,255,.1);font-size:10px;flex-shrink:0">·</span>');
 
@@ -10153,6 +10301,454 @@ nt.trim();
     navigator.clipboard.writeText(code).then(() => toast(`✓ Code "${code}" copied`)).catch(() => {});
   }
 });
+
+// ════════════════════════════════════════════
+// SOCIAL SYSTEM — Friends, Messages, Challenges
+// ════════════════════════════════════════════
+
+function _getSocial() {
+  return JSON.parse(localStorage.getItem('sd_social') || '{"friends":[],"requests":[],"messages":[],"challenges":[]}');
+}
+function _saveSocial(d) { localStorage.setItem('sd_social', JSON.stringify(d)); }
+
+function renderSocial() {
+  renderFriends();
+  renderMessages();
+  updateMsgBadge();
+}
+
+// ── Player Search ──
+function searchPlayers(q) {
+  const el = document.getElementById('player-search-results');
+  if (!el) return;
+  q = (q||'').trim().toLowerCase();
+  if (!q) { el.innerHTML = ''; return; }
+
+  // Gather all known players from leagues + bots
+  const allPlayers = [];
+  const seen = new Set();
+  const myName = getMyData().name || sessionStorage.getItem('sd_username') || '';
+  [...getLeagues(), ...getPublicLeagues()].forEach(function(l) {
+    (l.participants||[]).forEach(function(p) {
+      const n = p.name || '';
+      if (n && !seen.has(n) && n !== myName) {
+        seen.add(n);
+        allPlayers.push({name: n, uid: p.uid || '', league: l.name});
+      }
+    });
+  });
+
+  const matches = allPlayers.filter(function(p) {
+    return p.name.toLowerCase().includes(q);
+  }).slice(0, 8);
+
+  if (!matches.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px 0">No players found</div>';
+    return;
+  }
+
+  const soc = _getSocial();
+  const myFriends = soc.friends.map(function(f){return f.name;});
+  const pendingOut = soc.requests.filter(function(r){return r.dir==='out';}).map(function(r){return r.name;});
+
+  el.innerHTML = matches.map(function(p) {
+    const isFriend = myFriends.includes(p.name);
+    const isPending = pendingOut.includes(p.name);
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">' +
+      '<div>' +
+        '<div style="font-weight:600;font-size:13px">' + p.name + '</div>' +
+        '<div style="font-size:10px;color:var(--muted);font-family:IBM Plex Mono,monospace">' + p.league + '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:6px">' +
+        (isFriend
+          ? '<span style="font-size:10px;color:var(--pos);font-weight:600">✓ Friends</span>'
+          : isPending
+            ? '<span style="font-size:10px;color:var(--muted)">Pending…</span>'
+            : '<button data-name="" + p.name + "" onclick="sendFriendRequest(this.dataset.name)" style="background:var(--ink);color:#fff;border:none;border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px;font-weight:600">Add</button>') +
+        '<button data-name="" + p.name + "" onclick="sendChallenge(this.dataset.name)" style="background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px;font-weight:600">⚔ Challenge</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function sendFriendRequest(name) {
+  const soc = _getSocial();
+  if (soc.friends.find(function(f){return f.name===name;})) { toast(name + ' is already a friend'); return; }
+  if (soc.requests.find(function(r){return r.name===name&&r.dir==='out';})) { toast('Request already sent'); return; }
+  soc.requests.push({name: name, dir: 'out', ts: Date.now()});
+  // Simulate them receiving it — auto-add as pending incoming for demo
+  soc.requests.push({name: name, dir: 'in', ts: Date.now()});
+  _saveSocial(soc);
+  toast('Friend request sent to ' + name + ' ✓');
+  searchPlayers(document.getElementById('player-search')?.value || '');
+  renderFriends();
+  updateMsgBadge();
+}
+
+function acceptFriend(name) {
+  const soc = _getSocial();
+  soc.requests = soc.requests.filter(function(r){return !(r.name===name&&r.dir==='in');});
+  if (!soc.friends.find(function(f){return f.name===name;})) {
+    soc.friends.push({name: name, since: Date.now()});
+  }
+  _saveSocial(soc);
+  toast('You and ' + name + ' are now friends! 🤝');
+  renderFriends();
+  updateMsgBadge();
+}
+
+function declineFriend(name) {
+  const soc = _getSocial();
+  soc.requests = soc.requests.filter(function(r){return !(r.name===name&&r.dir==='in');});
+  _saveSocial(soc);
+  renderFriends();
+}
+
+function renderFriends() {
+  const soc = _getSocial();
+  const reqEl = document.getElementById('friend-requests');
+  const listEl = document.getElementById('friends-list');
+  const cntEl = document.getElementById('friend-req-count');
+  
+  // Incoming requests
+  const incoming = soc.requests.filter(function(r){return r.dir==='in';});
+  if (cntEl) { cntEl.style.display = incoming.length ? 'inline' : 'none'; cntEl.textContent = incoming.length + ' new'; }
+  if (reqEl) {
+    reqEl.innerHTML = incoming.map(function(r) {
+      return '<div style="background:var(--accent-bg);border:1px solid var(--accent-bd);border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">' +
+        '<div>' +
+          '<div style="font-size:12px;font-weight:600">' + r.name + ' wants to be friends</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px">' +
+          '<button data-name="" + r.name + "" onclick="acceptFriend(this.dataset.name)" style="background:#00c087;color:#000;border:none;border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px;font-weight:700">Accept</button>' +
+          '<button data-name="" + r.name + "" onclick="declineFriend(this.dataset.name)" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px">Decline</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+  
+  if (listEl) {
+    if (!soc.friends.length) {
+      listEl.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic;padding:6px 0">No friends yet — search to add someone</div>';
+    } else {
+      listEl.innerHTML = soc.friends.map(function(f) {
+        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">' +
+          '<div style="display:flex;align-items:center;gap:10px">' +
+            '<div style="width:32px;height:32px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--bg)">' + f.name[0].toUpperCase() + '</div>' +
+            '<div style="font-weight:600;font-size:13px">' + f.name + '</div>' +
+          '</div>' +
+          '<button data-name="" + f.name + "" onclick="sendChallenge(this.dataset.name)" style="background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px;font-weight:600">⚔ Challenge</button>' +
+        '</div>';
+      }).join('');
+    }
+  }
+}
+
+// ── Challenges ──
+function sendChallenge(name) {
+  const myName = getMyData().name || sessionStorage.getItem('sd_username') || 'You';
+  const soc = _getSocial();
+  const msg = {
+    id: 'ch_' + Date.now(),
+    type: 'challenge',
+    from: myName,
+    to: name,
+    dir: 'out',
+    ts: Date.now(),
+    status: 'pending',
+    text: myName + ' challenged you to a head-to-head! $25 entry — best portfolio by Friday wins.'
+  };
+  soc.messages.push(msg);
+  // Simulate incoming challenge from them for demo
+  soc.messages.push({...msg, id: 'ch_in_'+Date.now(), dir:'in', from:name, to:myName, status:'pending'});
+  _saveSocial(soc);
+  toast('⚔ Challenge sent to ' + name + '!');
+  renderMessages();
+  updateMsgBadge();
+}
+
+function respondChallenge(id, accept) {
+  const soc = _getSocial();
+  const msg = soc.messages.find(function(m){return m.id===id;});
+  if (msg) msg.status = accept ? 'accepted' : 'declined';
+  _saveSocial(soc);
+  if (accept) {
+    toast('Challenge accepted! Pool created — head to Draft to submit picks 🔥');
+  } else {
+    toast('Challenge declined');
+  }
+  renderMessages();
+}
+
+function renderMessages() {
+  const el = document.getElementById('messages-list');
+  if (!el) return;
+  const soc = _getSocial();
+  const msgs = soc.messages.slice().reverse();
+  if (!msgs.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic;padding:6px 0">No messages yet</div>';
+    return;
+  }
+  el.innerHTML = msgs.map(function(m) {
+    const isIn = m.dir === 'in';
+    const time = new Date(m.ts).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    if (m.type === 'challenge') {
+      const isPending = m.status === 'pending';
+      const statusColor = m.status === 'accepted' ? 'var(--pos)' : m.status === 'declined' ? 'var(--neg)' : 'var(--accent)';
+      const fromLabel = isIn ? (m.from + ' challenged you!') : ('Challenge sent to ' + m.to);
+      const btns = (isIn && isPending)
+        ? '<div style="display:flex;gap:8px;margin-top:8px">' +
+            '<button data-id="' + m.id + '" data-accept="1" onclick="respondChallenge(this.dataset.id,true)" style="flex:1;background:#00c087;color:#000;border:none;border-radius:6px;padding:7px;cursor:pointer;font-size:11px;font-weight:700">✓ Accept</button>' +
+            '<button data-id="' + m.id + '" onclick="respondChallenge(this.dataset.id,false)" style="flex:1;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:7px;cursor:pointer;font-size:11px">Decline</button>' +
+          '</div>'
+        : '';
+      return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
+          '<span style="font-size:16px">⚔</span>' +
+          '<div><div style="font-weight:700;font-size:12px">' + fromLabel + '</div>' +
+          '<div style="font-size:10px;color:var(--muted)">' + time + '</div></div>' +
+          '<span style="margin-left:auto;font-size:10px;font-weight:700;color:' + statusColor + '">' + m.status.toUpperCase() + '</span>' +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--muted);line-height:1.5">' + m.text + '</div>' +
+        btns +
+      '</div>';
+    }
+    return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px">' +
+      '<div style="font-size:11px;color:var(--muted)">' + m.from + ' · ' + time + '</div>' +
+      '<div style="font-size:12px;margin-top:3px">' + m.text + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+
+function updateMsgBadge() {
+  const soc = _getSocial();
+  const unread = soc.messages.filter(function(m){return m.dir==='in'&&m.status==='pending';}).length +
+    soc.requests.filter(function(r){return r.dir==='in';}).length;
+  const badge = document.getElementById('msg-badge');
+  if (badge) badge.style.display = unread ? 'inline' : 'none';
+}
+
+
+// ════════════════════════════════
+// CHART MODAL
+// ════════════════════════════════
+var _chartSym = 'SPY';
+var _chartPeriod = '1D';
+var _chartTV = null;
+
+var _chartNames = {
+  SPY: 'SPDR S&P 500 ETF', QQQ: 'Invesco QQQ Trust',
+  IWM: 'iShares Russell 2000', DIA: 'SPDR Dow Jones ETF'
+};
+
+function openChart(sym) {
+  _chartSym = sym || 'SPY';
+  om('chart');
+  // Update header
+  var symEl = document.getElementById('chart-sym');
+  var nameEl = document.getElementById('chart-name');
+  if (symEl) symEl.textContent = _chartSym;
+  if (nameEl) nameEl.textContent = _chartNames[_chartSym] || _chartSym;
+  // Update ticker buttons
+  ['SPY','QQQ','IWM','DIA'].forEach(function(t) {
+    var btn = document.getElementById('chart-btn-' + t);
+    if (!btn) return;
+    var active = t === _chartSym;
+    btn.style.background = active ? 'var(--accent)' : 'transparent';
+    btn.style.color = active ? '#000' : 'var(--muted)';
+    btn.style.borderColor = active ? 'var(--accent)' : 'var(--border)';
+  });
+  // Stats from LD
+  var d = LD[_chartSym] || FALLBACK[_chartSym] || {};
+  var pct = d.pct; var wpct = d.weekPct; var ytd = d.ytdPct; var beta = d.beta; var price = d.price;
+  var fmt = function(v,sfx){ return v!=null ? ((v>=0?'+':'')+v.toFixed(2)+(sfx||'%')) : '—'; };
+  var fmtC = function(v){ return v!=null ? (v>=0?'var(--pos)':'var(--neg)') : 'var(--muted)'; };
+  var priceEl = document.getElementById('chart-price');
+  var chgEl = document.getElementById('chart-chg');
+  if (priceEl) priceEl.textContent = price ? '$' + price.toFixed(2) : '—';
+  if (chgEl) { chgEl.textContent = fmt(pct); chgEl.style.color = fmtC(pct); }
+  var cs = {day:pct,week:wpct,ytd:ytd,beta:beta,vol:null};
+  ['day','week','ytd'].forEach(function(k){
+    var el=document.getElementById('cs-'+k); if(el){el.textContent=fmt(cs[k]);el.style.color=fmtC(cs[k]);}
+  });
+  var betaEl=document.getElementById('cs-beta'); if(betaEl) betaEl.textContent = beta!=null?beta.toFixed(2):'—';
+  var volEl=document.getElementById('cs-vol'); if(volEl) volEl.textContent = '—';
+  // Load TradingView
+  loadTVChart();
+}
+
+function setChartPeriod(p, btn) {
+  _chartPeriod = p;
+  document.querySelectorAll('.chart-period-btn').forEach(function(b) {
+    b.style.background = 'transparent'; b.style.color = 'var(--muted)';
+  });
+  if (btn) { btn.style.background = '#00c087'; btn.style.color = '#000'; }
+  loadTVChart();
+}
+
+function loadTVChart() {
+  var wrap = document.getElementById('chart-canvas-wrap');
+  var loading = document.getElementById('chart-loading');
+  if (!wrap) return;
+  if (loading) loading.style.display = 'flex';
+  wrap.innerHTML = '';
+
+  var periodMap = {'1D':'1','1W':'W','1M':'M','3M':'3M','1Y':'12M','5Y':'60M'};
+  var interval = periodMap[_chartPeriod] || 'D';
+  var rangeMap = {'1D':'1D','1W':'5D','1M':'1M','3M':'3M','1Y':'12M','5Y':'60M'};
+  var range = rangeMap[_chartPeriod] || '1D';
+
+  // Use TradingView mini widget
+  var isDark = document.body.classList.contains('dark');
+  var script = document.createElement('script');
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+  script.async = true;
+  script.innerHTML = JSON.stringify({
+    "symbol": _chartSym,
+    "width": "100%",
+    "height": "400",
+    "locale": "en",
+    "dateRange": range,
+    "colorTheme": isDark ? "dark" : "light",
+    "isTransparent": true,
+    "autosize": true,
+    "largeChartUrl": ""
+  });
+  wrap.appendChild(script);
+  setTimeout(function(){ if(loading) loading.style.display='none'; }, 1800);
+}
+
+// Add @keyframes spin
+(function(){
+  var s=document.createElement('style');
+  s.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
+  document.head.appendChild(s);
+})();
+
+// ════════════════════════════════════
+// DEPOSIT SYSTEM
+// ════════════════════════════════════
+var _depositAmt = 100;
+var _depositCardEl = null;
+
+function openDeposit() {
+  _depositAmt = 100;
+  om('deposit');
+  // Update summary
+  updateDepositSummary();
+  // Mount Stripe card
+  var stripe = getStripe();
+  if (stripe) {
+    if (_depositCardEl) { try { _depositCardEl.unmount(); } catch(e){} }
+    if (_stripeCardEl) { try { _stripeCardEl.unmount(); _stripeCardEl = null; } catch(e){} }
+    var els = stripe.elements({locale:'en'});
+    _depositCardEl = els.create('card', {
+      style: { base: { fontFamily: 'IBM Plex Mono, monospace', fontSize: '14px', color: '#0a0a0f', '::placeholder': {color:'#9999ad'} }, invalid: {color:'#e63946'} },
+      hidePostalCode: true, disableLink: true
+    });
+    _depositCardEl.mount('#deposit-card-element');
+  }
+}
+
+function setDepositAmt(amt, btn) {
+  _depositAmt = amt;
+  // Update button states
+  document.querySelectorAll('.dep-amt-btn').forEach(function(b) {
+    b.style.background = 'var(--surface2)';
+    b.style.borderColor = 'var(--border)';
+    b.style.color = 'var(--ink)';
+  });
+  if (btn) {
+    btn.style.background = 'var(--accent)';
+    btn.style.borderColor = 'var(--accent)';
+    btn.style.color = '#000';
+  }
+  // Sync custom input
+  var inp = document.getElementById('deposit-custom-amt');
+  if (inp && btn) inp.value = '';
+  updateDepositSummary();
+}
+
+function updateDepositSummary() {
+  var amt = _depositAmt || 0;
+  var bal = getBalance();
+  var sumAmt = document.getElementById('dep-summary-amt');
+  var sumAfter = document.getElementById('dep-summary-after');
+  if (sumAmt) sumAmt.textContent = '$' + amt.toFixed(2);
+  if (sumAfter) sumAfter.textContent = '$' + (bal + amt).toFixed(2);
+}
+
+async function confirmDeposit() {
+  var btn = document.getElementById('deposit-confirm-btn');
+  var errEl = document.getElementById('deposit-card-errors');
+  if (!_depositAmt || _depositAmt < 1) { if(errEl) errEl.textContent = 'Enter a valid amount'; return; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Processing…'; }
+  if (errEl) errEl.textContent = '';
+
+  try {
+    var stripe = getStripe();
+    if (!stripe || !_depositCardEl) {
+      // Stripe not loaded — add to balance anyway (dev mode)
+      console.warn('[Openbell] Stripe not available — crediting balance directly');
+      creditBalance(_depositAmt);
+      return;
+    }
+
+    var result = await stripe.createToken(_depositCardEl, {
+      name: sessionStorage.getItem('sd_username') || 'User'
+    });
+
+    if (result.error) {
+      if (errEl) errEl.textContent = result.error.message;
+      if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
+      return;
+    }
+
+    // Charge via Cloudflare function
+    var res = await fetch('/charge-card', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        token: result.token.id,
+        amount: _depositAmt,
+        email: sessionStorage.getItem('sd_useremail') || '',
+        fundName: 'Openbell Deposit'
+      })
+    }).then(function(r){ return r.json(); }).catch(function(){ return null; });
+
+    if (!res || !res.success) {
+      if (errEl) errEl.textContent = (res && res.error) ? res.error : 'Payment failed — please try again';
+      if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
+      return;
+    }
+
+    creditBalance(_depositAmt);
+
+  } catch(err) {
+    if (errEl) errEl.textContent = 'Something went wrong — please try again';
+    if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
+  }
+}
+
+function creditBalance(amt) {
+  var newBal = getBalance() + parseFloat(amt);
+  localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
+  updateBalanceDisplay();
+  cm('deposit');
+  toast('✓ $' + parseFloat(amt).toFixed(2) + ' added to your balance!');
+  // Save card last4 for display
+  renderDashboard();
+}
+
+function updateBalanceDisplay() {
+  var bal = getBalance();
+  var els = ['sb-wins', 'wd-balance'];
+  els.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = '$' + bal.toFixed(2);
+  });
+}
 </script>
   <!-- Firebase loaded at end of body to not block page render -->
 
