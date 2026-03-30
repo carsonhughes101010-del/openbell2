@@ -1971,9 +1971,8 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 #picks-history > div > div { transition:transform .18s ease, box-shadow .18s ease; }
 #picks-history > div > div:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.1) !important; }
 
-/* ── Draft lock — disable interaction when overlay visible ── */
-#draft-pick-lock ~ .dg { pointer-events:none; }
-#draft-pick-lock:not([style*="display: none"]):not([style*="display:none"]) ~ .dg { filter:blur(2px); opacity:.5; }
+/* ── Draft lock — applied via JS class on wrapper ── */
+.draft-locked .dg { pointer-events:none; filter:blur(1.5px); opacity:.55; transition:opacity .2s,filter .2s; }
 </style>
 </head>
 <body>
@@ -2139,16 +2138,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
         <button class="btn" onclick="openDeposit()" style="width:100%;background:#00c087;color:#000;font-weight:700;font-size:12px;border:none;border-radius:8px;padding:9px;cursor:pointer;margin-bottom:6px">+ Deposit Cash</button>
         <button class="btn btn-outline btn-sm" style="width:100%;font-size:10px;padding:5px;color:var(--muted);margin-bottom:10px" onclick="openWithdraw()">↑ Withdraw</button>
         <!-- Card row -->
-        <div id="sb-payment-method" style="padding:8px 10px;border-radius:8px;background:var(--paper);margin-bottom:8px">
-          <div style="display:flex;align-items:center;gap:9px" id="sb-card-display">
-            <svg width="32" height="22" viewBox="0 0 32 22" fill="none"><rect width="32" height="22" rx="4" fill="#1434CB"/><rect x="11" y="6" width="9" height="9" rx="4.5" fill="#F9A000" opacity=".8"/><rect x="7" y="6" width="9" height="9" rx="4.5" fill="#EB001B" opacity=".8"/></svg>
-            <div>
-              <div style="font-family:monospace;font-size:11px;font-weight:700;letter-spacing:1px" id="sb-card-last4">No card on file</div>
-              <div style="font-size:9px;color:var(--muted);margin-top:1px" id="sb-card-exp"></div>
-            </div>
-            <span id="sb-card-badge" style="display:none;margin-left:auto;font-size:8px;font-weight:700;background:var(--green-bg);color:var(--green);padding:2px 7px;border-radius:100px">Default</span>
-          </div>
-        </div>
+        
         <button class="btn btn-outline" style="width:100%;font-size:11px" onclick="event.stopPropagation();openAddPayment()">+ Add Payment Method</button>
       </div>
       <div class="sb-div"></div>
@@ -2821,7 +2811,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 </div>
 
 <!-- ══ CHART VIEW ══ -->
-<div id="chart-view" class="view" style="display:none">
+<div id="chart-view" class="view">
   <div style="max-width:1100px;margin:0 auto;padding:0 24px 40px">
     <!-- Back button + header -->
     <div style="display:flex;align-items:center;gap:16px;padding:20px 0 18px;border-bottom:1px solid var(--border);margin-bottom:20px">
@@ -6153,7 +6143,7 @@ function _goCore(view) {
     var _sel = document.getElementById('draft-fund-select-top');
     if (_draftLeagues.length === 0) {
       // No funds — show lock banner
-      if (_lockEl) _lockEl.style.display='flex';
+      if (_lockEl) _lockEl.style.display='flex'; var _draftView=document.getElementById('draft'); if(_draftView) _draftView.classList.add('draft-locked');
       var _bannerEl = document.getElementById('draft-fund-banner');
       if (_bannerEl) {
         _bannerEl.innerHTML =
@@ -6170,7 +6160,7 @@ function _goCore(view) {
       if (_sel) _sel.innerHTML = '<option value="">— No pools joined —</option>';
     } else {
       // Has funds — hide lock, populate dropdown
-      if (_lockEl) _lockEl.style.display='none';
+      if (_lockEl) _lockEl.style.display='none'; var _draftView=document.getElementById('draft'); if(_draftView) _draftView.classList.remove('draft-locked');
       if (_sel) {
         _sel.innerHTML = '<option value="">— Select a pool —</option>' +
           _draftLeagues.map(function(l){
@@ -6198,6 +6188,7 @@ function _goCore(view) {
     }
   }
   if (view==='earnings') { loadEarnings(); }
+  if (view==='chart-view') { _renderChartView(_chartSym||'SPY'); }
   if (view==='resources') { loadResources(); }
   if (view==='public') { renderPublic(); }
 }
@@ -8122,7 +8113,7 @@ function getStripe() {
   if (!_stripeInstance) {
     try {
       if (typeof Stripe === 'undefined') return null; // Stripe not ready yet, caller will retry
-      _stripeInstance = Stripe('pk_test_51RMnVZHFcLgaCCRxhPcFGhqiT8AJb2kDvFXVoSNBLMFBrERv1HjUoQnCTc3cjFbkPv41QEa6ixK8xMW3E5xAsBM009F04r9Ro', {
+      _stripeInstance = Stripe('pk_test_51RtMXw0tJXAYTPpRMmkEfjFXnklV3s2HbDM6GBlodmo715qVSCum1x4dJdyftilmT34Z7UejZ5O6nb4v6ZnwHtSB00NMBViQ67', {
         betas: []
       });
     } catch(e) { return null; }
@@ -8816,7 +8807,7 @@ function directJoin(id) {
   try {
     if (!window._stripeInstance && window.Stripe) {
       // Replace with your Stripe publishable key
-      window._stripeInstance = Stripe('pk_test_YOUR_STRIPE_PUBLISHABLE_KEY');
+      // Stripe initialized via getStripe() — do not duplicate here
       var elements = window._stripeInstance.elements();
       window._stripeCardElement = elements.create('card', {
         style: { base: { fontSize:'14px', color:'var(--ink)', fontFamily:'inherit' } }
@@ -9405,7 +9396,6 @@ if (_origSbNav) {
   sbNav = function(el, target) {
     _origSbNav(el, target);
     if (target === 'dash-picks') renderPicksHistory();
-  if (view === 'chart-view') { /* handled by _renderChartView */ }
   };
 }
 
@@ -10061,7 +10051,7 @@ function openAddPayment() {
   setTimeout(function() {
     try {
       if (!window._stripeInstance && window.Stripe) {
-        window._stripeInstance = Stripe('pk_test_51RMnVZHFcLgaCCRxhPcFGhqiT8AJb2kDvFXVoSNBLMFBrERv1HjUoQnCTc3cjFbkPv41QEa6ixK8xMW3E5xAsBM009F04r9Ro');
+        window._stripeInstance = Stripe('pk_test_51RtMXw0tJXAYTPpRMmkEfjFXnklV3s2HbDM6GBlodmo715qVSCum1x4dJdyftilmT34Z7UejZ5O6nb4v6ZnwHtSB00NMBViQ67');
       }
       if (window._stripeInstance && !window._stripeCardMounted) {
         var elements = window._stripeInstance.elements();
@@ -11172,6 +11162,7 @@ function getAllKnownPlayers() {
   var seen = new Set();
   var players = [];
   var myName = (getMyData().name || sessionStorage.getItem('sd_username') || '').toLowerCase();
+  // Known players from leagues
   try {
     [...getLeagues(), ...getPublicLeagues()].forEach(function(l) {
       (l.participants || []).forEach(function(p) {
@@ -11183,6 +11174,24 @@ function getAllKnownPlayers() {
       });
     });
   } catch(e){}
+  // Also include leaderboard bots + any cached users from localStorage
+  try {
+    var allU = JSON.parse(localStorage.getItem('sd_all_users') || '[]');
+    allU.forEach(function(u) {
+      var n = ((u.firstName||'') + ' ' + (u.lastName||'')).trim() || u.email || '';
+      if (n && n.toLowerCase() !== myName && !seen.has(n.toLowerCase())) {
+        seen.add(n.toLowerCase());
+        players.push({name: n, uid: u.uid || '', league: 'Registered user'});
+      }
+    });
+  } catch(e){}
+  // Known bot names for demo
+  ['Marcus Webb','Ryan Callahan','J. Torres','Alex Kim','Sam Park','Mike Chen','BradyBags','Jordan Lee','Taylor Morgan','Casey Smith'].forEach(function(n) {
+    if (!seen.has(n.toLowerCase())) {
+      seen.add(n.toLowerCase());
+      players.push({name: n, uid: '', league: 'Openbell Community'});
+    }
+  });
   return players;
 }
 
