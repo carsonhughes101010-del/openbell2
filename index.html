@@ -1257,7 +1257,7 @@ body.dark .step:hover { box-shadow: 0 4px 16px rgba(0,0,0,.4); }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
 /* ════════════════════════════════════════════════
-   FIXES: Market Prices, My Funds, Pub Funds, Draft
+   FIXES: Market Prices, My Pools, Pub Funds, Draft
    ════════════════════════════════════════════════ */
 
 /* ── Market Prices — full width strip ── */
@@ -1296,7 +1296,7 @@ body.dark .step:hover { box-shadow: 0 4px 16px rgba(0,0,0,.4); }
 .pg .pc:last-child { border-right: none; }
 .pg .pc:hover { background: var(--surface2); }
 
-/* ── My Funds — 2 per row ── */
+/* ── My Pools — 2 per row ── */
 .lg {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1310,7 +1310,7 @@ body.dark .step:hover { box-shadow: 0 4px 16px rgba(0,0,0,.4); }
   gap: 10px !important;
 }
 
-/* ── Public Funds — visible header both modes ── */
+/* ── Public Pools — visible header both modes ── */
 .pub-hero {
   background: var(--ink);
   padding: 32px 40px 24px;
@@ -1349,7 +1349,7 @@ body.dark .pub-hero { background: #0a0a0a; }
 }
 .phs-l { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 4px; }
 
-/* ── Public Funds body ── */
+/* ── Public Pools body ── */
 .pub-body { max-width: 1240px; margin: 0 auto; padding: 24px 40px 40px; }
 .pub-filters {
   display: flex;
@@ -1461,7 +1461,7 @@ body.dark .lbtag { background: var(--surface3) !important; border-color: var(--b
 body.dark [style*="background:var(--white)"] { background: var(--surface) !important; }
 body.dark [style*="color:var(--ink)"] { color: var(--ink) !important; }
 
-/* Dark mode fund card readability */
+/* Dark mode pool card readability */
 body.dark .lc { background: var(--surface) !important; border-color: var(--border) !important; }
 body.dark .lc:hover { background: var(--surface2) !important; border-color: var(--border2) !important; }
 body.dark .met { background: var(--surface) !important; }
@@ -1769,7 +1769,7 @@ nav {
 .btn.btn-primary[style*="#00c087"] { box-shadow: 0 2px 12px rgba(0,192,135,.35) !important; }
 .btn.btn-primary[style*="#00c087"]:hover { box-shadow: 0 4px 24px rgba(0,192,135,.5) !important; }
 
-/* Fund cards in dashboard — shimmer on hover */
+/* Pool cards in dashboard — shimmer on hover */
 .lc {
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease !important;
 }
@@ -1902,7 +1902,6 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 /* Selection color */
 ::selection { background:rgba(0,192,135,.2); color:var(--ink); }
 </style>
-</style>
 </head>
 <body>
 
@@ -1919,7 +1918,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 </svg><span style="letter-spacing:.1em">OPEN</span><span class="logo-o" style="letter-spacing:.1em">BELL</span></div>
   <div class="nav-r">
     <button class="btn btn-ghost" id="nav-btn-dashboard" onclick="go('dashboard')">Dashboard</button>
-    <button class="btn btn-ghost" id="nav-btn-public" onclick="go('public')">Public Funds</button>
+    <button class="btn btn-ghost" id="nav-btn-public" onclick="go('public')">Public Pools</button>
     <button class="btn btn-ghost" id="nav-btn-draft" onclick="go('draft')">Draft</button>
     <button class="btn btn-ghost" id="nav-btn-resources" onclick="go('resources')">Resources</button>
     <button class="btn btn-ghost" id="nav-btn-rules" onclick="om('how')">Rules</button>
@@ -1927,7 +1926,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
       <svg id="dark-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v1M7 12v1M1 7H0M14 7h-1M2.5 2.5l.7.7M10.8 10.8l.7.7M2.5 11.5l.7-.7M10.8 3.2l.7-.7M10 7A3 3 0 1 1 4 7a3 3 0 0 1 6 0z" stroke="var(--muted)" stroke-width="1.2" stroke-linecap="round"/></svg>
     </div>
     <button class="btn btn-outline btn-sm" onclick="om('join')" style="border-color:var(--border2);color:var(--ink)">Join</button>
-    <button class="btn btn-primary btn-sm" onclick="om('create')">+ New Fund</button>
+    <button class="btn btn-primary btn-sm" onclick="om('create')">+ New Pool</button>
     <div id="nav-auth-btns" style="display:flex;gap:6px">
       <button class="btn btn-outline btn-sm" onclick="openLogin()" id="nav-login-btn" style="border-color:var(--border2);color:var(--ink)">Log In</button>
       <button class="btn btn-primary btn-sm" onclick="openSignup()" id="nav-signup-btn" style="background:var(--accent);color:#000;font-weight:700">Sign Up</button>
@@ -1948,7 +1947,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
       <h1>DRAFT <span class="acc">STOCKS.</span><br>COMPETE WEEKLY.</h1>
       <p class="hero-sub">Pick five stocks, enter a pool, and let the market decide the winner by Friday's close. Real prices. Real money.</p>
       <div class="hero-cta">
-        <button class="btn btn-primary btn-lg" onclick="om('create')">Create a Fund →</button>
+        <button class="btn btn-primary btn-lg" onclick="om('create')">Create a Pool →</button>
         <button class="btn btn-outline btn-lg" onclick="om('join')">Join with a Code</button>
       </div>
       <div class="hero-stats">
@@ -2044,8 +2043,8 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
       </div>
       <div class="sb-div"></div>
       <div class="sb-sec">
-        <div class="sb-lbl">My Funds</div>
-        <div id="sb-leagues"><div style="padding:6px 9px;font-size:12px;color:var(--muted);font-style:italic">No funds yet</div></div>
+        <div class="sb-lbl">My Pools</div>
+        <div id="sb-leagues"><div style="padding:6px 9px;font-size:12px;color:var(--muted);font-style:italic">No pools yet</div></div>
       </div>
       <div class="sb-div"></div>
       <div class="sb-sec">
@@ -2070,7 +2069,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
         <button class="btn btn-outline" style="width:100%;font-size:11px" onclick="event.stopPropagation();openAddPayment()">+ Add Payment Method</button>
       </div>
       <div class="sb-div"></div>
-      <div class="sb-sec"><button class="btn btn-outline" style="width:100%;font-size:11px" onclick="om('create')">+ New Fund</button></div>
+      <div class="sb-sec"><button class="btn btn-outline" style="width:100%;font-size:11px" onclick="om('create')">+ New Pool</button></div>
     </div>
     <div class="main">
       <div class="ph">
@@ -2078,7 +2077,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
         <div style="display:flex;gap:8px;align-items:center">
           <div id="draft-countdown" style="display:none"></div>
           <button class="btn btn-outline btn-sm" onclick="om('h2h')">⚔ Challenge</button>
-          <button class="btn btn-primary btn-sm" onclick="om('join')">Join a Fund</button>
+          <button class="btn btn-primary btn-sm" onclick="om('join')">Join a Pool</button>
         </div>
       </div>
       <div id="winner-banner" style="display:none"></div>
@@ -2118,12 +2117,12 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
         <!-- Two-column layout: funds + activity feed -->
         <div style="display:flex;flex-direction:column;gap:14px">
           <div>
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--faint);margin-bottom:10px">My Funds</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--faint);margin-bottom:10px">My Pools</div>
             <div class="lg" id="leagues-grid">
               <div class="empty-leagues">
                 <div class="empty-icon">🏆</div>
-                <div class="empty-t">No funds yet</div>
-                <div class="empty-s">Join a public fund or create a private one with friends. Entry fees start at $10.</div>
+                <div class="empty-t">No pools yet</div>
+                <div class="empty-s">Join a public pool or create a private one with friends. Entry fees start at $10.</div>
               </div>
             </div>
           </div>
@@ -2136,7 +2135,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
           <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--faint);margin-bottom:10px">Invite Friends</div>
           <div class="card" style="padding:14px">
             <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Share your invite link or access code</div>
-            <div id="invite-list" style="font-size:11px;color:var(--muted);font-style:italic">Join a fund to get your invite link</div>
+            <div id="invite-list" style="font-size:11px;color:var(--muted);font-style:italic">Join a pool to get your invite link</div>
             <div style="display:flex;gap:6px;margin-top:10px">
               <button class="btn btn-outline btn-sm" style="flex:1;font-size:10px" onclick="copyReferralLink()">📢 Invite & Earn</button>
               <button class="btn btn-primary btn-sm" style="flex:1;font-size:10px" onclick="om('h2h')">⚔️ Challenge</button>
@@ -2237,7 +2236,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
         </div>
         <div style="text-align:right">
           <div id="lb-friday-timer" style="font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:700;color:#fff;letter-spacing:-.02em">—</div>
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px">until market close</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.35);margin-top:2px">until returns calculated</div>
         </div>
       </div>
 
@@ -2282,10 +2281,10 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
         </div>
       </div>
 
-      <!-- Fund chat -->
+      <!-- Pool chat -->
       <div class="card" style="margin-top:14px;overflow:hidden">
         <div class="card-h">
-          <div class="card-t">Fund Chat</div>
+          <div class="card-t">Pool Chat</div>
           <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted)">This week only</div>
         </div>
         <div id="fund-chat-msgs" style="height:160px;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px">
@@ -2324,14 +2323,14 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
         </div>
       </div>
 
-      <!-- Fund selector — prominent -->
+      <!-- Pool selector — prominent -->
       <div id="draft-fund-banner" style="background:var(--ink);border-radius:8px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:20px">
         <div style="flex:1">
           <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.4);margin-bottom:6px">Drafting For</div>
           <select id="draft-fund-select-top" onchange="var _p=this.value.split('__');switchDraftLeague(_p[0],_p[1]);updateDraftFundBanner()" style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.2);color:#fff;cursor:pointer;padding:4px 0;outline:none;appearance:none;-webkit-appearance:none">
-            <option value="" style="background:#141414;color:#fff">— Select a fund to draft for —</option>
+            <option value="" style="background:#141414;color:#fff">— Select a pool to draft for —</option>
           </select>
-          <div id="draft-active-fund-label" style="font-family:'DM Serif Display',Georgia,serif;font-size:22px;font-weight:400;color:rgba(255,255,255,.9);margin-top:6px;letter-spacing:-.01em;line-height:1.1">No fund selected</div>
+          <div id="draft-active-fund-label" style="font-family:'DM Serif Display',Georgia,serif;font-size:22px;font-weight:400;color:rgba(255,255,255,.9);margin-top:6px;letter-spacing:-.01em;line-height:1.1">No pool selected</div>
         </div>
         <div id="draft-fund-info" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(255,255,255,.5);text-align:right;flex-shrink:0;line-height:1.8"></div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
@@ -2349,8 +2348,8 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
       <div style="position:relative">
         <div id="draft-pick-lock" style="display:flex;position:absolute;inset:0;background:var(--bg);opacity:.95;backdrop-filter:blur(4px);z-index:10;border-radius:6px;flex-direction:column;align-items:center;justify-content:center;gap:8px;pointer-events:all">
           <div style="font-size:28px">🔒</div>
-          <div style="font-family:'DM Serif Display',Georgia,serif;font-size:20px;font-weight:400;color:var(--ink)">Select a fund first</div>
-          <div style="font-size:12px;color:var(--muted);text-align:center;max-width:240px">Choose which fund you're drafting for above before picking stocks</div>
+          <div style="font-family:'DM Serif Display',Georgia,serif;font-size:20px;font-weight:400;color:var(--ink)">Select a pool first</div>
+          <div style="font-size:12px;color:var(--muted);text-align:center;max-width:240px">Choose which pool you're drafting for above before picking stocks</div>
         </div>
         <div class="dg">
           <div class="card">
@@ -2411,7 +2410,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
     <div class="pub-hero-in">
       <div>
         <div id="pub-week-label">WEEK — · DRAFTING NOW</div>
-        <h2>Public <span>Funds</span></h2>
+        <h2>Public <span>Pools</span></h2>
         <p>Draft opens now for next week's competition. All picks lock Sunday at 11:59 PM ET.</p>
       </div>
       <div style="margin-top:12px">
@@ -2420,7 +2419,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
         <div class="pub-hero-stats">
         <div class="phs"><div class="phs-n" id="pub-stat-active">—</div><div class="phs-l">Active funds</div></div>
         <div class="phs"><div class="phs-n" id="pub-stat-players">—</div><div class="phs-l">Total players</div></div>
-        <div class="phs"><div class="phs-n" id="pub-stat-prize">—</div><div class="phs-l">Prize pool</div></div>
+        <div class="phs"><div class="phs-n" id="pub-stat-prize">—</div><div class="phs-l">Volume</div></div>
       </div>
     </div>
   </div>
@@ -2434,8 +2433,8 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
       <button class="pub-filter" id="pf-open" onclick="setPubFilter('open',this)">Open to Join</button>
       <button class="pub-filter" id="pf-large" onclick="setPubFilter('large',this)">Large (25–50)</button>
       <button class="pub-filter" id="pf-small" onclick="setPubFilter('small',this)">Small (≤10)</button>
-      <button class="pub-filter" id="pf-mine" onclick="setPubFilter('mine',this)">My Public Funds</button>
-      <button class="btn btn-primary btn-sm" onclick="om('create-public')" style="margin-left:auto">+ Create Public Fund</button>
+      <button class="pub-filter" id="pf-mine" onclick="setPubFilter('mine',this)">My Public Pools</button>
+      <button class="btn btn-primary btn-sm" onclick="om('create-public')" style="margin-left:auto">+ Create Public Pool</button>
     </div>
 
     <!-- FEATURED -->
@@ -2445,13 +2444,13 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
     </div>
 
     <!-- ALL PUBLIC -->
-    <div class="pub-section-title" id="pub-all-label">All Public Funds</div>
+    <div class="pub-section-title" id="pub-all-label">All Public Pools</div>
     <div class="pub-grid" id="pub-all"></div>
 
     <div id="pub-empty" style="display:none;padding:48px;text-align:center;background:var(--white);border:1.5px solid var(--border);border-radius:12px;color:var(--muted)">
       <div style="font-size:32px;margin-bottom:10px">🏆</div>
       <div style="font-weight:700;font-size:15px;color:var(--ink2);margin-bottom:6px">No pools match your filter</div>
-      <div style="font-size:13px">Try a different filter or create a new public fund.</div>
+      <div style="font-size:13px">Try a different filter or create a new public pool.</div>
     </div>
 
   </div>
@@ -2640,7 +2639,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
             <div style="border-left:3px solid var(--orange);padding:10px 14px;background:var(--paper);border-radius:0 8px 8px 0;margin-bottom:10px"><div style="font-weight:700;font-size:12px;margin-bottom:3px">2. One High-Beta, Four Steady</div><div style="font-size:11px;color:var(--muted);line-height:1.65">Your moonshot can win the week. But 4 steady performers protect your floor. Don't draft 5 lottery tickets — one blow-up tanks the portfolio.</div></div>
             <div style="border-left:3px solid var(--orange);padding:10px 14px;background:var(--paper);border-radius:0 8px 8px 0;margin-bottom:10px"><div style="font-weight:700;font-size:12px;margin-bottom:3px">3. Sector Rotation is the Game</div><div style="font-size:11px;color:var(--muted);line-height:1.65">The weekly winner is usually a sector story. Identify which sector has a catalyst — earnings, macro data, geopolitical event — and overweight that theme.</div></div>
             <div style="border-left:3px solid var(--orange);padding:10px 14px;background:var(--paper);border-radius:0 8px 8px 0;margin-bottom:10px"><div style="font-weight:700;font-size:12px;margin-bottom:3px">4. Earnings Week = Edge Week</div><div style="font-size:11px;color:var(--muted);line-height:1.65">Stocks with earnings during the draft week have high variance. A beat can move a stock 10%+ in one day. Know the earnings calendar before you draft.</div></div>
-            <div style="border-left:3px solid var(--orange);padding:10px 14px;background:var(--paper);border-radius:0 8px 8px 0"><div style="font-weight:700;font-size:12px;margin-bottom:3px">5. Beat the S&P, Not Just the Room</div><div style="font-size:11px;color:var(--muted);line-height:1.65">Your real benchmark is SPY. If you go +2% but the market went +3%, you underperformed. Think like a fund manager — aim to beat the index.</div></div>
+            <div style="border-left:3px solid var(--orange);padding:10px 14px;background:var(--paper);border-radius:0 8px 8px 0"><div style="font-weight:700;font-size:12px;margin-bottom:3px">5. Beat the S&P, Not Just the Room</div><div style="font-size:11px;color:var(--muted);line-height:1.65">Your real benchmark is SPY. If you go +2% but the market went +3%, you underperformed. Think like a pool manager — aim to beat the index.</div></div>
           </div>
           <div style="background:var(--white);border:1.5px solid var(--border);border-radius:11px;padding:20px">
             <div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:18px;margin-bottom:14px">Portfolio Frameworks</div>
@@ -2690,7 +2689,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
           <div class="card" style="overflow:hidden"><div id="sentiment-index"><div style="padding:24px;text-align:center;color:var(--muted);font-size:12px">Loading…</div></div></div>
           <div id="pro-lock-sentinel" style="position:absolute;inset:0;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);z-index:10;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(247,247,248,.78)">
             <div style="font-size:26px">🔒</div>
-            <div style="text-align:center;max-width:260px"><div style="font-weight:800;font-size:17px;letter-spacing:-.02em;margin-bottom:5px">Pro Feature</div><div style="font-size:12px;color:var(--muted);line-height:1.6;max-width:240px">See what every player across all public funds is drafting this week. Fade the consensus or follow the crowd.</div></div>
+            <div style="text-align:center;max-width:260px"><div style="font-weight:800;font-size:17px;letter-spacing:-.02em;margin-bottom:5px">Pro Feature</div><div style="font-size:12px;color:var(--muted);line-height:1.6;max-width:240px">See what every player across all public pools is drafting this week. Fade the consensus or follow the crowd.</div></div>
             <button onclick="om('upgrade')" style="background:#00c087;color:#000;font-weight:700;font-size:13px;border:none;border-radius:8px;padding:10px 24px;cursor:pointer">Upgrade — $5/mo →</button>
             <div style="font-size:11px;color:var(--faint)">Cancel anytime · Instant access</div>
           </div>
@@ -2710,7 +2709,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
     <div style="padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start">
       <div>
         <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:5px" id="pd-type">PUBLIC FUND</div>
-        <div style="font-family:'DM Serif Display',Georgia,serif;font-size:24px;font-weight:400" id="pd-name">Fund Name</div>
+        <div style="font-family:'DM Serif Display',Georgia,serif;font-size:24px;font-weight:400" id="pd-name">Pool Name</div>
         <div style="font-size:12px;color:var(--muted);margin-top:3px" id="pd-desc"></div>
       </div>
       <button onclick="cm('pub-detail')" style="background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:4px;margin-left:12px;flex-shrink:0">✕</button>
@@ -2922,10 +2921,10 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 <!-- MODALS -->
 <div class="ov" id="ov-create">
   <div class="modal">
-    <div class="mt">New Fund</div>
+    <div class="mt">New Pool</div>
     <div class="ms">Private — share the access code with your group.</div>
     <div class="field"><label>Your Name</label><input class="fi" id="c-name" placeholder="Jake Morrison" type="text"></div>
-    <div class="field"><label>Fund Name</label><input class="fi" id="c-league" placeholder="Finance 301 Portfolio Challenge" type="text"></div>
+    <div class="field"><label>Pool Name</label><input class="fi" id="c-league" placeholder="Finance 301 Portfolio Challenge" type="text"></div>
     <div class="field-row">
       <div class="field"><label>Entry Fee ($)</label><input class="fi" id="c-fee" placeholder="20" type="number" min="10" value="20"></div>
       <div class="field"><label>Max Participants</label><input class="fi" id="c-max" placeholder="8" type="number" min="2" value="8"></div>
@@ -2972,7 +2971,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 
 <div class="ov" id="ov-join">
   <div class="modal">
-    <div class="mt">Join a Fund</div>
+    <div class="mt">Join a Pool</div>
     <div class="ms">Enter the access code your organizer shared.</div>
     <div class="field"><label>Your Name</label><input class="fi" id="j-name" placeholder="Jake Morrison" type="text"></div>
     <div class="field"><label>Email Address</label><input class="fi" id="j-email" placeholder="jake@university.edu" type="email"></div>
@@ -2995,10 +2994,10 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 <!-- CREATE PUBLIC SLATE MODAL -->
 <div class="ov" id="ov-create-public">
   <div class="modal">
-    <div class="mt">Create Public Fund</div>
-    <div class="ms">Anyone on Openbell can see and join this fund. Set your parameters and it goes live immediately.</div>
+    <div class="mt">Create Public Pool</div>
+    <div class="ms">Anyone on Openbell can see and join this pool. Set your parameters and it goes live immediately.</div>
     <div class="field"><label>Your Name</label><input class="fi" id="cp-name" placeholder="Jake Morrison" type="text"></div>
-    <div class="field"><label>Fund Name</label><input class="fi" id="cp-league" placeholder="e.g. The Big Board Week 12" type="text"></div>
+    <div class="field"><label>Pool Name</label><input class="fi" id="cp-league" placeholder="e.g. The Big Board Week 12" type="text"></div>
     <div class="field"><label>Description <span style="color:var(--muted);font-weight:400">(optional)</span></label><input class="fi" id="cp-desc" placeholder="e.g. Open to all — top return wins" type="text"></div>
     <div class="field-row">
       <div class="field"><label>Entry Fee ($)</label><input class="fi" id="cp-fee" placeholder="20" type="number" min="10" value="20"></div>
@@ -3121,7 +3120,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
         </div>
       </div>
       <div id="su-state-warning" style="display:none;background:#fffbeb;border:1px solid rgba(217,119,6,.3);border-radius:8px;padding:10px 14px;font-size:11px;color:#92400e;line-height:1.6">
-        ⚠️ <strong>Paid competitions are currently unavailable in your state.</strong> You can still browse public funds and practice drafting, but you cannot enter paid competitions from this location.
+        ⚠️ <strong>Paid competitions are currently unavailable in your state.</strong> You can still browse public pools and practice drafting, but you cannot enter paid competitions from this location.
       </div>
       <div id="su-error" style="display:none;background:var(--red-bg);color:var(--red);border-radius:8px;padding:10px 14px;font-size:12px"></div>
       <div style="background:var(--paper);border-radius:8px;padding:12px 14px">
@@ -3278,7 +3277,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
           <div style="width:32px;height:32px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:16px;color:#fff;flex-shrink:0">2</div>
           <div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:22px;letter-spacing:.3px">Funds & Drafting</div>
         </div>
-        <div style="font-size:13px;color:var(--ink2);line-height:1.75">A <strong>Fund</strong> is a weekly competition between you and your group. One person creates it, sets the entry fee, and shares an access code. Everyone else joins with that code and submits their 5 picks before Monday's market open.</div>
+        <div style="font-size:13px;color:var(--ink2);line-height:1.75">A <strong>Pool</strong> is a weekly competition between you and your group. One person creates it, sets the entry fee, and shares an access code. Everyone else joins with that code and submits their 5 picks before Monday's market open.</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
           <div style="background:var(--surface2);border-radius:8px;padding:14px 16px">
             <div style="font-weight:700;font-size:13px;margin-bottom:5px">Draft Window</div>
@@ -3337,7 +3336,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
           </div>
 
           <div style="background:var(--white);border:1.5px solid var(--orange-bd);border-radius:9px;padding:16px;position:relative">
-            <div style="position:absolute;top:-1px;right:12px;font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:700;background:var(--red);color:white;padding:2px 8px;border-radius:0 0 6px 6px;text-transform:uppercase;letter-spacing:.5px">Public Funds Default</div>
+            <div style="position:absolute;top:-1px;right:12px;font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:700;background:var(--red);color:white;padding:2px 8px;border-radius:0 0 6px 6px;text-transform:uppercase;letter-spacing:.5px">Public Pools Default</div>
             <div style="font-weight:700;font-size:13px;margin-bottom:3px">Top 3 Split</div>
             <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Best for larger groups (10+ players)</div>
             <div style="display:flex;flex-direction:column;gap:6px">
@@ -3358,7 +3357,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
           </div>
         </div>
 
-        <div style="font-size:12px;color:var(--muted);line-height:1.7;padding:0 4px">Openbell retains a flat <strong style="color:var(--ink)">5% administrative fee</strong> from the total pool before any payouts are distributed. There are no hidden charges, subscription fees, or per-trade costs. The minimum entry pool. All public funds default to Top 3 Split.</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;padding:0 4px">Openbell retains a flat <strong style="color:var(--ink)">5% administrative fee</strong> from the total pool before any payouts are distributed. There are no hidden charges, subscription fees, or per-trade costs. The minimum entry pool. All public pools default to Top 3 Split.</div>
       </div>
 
       <div style="height:1px;background:var(--border)"></div>
@@ -3433,13 +3432,13 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
     <div style="padding:22px 24px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start">
       <div>
         <div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent,#00c087);margin-bottom:5px">Secure Checkout</div>
-        <div style="font-weight:800;font-size:20px;letter-spacing:-.02em" id="pay-fund-name">Fund Name</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:3px" id="pay-subtitle">Entry fee</div>
+        <div style="font-weight:800;font-size:20px;letter-spacing:-.02em" id="pay-fund-name">Pool Name</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px" id="pay-subtitle">Buy In</div>
       </div>
       <button onclick="cm('payment')" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px;line-height:1">✕</button>
     </div>
 
-    <!-- Fund stats -->
+    <!-- Pool stats -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border)">
       <div style="padding:14px;text-align:center;border-right:1px solid var(--border)">
         <div style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:22px;color:#00c087" id="pay-fee">$0</div>
@@ -3502,11 +3501,11 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 </div>
 
 <!-- ══ PUBLIC FUND JOIN MODAL ══ -->
-<div class="ov" id="ov-join-fund">
+<div class="ov" id="ov-join-pool">
   <div class="modal" style="width:440px;padding:0;overflow:hidden">
     <div style="padding:22px 24px 18px;border-bottom:1px solid var(--border)">
       <div style="font-family:monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent,#00c087);font-family:IBM Plex Mono,monospace;margin-bottom:5px" id="jm-badge">PUBLIC FUND</div>
-      <div style="font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:28px;line-height:1" id="jm-name">Fund</div>
+      <div style="font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:28px;line-height:1" id="jm-name">Pool</div>
       <div style="font-size:12px;color:var(--muted);margin-top:4px" id="jm-desc"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border)">
@@ -3516,7 +3515,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
       </div>
       <div style="padding:14px;text-align:center;border-right:1px solid var(--border)">
         <div style="font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:24px" id="jm-pool">$0</div>
-        <div style="font-size:10px;color:var(--muted)">Prize pool</div>
+        <div style="font-size:10px;color:var(--muted)">Volume</div>
       </div>
       <div style="padding:14px;text-align:center">
         <div style="font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:24px" id="jm-spots">0/0</div>
@@ -3551,7 +3550,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
       <span style="font-size:10px;color:var(--muted)">Secured by Stripe · 256-bit SSL · PCI compliant</span>
     </div>
     <div style="padding:14px 24px;display:flex;gap:10px">
-      <button class="btn btn-outline" style="flex:1" onclick="cm('join-fund')">Cancel</button>
+      <button class="btn btn-outline" style="flex:1" onclick="cm('join-pool')">Cancel</button>
       <button class="btn" id="jm-pay-btn" style="flex:2;background:#00c087;color:#000;font-weight:700;font-size:13px;border:none;border-radius:8px;padding:11px;cursor:pointer" onclick="doJoinFundStripe()">Pay & Join →</button>
     </div>
   </div>
@@ -4286,8 +4285,14 @@ function cycleDraftSort() {
 
 function renderDraftList() {
   const q = (document.getElementById('ds')?.value||'').toLowerCase();
+  // Get active league constraints
+  var _activeLg = null;
+  try { _activeLg = [...getLeagues(),...getPublicLeagues()].find(function(l){return l.id===activeDraftLeagueId;}); } catch(e){}
+  var _maxPicksRD = (_activeLg&&_activeLg.maxPicks) ? _activeLg.maxPicks : 5;
+  var _etfOnly = _activeLg && _activeLg.id && _activeLg.id.includes('pub_etf');
+  
   let stocks = Object.keys(SMETA)
-    .filter(s=>draftFilt==='all'||SMETA[s].s===draftFilt)
+    .filter(s => _etfOnly ? SMETA[s].s === 'etf' : (draftFilt==='all'||SMETA[s].s===draftFilt))
     .filter(s=>!q||s.toLowerCase().includes(q)||SMETA[s].n.toLowerCase().includes(q));
 
   // Sort by % change if requested
@@ -4410,6 +4415,64 @@ function switchDraftLeague(id, weekOverride) {
     const drafts = getDrafts();
     const dKey = `${id}_${league.week || getWN()}`;
     userPicks = drafts[dKey] ? [...drafts[dKey]] : [];
+
+    // ── Pool-specific constraints ──
+    // 1. ETF Only — force ETF filter
+    if (league.id && league.id.includes('pub_etf')) {
+      setFilter('etf', document.querySelector('.fp[onclick*="etf"]'));
+    } else {
+      // Reset to all
+      setFilter('all', document.querySelector('.fp[onclick*="all"]'));
+    }
+
+    // 2. Show pool game mode badge in notice bar
+    const dn = document.getElementById('dn-title');
+    const db = document.getElementById('dn-body');
+    if (league.maxPicks === 1) {
+      if (dn) { dn.textContent = '⚡ The One Pick — 1 stock only'; dn.style.color = '#7c3aed'; }
+      if (db) db.textContent = 'Choose your single best pick. Highest individual return wins.';
+    } else if (league.contrarian) {
+      if (dn) { dn.textContent = '🔄 Contrarian Mode — lowest return wins'; dn.style.color = '#dc2626'; }
+      if (db) db.textContent = 'Pick the stocks you think will perform worst this week.';
+    } else if (league.payoutStructure === 'beater') {
+      if (dn) { dn.textContent = '📈 Beat the Market — outperform SPY'; dn.style.color = '#0284c7'; }
+      if (db) db.textContent = 'Beat SPY weekly return to split the pot with other winners.';
+    } else if (league.id && league.id.includes('pub_etf')) {
+      if (dn) { dn.textContent = '🏦 ETF Only — index and sector ETFs'; dn.style.color = '#059669'; }
+      if (db) db.textContent = 'Only ETFs available. SPY, QQQ, sector ETFs and more.';
+    }
+
+    // 3. Update pick counter label for maxPicks
+    const maxP = league.maxPicks || 5;
+    const pkhc = document.getElementById('pickCLabel');
+    if (pkhc) pkhc.textContent = userPicks.length + ' / ' + maxP;
+    const pickCtr = document.getElementById('pickCtr');
+    if (pickCtr) pickCtr.textContent = userPicks.length + ' of ' + maxP + ' selected';
+
+    // 4. Lock if already submitted
+    const alreadySubmitted = userPicks.length > 0 && drafts[dKey];
+    const subBtn = document.getElementById('subBtn');
+    const lockOverlay = document.getElementById('draft-pick-lock');
+    if (alreadySubmitted) {
+      if (subBtn) { subBtn.textContent = '✓ Picks Locked In'; subBtn.disabled = true; subBtn.style.background = 'var(--pos)'; subBtn.style.color = '#000'; }
+      // Show submitted notice instead of lock overlay
+      if (lockOverlay) {
+        lockOverlay.style.display = 'flex';
+        lockOverlay.innerHTML = '<div style="text-align:center;padding:20px">' +
+          '<div style="font-size:32px;margin-bottom:10px">✅</div>' +
+          '<div style="font-family:Figtree,sans-serif;font-weight:800;font-size:18px;margin-bottom:6px">Picks Locked</div>' +
+          '<div style="font-size:12px;color:var(--muted);margin-bottom:14px">Picks already submitted for this pool.</div>' +
+          '<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:14px">' +
+            userPicks.map(function(s){return '<span style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:11px;padding:4px 10px;border-radius:4px;background:var(--surface2);border:1px solid var(--border)">'+s+'</span>';}).join('') +
+          '</div>' +
+          '<button onclick="var _l=document.getElementById(\'draft-pick-lock\');if(_l)_l.style.display=\'none\'" style="background:var(--ink);color:#fff;border:none;border-radius:7px;padding:8px 20px;cursor:pointer;font-size:12px;font-weight:600">View Picks</button>' +
+        '</div>';
+      }
+    } else {
+      if (lockOverlay) lockOverlay.style.display = 'none';
+      if (subBtn) { subBtn.textContent = 'Submit Picks →'; subBtn.disabled = userPicks.length < (league.maxPicks||5); subBtn.style.background = ''; subBtn.style.color = ''; }
+    }
+
     renderPickSlots(); renderDraftList();
     loadAutoSavedPicks(id);
   }
@@ -4422,7 +4485,7 @@ async function submitDraft() {
   const leagues = getLeagues();
 
   // Save draft
-  // Use the fund's actual week number (could be next week for public funds)
+  // Use the pool's actual week number (could be next week for public pools)
   const _activeLeague = [...getLeagues(), ...getPublicLeagues()].find(l => l.id === activeDraftLeagueId);
   const _fundWeek = _activeLeague ? _activeLeague.week : getWN();
   const dKey = activeDraftLeagueId ? `${activeDraftLeagueId}_${_fundWeek}` : `free_${getWN()}`;
@@ -4542,7 +4605,7 @@ async function createLeague() {
   result.style.display = 'block';
   result.innerHTML = `
     <div class="invite-box">
-      <div class="invite-label">Your fund is live. Share this access code:</div>
+      <div class="invite-label">Your pool is live. Share this access code:</div>
       <div class="invite-code">${code}</div>
       <span class="invite-copy" onclick="copyCode('${code}')">📋 Click to copy</span>
     </div>
@@ -4604,9 +4667,9 @@ async function joinLeague() {
   }
 
   const league = leagues[idx];
-  if (league.participants.length >= league.maxPlayers) { toast('This fund is full'); return; }
+  if (league.participants.length >= league.maxPlayers) { toast('This pool is full'); return; }
   if (league.participants.find(p => p.name.toLowerCase() === jname.toLowerCase())) {
-    toast("You're already in this fund — head to Draft Room");
+    toast("You're already in this pool — head to Draft Room");
     cm('join'); setTimeout(()=>go('draft'),800); return;
   }
 
@@ -4659,7 +4722,7 @@ function renderDashboard() {
     const inByUid  = myUid && l.participants?.find(p => p.uid === myUid);
     const inByName = n && l.participants?.find(p => p.name === n);
     const isOrg    = l.organizer === n || l.organizer_uid === myUid;
-    // Also include if user has draft picks stored for this fund (handles uid mismatch cases)
+    // Also include if user has draft picks stored for this pool (handles uid mismatch cases)
     const hasDraftPicks = !!_allDrafts[l.id + '_' + l.week]?.length;
     return inByUid || inByName || isOrg || hasDraftPicks;
   // dedupe by id+week (keep BOTH week 13 and week 14 of same fund)
@@ -4677,19 +4740,19 @@ function renderDashboard() {
   const grid = el('leagues-grid');
   if (grid) {
     if (!n || n === 'My Account') {
-      grid.innerHTML = `<div class="empty-leagues"><div class="empty-icon">👤</div><div class="empty-t">Sign in to see your funds</div><div class="empty-s">Click Sign In in the top navigation to get started.</div></div>`;
+      grid.innerHTML = `<div class="empty-leagues"><div class="empty-icon">👤</div><div class="empty-t">Sign in to see your pools</div><div class="empty-s">Click Sign In in the top navigation to get started.</div></div>`;
     } else if (myLeagues.length===0) {
-      grid.innerHTML = `<div class="empty-leagues"><div class="empty-icon">🏆</div><div class="empty-t">No funds yet</div><div class="empty-s">Create a pool to get started, or join one with an access code.<br>Entry fees start at $10.</div></div>`;
+      grid.innerHTML = `<div class="empty-leagues"><div class="empty-icon">🏆</div><div class="empty-t">No pools yet</div><div class="empty-s">Create a pool to get started, or join one with an access code.<br>Entry fees start at $10.</div></div>`;
     } else {
       grid.innerHTML = myLeagues.map(l=>{
-        // Picks: scan ALL draft storage keys for this fund — most reliable approach
+        // Picks: scan ALL draft storage keys for this pool — most reliable approach
         const _myUid = getUserId();
         const _dKey  = l.id + '_' + l.week;
         // Use the already-loaded _allDrafts (computed at top of renderDashboard)
         // Also scan for any key that starts with l.id + '_' in case week number differs
         let _storedPicks = _allDrafts[_dKey];
         if (!_storedPicks?.length) {
-          // Scan all draft keys for this fund (handles week number mismatches)
+          // Scan all draft keys for this pool (handles week number mismatches)
           const _altKey = Object.keys(_allDrafts).find(k => k.startsWith(l.id + '_') && _allDrafts[k]?.length > 0);
           if (_altKey) _storedPicks = _allDrafts[_altKey];
         }
@@ -4709,8 +4772,8 @@ function renderDashboard() {
         const myRet = calcRet(myPicks || []);
         let breakdownHtml = '';
         if (myPicks && myPicks.length) {
-          // Determine if the market has opened for this fund's week
-          // weekStarted = true only after Monday 9:30 AM ET of that fund's week
+          // Determine if the market has opened for this pool's week
+          // weekStarted = true only after Monday 9:30 AM ET of that pool's week
           const _wd = weekDatesFromWN(l.week);
           const _now = new Date();
           let weekStarted = false;
@@ -4788,7 +4851,7 @@ function renderDashboard() {
         const weekChip = wd ? `<span style="font-family:monospace;font-size:9px;padding:2px 7px;border-radius:4px;${wd.isCurrentWeek?'background:var(--orange-bg);color:var(--orange)':wd.isPast?'background:var(--paper2);color:var(--muted)':'background:var(--blue-bg);color:var(--blue)'}">Wk ${l.week} · ${wd.mon}–${wd.fri}${wd.isCurrentWeek?' · Live':wd.isPast?' · Done':''}</span>` : '';
         const countdownChip = ''; // removed from dashboard cards
 
-        // Calculate my rank in this fund
+        // Calculate my rank in this pool
         const allPicks = l.picks || {};
         const rankedPlayers = l.participants.map(p => {
           const pPicks = allPicks[p.uid] || allPicks[p.name] || [];
@@ -4814,7 +4877,7 @@ function renderDashboard() {
           ${weekChip ? `<div style="margin-top:2px">${weekChip}</div>` : ''}
           ${breakdownHtml}
         </div>`;
-      }).join('') + `<div class="add-l" onclick="om('create')"><div style="font-size:24px">＋</div><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">New Fund</div></div>`;
+      }).join('') + `<div class="add-l" onclick="om('create')"><div style="font-size:24px">＋</div><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">New Pool</div></div>`;
     }
   }
 
@@ -4822,7 +4885,7 @@ function renderDashboard() {
   const sbL = el('sb-leagues');
   if (sbL) {
     if (!n || n === 'My Account' || myLeagues.length===0) {
-      sbL.innerHTML='<div style="padding:6px 9px;font-size:12px;color:var(--muted);font-style:italic">No funds yet</div>';
+      sbL.innerHTML='<div style="padding:6px 9px;font-size:12px;color:var(--muted);font-style:italic">No pools yet</div>';
     } else {
       sbL.innerHTML = myLeagues.map(l=>{
         const wd = weekDatesFromWN(l.week);
@@ -4845,7 +4908,7 @@ function renderDashboard() {
     const _allUserLeagues = [...getLeagues(), ...getPublicLeagues()].filter(l => {
       return l.participants?.find(p => p.uid === _uid || p.name === n);
     }).filter((l,i,arr) => arr.findIndex(x=>x.id===l.id && x.week===l.week)===i); // dedup
-    const _opts = '<option value="">— Choose a fund —</option>' +
+    const _opts = '<option value="">— Choose a pool —</option>' +
       _allUserLeagues.map(l=>`<option value="${l.id}__${l.week}">${l.name} — Week ${l.week}</option>`).join('');
     const topSel = document.getElementById('draft-fund-select-top');
     if (topSel) {
@@ -4863,7 +4926,7 @@ function renderDashboard() {
   const lbList = el('lb-league-list');
   if (lbList) {
     if (!n || n === 'My Account' || myLeagues.length === 0) {
-      lbList.innerHTML = '<div style="padding:6px 9px;font-size:12px;color:var(--muted);font-style:italic">Join a fund to see standings</div>';
+      lbList.innerHTML = '<div style="padding:6px 9px;font-size:12px;color:var(--muted);font-style:italic">Join a pool to see standings</div>';
     } else {
       lbList.innerHTML = myLeagues.map(l => {
         const wd = weekDatesFromWN(l.week);
@@ -5031,11 +5094,15 @@ function renderLeaderboard(leagueId) {
       : '<span style="font-size:11px;color:var(--muted);font-style:italic">No picks submitted</span>';
     // Also hide return % for others if user hasn't submitted
     const hideRet = !isMyRow && !iHaveSubmitted;
+    // For upcoming weeks (not yet started), show 0.000% with a "pending" look
+    const isUpcomingWk = wdLb && !wdLb.isCurrentWeek && !wdLb.isPast;
     const retDisp = hideRet
       ? `<div class="lbret" style="color:var(--muted);font-size:14px">—</div>`
-      : hasRet
-        ? `<div class="lbret ${p?'pos':'neg'} lbl">${p?'+':''}${r.ret.toFixed(3)}%</div>`
-        : `<div class="lbret" style="color:var(--muted);font-size:14px">—</div>`;
+      : isUpcomingWk && r.picks.length > 0
+        ? `<div class="lbret" style="color:var(--muted);font-size:13px;font-family:IBM Plex Mono,monospace">0.000%<div style="font-size:8px;color:var(--faint);margin-top:1px">starts ${wdLb?wdLb.mon:'soon'}</div></div>`
+        : hasRet
+          ? `<div class="lbret ${p?'pos':'neg'} lbl">${p?'+':''}${r.ret.toFixed(3)}%</div>`
+          : `<div class="lbret" style="color:var(--muted);font-size:14px">—</div>`;
     return `<div class="lbr ${isMe?'me':''}">
       <div class="lbrn ${hasRet ? rankClasses[i]||'' : ''}">${hasRet ? i+1 : '—'}</div>
       <div><div class="lbu">${r.name}${isMe?'<span class="you-t">YOU</span>':''}</div><div class="lbm">Week ${league.week}</div></div>
@@ -5137,20 +5204,20 @@ function _goCore(view) {
         _bannerEl.innerHTML =
           '<div style="flex:1;text-align:center;padding:12px">' +
             '<div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.35);margin-bottom:10px">Draft Room Locked</div>' +
-            '<div style="font-family:Figtree,sans-serif;font-size:16px;font-weight:800;color:#fff;margin-bottom:6px;letter-spacing:-.02em">You have no active funds</div>' +
-            '<div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:16px">Join a public fund or create a private one to start drafting.</div>' +
+            '<div style="font-family:Figtree,sans-serif;font-size:16px;font-weight:800;color:#fff;margin-bottom:6px;letter-spacing:-.02em">You have no active pools</div>' +
+            '<div style="font-size:12px;color:rgba(255,255,255,.45);margin-bottom:16px">Join a public pool or create a private one to start drafting.</div>' +
             '<div style="display:flex;gap:10px;justify-content:center">' +
-              '<button onclick="go(\'public\')" style="background:#00c087;color:#000;font-weight:700;font-size:12px;border:none;border-radius:7px;padding:9px 20px;cursor:pointer">Browse Funds →</button>' +
-              '<button onclick="om(\'create\')" style="background:rgba(255,255,255,.1);color:#fff;font-weight:600;font-size:12px;border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:9px 20px;cursor:pointer">Create Fund</button>' +
+              '<button onclick="go(\'public\')" style="background:#00c087;color:#000;font-weight:700;font-size:12px;border:none;border-radius:7px;padding:9px 20px;cursor:pointer">Browse Pools →</button>' +
+              '<button onclick="om(\'create\')" style="background:rgba(255,255,255,.1);color:#fff;font-weight:600;font-size:12px;border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:9px 20px;cursor:pointer">Create Pool</button>' +
             '</div>' +
           '</div>';
       }
-      if (_sel) _sel.innerHTML = '<option value="">— No funds joined —</option>';
+      if (_sel) _sel.innerHTML = '<option value="">— No pools joined —</option>';
     } else {
       // Has funds — hide lock, populate dropdown
       if (_lockEl) _lockEl.style.display='none';
       if (_sel) {
-        _sel.innerHTML = '<option value="">— Select a fund —</option>' +
+        _sel.innerHTML = '<option value="">— Select a pool —</option>' +
           _draftLeagues.map(function(l){
             return '<option value="'+l.id+'__'+l.week+'">'+l.name+' — Week '+l.week+'</option>';
           }).join('');
@@ -5172,7 +5239,7 @@ function _goCore(view) {
     // Populate sidebar fund list
     const lbList = document.getElementById('lb-league-list');
     if (lbList) {
-      lbList.innerHTML = allL.map(l => { const ck=l.id+'__'+l.week; return `<div class="sb-it${ck===activeDraftLeagueId?' on':''}" onclick="openLeague('${l.id}',${l.week})">${l.name} — Wk ${l.week}</div>`; }).join('') || '<div style="padding:6px 9px;font-size:12px;color:var(--muted);font-style:italic">No funds yet</div>';
+      lbList.innerHTML = allL.map(l => { const ck=l.id+'__'+l.week; return `<div class="sb-it${ck===activeDraftLeagueId?' on':''}" onclick="openLeague('${l.id}',${l.week})">${l.name} — Wk ${l.week}</div>`; }).join('') || '<div style="padding:6px 9px;font-size:12px;color:var(--muted);font-style:italic">No pools yet</div>';
     }
   }
   if (view==='earnings') { loadEarnings(); }
@@ -5763,7 +5830,7 @@ function loadEarnings() {
 // PUBLIC POOLS
 // ══════════════════════════════════════════════════
 
-// Featured public funds — real players only, starts at 0
+// Featured public pools — real players only, starts at 0
 function getFeaturedSlates() {
   const wn = getWN() + 1;  // Public funds always draft for NEXT week
   // Week-specific IDs — each week gets a unique ID so joining week 14 never overwrites week 13
@@ -5816,13 +5883,13 @@ function getFeaturedSlates() {
 }
 
 function getPublicLeagues() {
-  // Featured slates are the SINGLE source of truth for current-week public funds.
+  // Featured slates are the SINGLE source of truth for current-week public pools.
   // No stored copies, no legacy IDs, no past weeks bleed through.
   const featured = getFeaturedSlates();
   const featuredIds = new Set(featured.map(f => f.id));
   const baseIds = new Set(['pub_flagship','pub_highroller','pub_rookie','pub_etf','pub_momentum','pub_sector']);
 
-  // For "My Funds" continuity: include past-week enrolled funds (not shown on public page grid)
+  // For "My Pools" continuity: include past-week enrolled funds (not shown on public page grid)
   const stored = getLeagues().filter(l => l.isPublic);
   const myName = sessionStorage.getItem('sd_username') || '';
   const myUid  = typeof getUserId === 'function' ? getUserId() : '';
@@ -5905,7 +5972,7 @@ function renderPublic() {
 
   // All section label
   const allLabel = elN('pub-all-label');
-  if (allLabel) allLabel.textContent = pubFilter==='all' ? 'All Public Funds' : `Showing ${filtered.length} fund${filtered.length!==1?'s':''}`;
+  if (allLabel) allLabel.textContent = pubFilter==='all' ? 'All Public Pools' : `Showing ${filtered.length} fund${filtered.length!==1?'s':''}`;
 
   // All grid
   const allGrid = elN('pub-all');
@@ -5975,7 +6042,7 @@ function pubCard(l, myName, isFeat) {
     </div>
     <div class="prob-bar-wrap" style="margin-bottom:12px"><div class="prob-bar-fill" style="width:${pct}%"></div></div>
     ${full
-      ? '<div style="text-align:center;padding:9px;background:var(--paper);border-radius:8px;font-size:12px;color:var(--muted)">This fund is full</div>'
+      ? '<div style="text-align:center;padding:9px;background:var(--paper);border-radius:8px;font-size:12px;color:var(--muted)">This pool is full</div>'
       : isMine
         ? '<div style="text-align:center;padding:9px;background:var(--green-bg);border-radius:8px;font-size:12px;color:var(--green);font-weight:600">✓ Enrolled — picks due Sunday</div>'
         : `<button class="btn btn-primary" style="width:100%;padding:10px" onclick="event.stopPropagation();directJoin('${l.id}')">Join for $${l.fee} →</button>`}
@@ -6163,7 +6230,7 @@ function handleGlobalSearch(e) {
     return;
   }
   // Check if matches a nav section
-  const navMap = {dashboard:'dashboard',draft:'draft','draft room':'draft',standings:'leaderboard',leaderboard:'leaderboard',earnings:'earnings','public funds':'public',public:'public'};
+  const navMap = {dashboard:'dashboard',draft:'draft','draft room':'draft',standings:'leaderboard',leaderboard:'leaderboard',earnings:'earnings','public pools':'public',public:'public'};
   const navHit = Object.entries(navMap).find(([k]) => k.includes(q));
   if (navHit) { go(navHit[1]); e.target.value = ''; return; }
   toast(`No results for "${q}" — try a ticker like NVDA or a pool name`);
@@ -6315,7 +6382,7 @@ function getMyRank(league) {
 // ══════════════════════════════════════════════════
 // IMPROVEMENT 11: PAGE TITLE UPDATER
 // ══════════════════════════════════════════════════
-const PAGE_TITLES = {landing:'Openbell — Competitive Stock Pools',dashboard:'Dashboard — Openbell',draft:'Draft Room — Openbell',leaderboard:'Standings — Openbell',earnings:'Earnings Calendar — Openbell',resources:'Resources — Openbell',public:'Public Funds — Openbell'};
+const PAGE_TITLES = {landing:'Openbell — Competitive Stock Pools',dashboard:'Dashboard — Openbell',draft:'Draft Room — Openbell',leaderboard:'Standings — Openbell',earnings:'Earnings Calendar — Openbell',resources:'Resources — Openbell',public:'Public Pools — Openbell'};
 function updatePageTitle(view) {
   document.title = PAGE_TITLES[view] || 'Openbell';
 }
@@ -6459,7 +6526,7 @@ document.addEventListener('DOMContentLoaded', () => { if(typeof checkAgeGate==='
       }
     }).catch(function(e) { console.warn('Redirect result:', e.message); });
   } catch(e) {}
-  // Clean stored week 13 (and older) featured funds — only keep current week
+  // Clean stored week 13 (and older) featured pools — only keep current week
   try {
     var _wn = getWN() + 1;
     var _stored = getLeagues();
@@ -6468,16 +6535,16 @@ document.addEventListener('DOMContentLoaded', () => { if(typeof checkAgeGate==='
       var _base = (l.id||'').replace(/_w\d+$/, '');
       var isFeaturedBase = _baseIds.has(l.baseId) || _baseIds.has(_base);
       if (!isFeaturedBase) return true; // keep non-featured user-created funds
-      // For featured funds: only keep if user is genuinely enrolled (has picks or is participant)
+      // For featured pools: only keep if user is genuinely enrolled (has picks or is participant)
       var _myN = sessionStorage.getItem('sd_username')||'';
       var _myU = localStorage.getItem('sd_uid')||sessionStorage.getItem('sd_uid')||'';
       var enrolled = l.participants?.some(function(p){
         return (p.uid&&p.uid===_myU&&p.uid!=='fake_')||(p.name&&p.name===_myN);
       });
-      // Keep enrolled past-week funds (My Funds), but remove current-week duplicates
+      // Keep enrolled past-week funds (My Pools), but remove current-week duplicates
       // (getFeaturedSlates handles current week — stored copies are redundant)
       if (enrolled) return true;
-      return false; // strip unenrolled featured fund copies entirely
+      return false; // strip unenrolled featured pool copies entirely
     });
     if (_cleaned.length !== _stored.length) saveLeagues(_cleaned);
   } catch(e) {}
@@ -7172,7 +7239,7 @@ async function doJoinFundStripe() {
     var custId = localStorage.getItem('sd_stripe_customer_id');
     var chargeRes = await fetch('/charge-card', {
       method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ customerId: custId, amount: _pendingLeagueFee || 0, fundName: _pendingLeagueName || 'Fund', fundId: _pendingLeagueId || '' })
+      body: JSON.stringify({ customerId: custId, amount: _pendingLeagueFee || 0, fundName: _pendingLeagueName || 'Pool', fundId: _pendingLeagueId || '' })
     }).catch(() => null);
 
     if (!chargeRes || !chargeRes.ok) {
@@ -7268,7 +7335,7 @@ async function confirmPaymentAndJoin() {
         token: token.id,
         amount: _pendingLeagueFee || 0,
         email: email,
-        fundName: _pendingLeagueName || 'Fund',
+        fundName: _pendingLeagueName || 'Pool',
         fundId: _pendingLeagueId || ''
       })
     }).catch(() => null);
@@ -7324,7 +7391,7 @@ submitDraft = function() {
 
   // Active fund name
   const _allL = [...getLeagues(), ...getPublicLeagues()];
-  let _fundName = 'your fund';
+  let _fundName = 'your pool';
   if (activeDraftLeagueId) {
     const [_lid, _lwk] = activeDraftLeagueId.includes('__') ? activeDraftLeagueId.split('__') : [activeDraftLeagueId, null];
     const _lg = _lwk ? _allL.find(l => l.id === _lid && String(l.week) === String(_lwk)) : _allL.find(l => l.id === _lid);
@@ -7374,9 +7441,9 @@ submitDraft = function() {
   document.body.appendChild(ov);
 };
 
-// ② STANDINGS — always go straight to standings when clicking a fund you're in
+// ② STANDINGS — always go straight to standings when clicking a pool you're in
 // openLeague — always navigates, no membership block
-// (Users can view standings of any fund they're in, clicking from dashboard)
+// (Users can view standings of any pool they're in, clicking from dashboard)
 
 // ③ FUND CARD HOVER PREVIEW — show top movers on hover
 document.addEventListener('mouseover', e => {
@@ -7476,7 +7543,7 @@ function showJoinModal(id) {
   if (myName && league.participants?.find(p => p.name.toLowerCase() === myName.toLowerCase())) {
     activeDraftLeagueId = id;
     go('draft');
-    toast('You are already in this fund — pick your stocks!');
+    toast('You are already in this pool — pick your stocks!');
     return;
   }
 
@@ -7545,7 +7612,7 @@ function showJoinModal(id) {
       : '🔒 Picks window closed — opens next week';
   }
 
-  om('join-fund');
+  om('join-pool');
   setTimeout(initJmCard, 150);
   setTimeout(() => { document.getElementById('jm-name-input')?.focus(); }, 150);
   } catch(err) { console.error('showJoinModal error:', err); alert('Error: ' + err.message); }
@@ -7561,9 +7628,9 @@ function doJoinFund() {
   const all    = getPublicLeagues();
   const league = all.find(l => l.id === _joinFundId);
   if (!league) { toast('Fund not found'); return; }
-  if (league.participants.length >= league.maxPlayers) { toast('This fund is full'); return; }
+  if (league.participants.length >= league.maxPlayers) { toast('This pool is full'); return; }
   if (league.participants.find(p => p.name.toLowerCase() === name.toLowerCase())) {
-    cm('join-fund');
+    cm('join-pool');
     sessionStorage.setItem('sd_username', name);
     activeDraftLeagueId = _joinFundId;
     go('draft');
@@ -7585,7 +7652,7 @@ function doJoinFund() {
 
   logEvent('Public_Joins', {session_user:name, email, pool_name:league.name, slate_id:_joinFundId, entry_fee:league.fee}).catch(()=>{});
 
-  cm('join-fund');
+  cm('join-pool');
   renderPublic();
   renderDashboard();
   toast('✓ Joined "' + league.name + '"! Now pick your 5 stocks.');
@@ -7611,7 +7678,7 @@ function getOrCreatePayOverlay() {
       '<div style="padding:22px 24px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start">',
         '<div>',
           '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--orange);margin-bottom:5px">Confirm & Pay</div>',
-          '<div style="font-family:Figtree,sans-serif;font-weight:700;font-size:22px" id="poi-name">Fund</div>',
+          '<div style="font-family:Figtree,sans-serif;font-weight:700;font-size:22px" id="poi-name">Pool</div>',
         '</div>',
         '<button onclick="closePayOverlay()" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:6px" onmouseover="this.style.background=\'var(--paper)\'" onmouseout="this.style.background=\'none\'">✕</button>',
       '</div>',
@@ -7619,7 +7686,7 @@ function getOrCreatePayOverlay() {
       // Fee summary + balance option
       '<div style="border-bottom:1px solid var(--border);padding:16px 24px">',
         '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">',
-          '<div style="font-size:13px;color:var(--muted)">Entry fee</div>',
+          '<div style="font-size:13px;color:var(--muted)">Buy In</div>',
           '<div style="font-family:Figtree,sans-serif;font-weight:700;font-size:28px;color:var(--orange)" id="poi-fee">$0</div>',
         '</div>',
         // Balance pay option row
@@ -7681,11 +7748,11 @@ function directJoin(id) {
     }
   }
 
-  if (league.participants.length >= league.maxPlayers) { toast('This fund is full'); return; }
+  if (league.participants.length >= league.maxPlayers) { toast('This pool is full'); return; }
 
   // Must be logged in to join
   if (!getUserId()) {
-    toast('Please log in or sign up before joining a fund');
+    toast('Please log in or sign up before joining a pool');
     openLogin();
     return;
   }
@@ -8012,7 +8079,7 @@ function renderActivityFeed() {
   if (!el) return;
   const feed = JSON.parse(localStorage.getItem(_uidKey('sd_activity')) || '[]');
   if (!feed.length) {
-    el.innerHTML = '<div style="padding:28px;text-align:center;color:var(--muted);font-size:12px">No activity yet — join a fund or submit a draft</div>';
+    el.innerHTML = '<div style="padding:28px;text-align:center;color:var(--muted);font-size:12px">No activity yet — join a pool or submit a draft</div>';
     return;
   }
   const icons = { join:'🤝', draft:'📋', win:'🏆', create:'✨', payment:'💳' };
@@ -8083,7 +8150,7 @@ function renderInvitePanel() {
   const myL = allL.filter(l => uid && (l.participants?.find(p => p.uid === uid) || l.organizer_uid === uid))
                   .filter((l,i,a) => a.findIndex(x=>x.id===l.id)===i);
   if (!myL.length) {
-    el.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic">Join a fund to get your invite link</div>';
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic">Join a pool to get your invite link</div>';
     return;
   }
   el.innerHTML = myL.map(l => {
@@ -8105,7 +8172,7 @@ function copyFundLink(code, link) {
 }
 
 function copyInviteLink() {
-  if (!activeDraftLeagueId) { toast('Select a fund first'); return; }
+  if (!activeDraftLeagueId) { toast('Select a pool first'); return; }
   const allL = [...getLeagues(), ...getPublicLeagues()];
   const l = allL.find(x => x.id === activeDraftLeagueId);
   if (!l) return;
@@ -8149,7 +8216,7 @@ function sendChatMsg() {
   const myName = sessionStorage.getItem('sd_username') || '';
   if (!myName) { toast('Sign in to chat'); openLogin(); return; }
   const key = getChatKey();
-  if (!key) { toast('Select a fund first'); return; }
+  if (!key) { toast('Select a pool first'); return; }
   const msgs = JSON.parse(localStorage.getItem(key) || '[]');
   msgs.push({ name: myName, uid: getUserId(), msg, ts: Date.now() });
   if (msgs.length > 100) msgs.shift();
@@ -8169,7 +8236,7 @@ function renderPicksHistory() {
   const allL = [...getLeagues(), ...getPublicLeagues()];
   const entries = Object.entries(drafts);
   if (!entries.length) {
-    el.innerHTML = '<div class="card" style="padding:40px;text-align:center;color:var(--muted)"><div style="font-size:28px;margin-bottom:12px">🎟</div><div style="font-weight:600;margin-bottom:6px">No submissions yet</div><div style="font-size:12px">Join a fund and submit your picks to see them here.</div></div>';
+    el.innerHTML = '<div class="card" style="padding:40px;text-align:center;color:var(--muted)"><div style="font-size:28px;margin-bottom:12px">🎟</div><div style="font-weight:600;margin-bottom:6px">No submissions yet</div><div style="font-size:12px">Join a pool and submit your picks to see them here.</div></div>';
     return;
   }
 
@@ -8207,7 +8274,7 @@ function renderPicksHistory() {
       <div style="height:4px;background:${ret!=null?(pos?'var(--pos)':'var(--neg)'):'var(--border2)'}"></div>
       <!-- Header -->
       <div style="padding:12px 14px;border-bottom:1px solid var(--border)">
-        <div style="font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px">${league?.name||'Fund'}</div>
+        <div style="font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px">${league?.name||'Pool'}</div>
         <div style="font-family:IBM Plex Mono,monospace;font-size:9px;color:var(--muted)">${dateStr}</div>
       </div>
       <!-- Stats row -->
@@ -8373,7 +8440,7 @@ function showDraftConfirmModal(picks, fundName) {
   const nameEl = document.getElementById('dc-fund-name');
   const rowEl  = document.getElementById('dc-picks-row');
 
-  if (nameEl) nameEl.textContent = 'Confirmed for "' + (fundName || 'your fund') + '"';
+  if (nameEl) nameEl.textContent = 'Confirmed for "' + (fundName || 'your pool') + '"';
 
   if (rowEl) {
     rowEl.innerHTML = picks.map(sym => {
@@ -8538,7 +8605,7 @@ document.addEventListener('keydown', e => {
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(20,20,20,.75);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center';
     ov.innerHTML = `<div style="background:var(--white);border-radius:14px;padding:28px 32px;width:380px;max-width:94vw">
       <div style="font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:24px;margin-bottom:18px">Keyboard Shortcuts</div>
-      ${[['1','Dashboard'],['2','Public Funds'],['3','Draft Room'],['4','Resources'],['Esc','Close modals'],['?','This menu'],['Cmd+K','Search stocks'],['Enter','Confirm / Submit']].map(([k,d])=>
+      ${[['1','Dashboard'],['2','Public Pools'],['3','Draft Room'],['4','Resources'],['Esc','Close modals'],['?','This menu'],['Cmd+K','Search stocks'],['Enter','Confirm / Submit']].map(([k,d])=>
         `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
           <span style="color:var(--muted)">${d}</span>
           <kbd style="font-family:monospace;font-size:11px;background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:2px 7px">${k}</kbd>
@@ -8829,7 +8896,7 @@ function _applyFirebaseUser(user, isNew) {
 
 
 // ══ FUND WEEK ROLLOVER ══
-// At Monday 9:30 AM ET, public featured funds roll to new week
+// At Monday 9:30 AM ET, public featured pools roll to new week
 function checkFundRollover() {
   const now = new Date();
   const etOffset = -5 * 60; // EST offset in minutes (no DST handling for simplicity)
@@ -8848,7 +8915,7 @@ function checkFundRollover() {
       if (k.startsWith('sd_leagues_')) {
         try {
           const stored = JSON.parse(localStorage.getItem(k) || '[]');
-          // Reset featured fund participant lists for new week
+          // Reset featured pool participant lists for new week
           const reset = stored.map(l => {
             if (l.isFeatured && l.week < currentWN) {
               return {...l, week: currentWN, participants: [], picks: {}};
@@ -8862,7 +8929,7 @@ function checkFundRollover() {
     localStorage.setItem('sd_last_rollover', String(currentWN));
     renderPublic();
     renderDashboard();
-    toast('New week — public funds are now open for drafting!');
+    toast('New week — public pools are now open for drafting!');
   }
 }
 
@@ -9042,13 +9109,13 @@ function updateDraftFundBanner() {
   if (!activeDraftLeagueId) {
     if (lock) lock.style.display = 'flex';
     if (info) info.textContent = '';
-    // Check if it's because no funds exist vs not selected
+    // Check if it's because no pools exist vs not selected
     var topSel = document.getElementById('draft-fund-select-top');
     if (topSel && topSel.options.length <= 1) {
       // No funds to draft for
       if (lock) {
         var _lockLast = lock.querySelector('div:last-of-type'); if(_lockLast) _lockLast.textContent = 'No funds available to draft for';
-        var _lockChild = lock.querySelector('div:nth-child(3)'); if(_lockChild) _lockChild.textContent = 'Join a public fund or create a private one';
+        var _lockChild = lock.querySelector('div:nth-child(3)'); if(_lockChild) _lockChild.textContent = 'Join a public pool or create a private one';
       }
     }
     return;
@@ -9093,12 +9160,12 @@ function recordWeekOutcome(won, ret) {
 // ② BADGES / ACHIEVEMENTS SYSTEM
 // ════════════════════════════════════════════════════════════════════════
 const BADGE_DEFS = [
-  { id:'first_blood',  name:'First Blood',   icon:'🩸', desc:'Win your first fund',           check: s => s.totalWins >= 1 },
+  { id:'first_blood',  name:'First Blood',   icon:'🩸', desc:'Win your first pool',           check: s => s.totalWins >= 1 },
   { id:'hat_trick',   name:'Hat Trick',      icon:'🎩', desc:'Win 3 funds',                   check: s => s.totalWins >= 3 },
   { id:'streak3',     name:'On Fire',        icon:'🔥', desc:'3-week winning streak',          check: s => s.best >= 3 },
   { id:'streak5',     name:'Unstoppable',    icon:'⚡', desc:'5-week winning streak',          check: s => s.best >= 5 },
-  { id:'veteran',     name:'Veteran',        icon:'🎖️', desc:'Enter 10 funds',                check: s => s.totalFunds >= 10 },
-  { id:'highroller',  name:'High Roller',    icon:'💎', desc:'Enter High Roller fund',         check: () => getLeagues().some(l=>l.id==='pub_highroller') },
+  { id:'veteran',     name:'Veteran',        icon:'🎖️', desc:'Enter 10 pools',                check: s => s.totalFunds >= 10 },
+  { id:'highroller',  name:'High Roller',    icon:'💎', desc:'Enter High Roller pool',         check: () => getLeagues().some(l=>l.id==='pub_highroller') },
   { id:'diversified', name:'Diversified',    icon:'📊', desc:'Pick stocks from 4 sectors',     check: () => false }, // set via submitDraft
   { id:'benchmark',   name:'Beat the Market',icon:'📈', desc:'Beat S&P 500 return',            check: () => {const spy=(LD['SPY']||FALLBACK['SPY']||{}).weekPct||0; const s=getStreaks(); return (s.lastRet||0) > spy;} },
 ];
@@ -9445,7 +9512,7 @@ function renderLeaderboardHistory() {
   }).sort(function(a,b){ return (b.week||0)-(a.week||0); });
 
   if (!hist.length) {
-    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-size:12px">Enter your first fund to build your history.</div>';
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-size:12px">Enter your first pool to build your history.</div>';
     return;
   }
 
@@ -9554,7 +9621,7 @@ function generateWeeklyRecap() {
   var recap = {
     week: getWN(),
     results: weekResults,
-    bestFund: bestRet.fund,
+    bestFund: bestRet.pool,
     bestReturn: bestRet.ret,
     wins: wins,
     streak: s.current,
@@ -9564,7 +9631,7 @@ function generateWeeklyRecap() {
   localStorage.setItem(_uidKey('sd_recap_'+getWN()), JSON.stringify(recap));
 
   if (wins > 0) {
-    logActivity('win', { msg: 'Week ' + getWN() + ' recap: Won ' + wins + ' fund' + (wins>1?'s':'') + '! Best return: ' + (bestRet.ret>=0?'+':'') + bestRet.ret.toFixed(3) + '%' });
+    logActivity('win', { msg: 'Week ' + getWN() + ' recap: Won ' + wins + ' pool' + (wins>1?'s':'') + '! Best return: ' + (bestRet.ret>=0?'+':'') + bestRet.ret.toFixed(3) + '%' });
     recordWeekOutcome(true, bestRet.ret);
   } else if (weekResults.length > 0) {
     recordWeekOutcome(false, bestRet.ret);
@@ -9574,7 +9641,7 @@ function generateWeeklyRecap() {
 }
 
 // ════════════════════════════════════════════════════════════════════════
-// ⑧ NATIONAL LEADERBOARD — global ranking across all public funds
+// ⑧ NATIONAL LEADERBOARD — global ranking across all public pools
 // ════════════════════════════════════════════════════════════════════════
 function computeNationalRanking() {
   var myName = sessionStorage.getItem('sd_username') || '';
@@ -9631,7 +9698,7 @@ function renderNationalRanking(containerId) {
 // ════════════════════════════════════════════════════════════════════════
 function shareResult(fundId, ret, rank) {
   var text = '📈 Just went ' + (ret>=0?'+':'') + ret.toFixed(2) + '% this week on @OpenBell' +
-    (rank===1 ? ' 🏆 Won the fund!' : ' — ranked #'+rank) +
+    (rank===1 ? ' 🏆 Won the pool!' : ' — ranked #'+rank) +
     ' | Can you beat me? openbell.app';
   if (navigator.share) {
     navigator.share({ title: 'Openbell — Week ' + getWN() + ' Results', text: text, url: location.href.split('?')[0] });
@@ -9952,7 +10019,7 @@ function renderMySummary(league) {
 // ══════════════════════════════════════════════════
 function confirmSubmitDraft() {
   if (userPicks.length < 5) return;
-  const pool = activeDraftLeagueId ? (getLeagues().find(l=>l.id===activeDraftLeagueId)?.name || 'your fund') : 'your fund';
+  const pool = activeDraftLeagueId ? (getLeagues().find(l=>l.id===activeDraftLeagueId)?.name || 'your pool') : 'your pool';
   const preview = userPicks.map(sym => {
     const d = LD[sym] || FALLBACK[sym];
     const p = d?.pct >= 0;
@@ -10189,7 +10256,7 @@ nt.trim();
         stored[sIdx].picks[_name] = [...userPicks];
         saveLeagues(stored);
       } else {
-        // Pull the featured fund definition and store it with picks
+        // Pull the featured pool definition and store it with picks
         const featured = getPublicLeagues().find(l => l.id === activeDraftLeagueId);
         if (featured) {
           const copy = {...featured};
