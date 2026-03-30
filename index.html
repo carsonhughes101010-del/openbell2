@@ -1667,6 +1667,242 @@ body.dark .pub-card:hover { border-color:var(--accent) !important; }
 body.dark select.fi option { background:var(--surface2) !important; color:var(--ink) !important; }
 </style>
 <script src="https://js.stripe.com/v3/"></script>
+
+<style>
+/* ════════════════════════════════════════════
+   VISUAL UPGRADE — Effects, Motion, Polish
+   ════════════════════════════════════════════ */
+
+/* Smooth page transitions */
+.view { animation: fadeSlideIn .22s cubic-bezier(.25,.46,.45,.94) both; }
+@keyframes fadeSlideIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* Hero — animated gradient background */
+.hero {
+  position:relative;
+  overflow:hidden;
+  background: #0a0a0f !important;
+}
+.hero::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 50%, rgba(0,192,135,.12) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 80% 30%, rgba(0,192,135,.06) 0%, transparent 70%);
+  pointer-events:none;
+  animation: heroGlow 8s ease-in-out infinite alternate;
+}
+@keyframes heroGlow {
+  from { opacity:.7; transform:scale(1); }
+  to   { opacity:1;  transform:scale(1.05); }
+}
+
+/* Animated grid lines in hero */
+.hero::after {
+  content:'';
+  position:absolute;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(0,192,135,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,192,135,.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events:none;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
+
+/* Hero h1 — glitch-free, tight, impactful */
+.hero h1 {
+  font-size: clamp(52px, 7vw, 96px) !important;
+  line-height: .92 !important;
+  letter-spacing: -.04em !important;
+}
+.hero h1 .acc {
+  color: var(--accent) !important;
+  position:relative;
+}
+
+/* Ticker animation - live market feel */
+@keyframes tickerScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+/* Card hover effects */
+.card {
+  transition: box-shadow .2s ease, transform .15s ease, border-color .15s ease;
+}
+.card:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,.08), 0 0 0 1px rgba(0,192,135,.1) !important;
+  transform: translateY(-1px);
+}
+
+/* Nav — glass effect */
+nav {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255,255,255,.92) !important;
+}
+
+/* Pub cards — hover lift with green glow */
+.pub-card {
+  transition: transform .18s cubic-bezier(.25,.46,.45,.94), box-shadow .18s ease, border-color .18s ease !important;
+}
+.pub-card:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,.1), 0 0 0 1px rgba(0,192,135,.2) !important;
+  border-color: rgba(0,192,135,.35) !important;
+}
+.pub-card.featured {
+  box-shadow: 0 4px 20px rgba(0,192,135,.1) !important;
+}
+
+/* Step cards — staggered reveal */
+.step { transition: transform .2s ease, box-shadow .2s ease !important; }
+.step:hover { transform: translateY(-4px) scale(1.01) !important; box-shadow: 0 16px 48px rgba(0,0,0,.1), 0 0 0 1px rgba(0,192,135,.15) !important; }
+
+/* Metric tiles — subtle pulse on update */
+.met { transition: all .3s ease; }
+
+/* Buttons — satisfying press */
+.btn { transition: transform .1s ease, box-shadow .15s ease, background .15s ease, color .15s ease !important; }
+.btn:active { transform: scale(.97) !important; }
+.btn-primary { box-shadow: 0 2px 8px rgba(0,0,0,.15) !important; }
+.btn-primary:hover { box-shadow: 0 4px 16px rgba(0,0,0,.2) !important; transform: translateY(-1px) !important; }
+.btn.btn-primary[style*="#00c087"] { box-shadow: 0 2px 12px rgba(0,192,135,.35) !important; }
+.btn.btn-primary[style*="#00c087"]:hover { box-shadow: 0 4px 24px rgba(0,192,135,.5) !important; }
+
+/* Fund cards in dashboard — shimmer on hover */
+.lc {
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease !important;
+}
+.lc:hover {
+  transform: translateY(-2px) !important;
+  border-color: rgba(0,192,135,.25) !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,.08) !important;
+}
+
+/* Sidebar nav items — smooth active indicator */
+.sb-it {
+  transition: background .12s ease, color .12s ease, padding-left .12s ease !important;
+  border-left: 2px solid transparent;
+}
+.sb-it.on {
+  border-left-color: var(--accent) !important;
+  padding-left: 11px !important;
+}
+
+/* Leaderboard rows */
+.lbr {
+  transition: background .1s ease !important;
+}
+
+/* Draft stock rows */
+.sr { transition: background .1s ease, transform .1s ease !important; }
+.sr:hover { transform: translateX(2px) !important; }
+.sr.pk { 
+  background: rgba(0,192,135,.06) !important;
+  border-left: 2px solid var(--accent) !important;
+}
+
+/* Modal entrance */
+.ov { animation: overlayIn .18s ease both; }
+.modal { animation: modalIn .22s cubic-bezier(.34,1.3,.64,1) both; }
+@keyframes overlayIn { from{opacity:0} to{opacity:1} }
+@keyframes modalIn { from{opacity:0;transform:scale(.94) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
+
+/* Toast — smooth slide up */
+#toast {
+  transition: all .25s cubic-bezier(.34,1.3,.64,1) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(0,192,135,.2) !important;
+}
+
+/* Input focus ring */
+.fi:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(0,192,135,.12) !important;
+  outline: none !important;
+}
+
+/* Live dot pulse */
+.rdot, .live-dot {
+  animation: livePulse 2s ease-in-out infinite !important;
+}
+@keyframes livePulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:.6; transform:scale(.85); }
+}
+
+/* Hero stats — count up feel */
+.hst-n { 
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.03em;
+}
+
+/* Sector performance chart bars */
+.prob-bar-fill { transition: width .6s cubic-bezier(.25,.46,.45,.94) !important; }
+
+/* Number changes — flash green/red */
+@keyframes flashPos { 0%{background:rgba(0,192,135,.15)} 100%{background:transparent} }
+@keyframes flashNeg { 0%{background:rgba(230,57,70,.12)} 100%{background:transparent} }
+.flash-pos { animation: flashPos .5s ease !important; }
+.flash-neg { animation: flashNeg .5s ease !important; }
+
+/* Confetti pop animation already exists — enhance */
+@keyframes popIn { 
+  0%{transform:scale(0) rotate(-10deg);opacity:0} 
+  70%{transform:scale(1.12) rotate(2deg);opacity:1} 
+  100%{transform:scale(1) rotate(0deg);opacity:1} 
+}
+
+/* Dark mode enhancements */
+body.dark nav { background: rgba(10,10,15,.88) !important; }
+body.dark .hero::before {
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 50%, rgba(0,214,143,.15) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 80% 30%, rgba(0,214,143,.08) 0%, transparent 70%);
+}
+body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,214,143,.15) !important; }
+
+/* Public funds hero */
+.pub-hero {
+  background: var(--ink) !important;
+  position: relative;
+  overflow: hidden;
+}
+.pub-hero::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background: radial-gradient(ellipse 50% 80% at 10% 50%, rgba(0,192,135,.08) 0%, transparent 60%);
+  pointer-events:none;
+}
+
+/* Metrics row */
+.met {
+  border-radius: 12px !important;
+  position: relative;
+  overflow: hidden;
+}
+.met::after {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity:0;
+  transition: opacity .3s ease;
+}
+.met:hover::after { opacity:1; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:var(--muted); }
+
+/* Selection color */
+::selection { background:rgba(0,192,135,.2); color:var(--ink); }
+</style>
+</style>
 </head>
 <body>
 
@@ -1716,9 +1952,10 @@ body.dark select.fi option { background:var(--surface2) !important; color:var(--
         <button class="btn btn-outline btn-lg" onclick="om('join')">Join with a Code</button>
       </div>
       <div class="hero-stats">
+        <div class="hst"><div class="hst-n" id="stat-funds">9</div><div class="hst-l">Game modes</div></div>
         <div class="hst"><div class="hst-n">$10</div><div class="hst-l">Min. entry</div></div>
-        <div class="hst"><div class="hst-n">5%</div><div class="hst-l">Platform fee</div></div>
-        <div class="hst"><div class="hst-n">Top 3</div><div class="hst-l">Get paid</div></div>
+        <div class="hst"><div class="hst-n">5%</div><div class="hst-l">Only fee ever</div></div>
+        <div class="hst"><div class="hst-n">Fri</div><div class="hst-l">Results drop</div></div>
       </div>
     </div>
     <div class="widget">
@@ -2705,6 +2942,14 @@ body.dark select.fi option { background:var(--surface2) !important; color:var(--
             <option value="top3">Top 3 Split — 1st 60% · 2nd 20% · 3rd 15%</option>
           </select>
         </div>
+      <div class="field"><label>Game Mode</label>
+        <select class="fi" id="c-gamemode">
+          <option value="standard">Standard — Pick 5 stocks</option>
+          <option value="onepick">The One Pick — 1 stock only</option>
+          <option value="contrarian">Contrarian — lowest return wins</option>
+          <option value="beater">Beat the Market — beat SPY to split pot</option>
+        </select>
+      </div>
         <div id="c-payout-preview" style="background:var(--paper);border-radius:7px;padding:10px 12px;font-family:monospace;font-size:10px;color:var(--muted);line-height:2">
           <span id="cprev-1st">1st: 95%</span> &nbsp;·&nbsp; <span style="opacity:.4">After 5% platform fee</span>
         </div>
@@ -5544,6 +5789,22 @@ function getFeaturedSlates() {
     {id:weekId('pub_sector'),    baseId:'pub_sector',    name:'Sector Showdown',   desc:'$15 entry. Pick one stock per sector.',
      fee:15, maxPlayers:40,  isPublic:true, isFeatured:true, organizer:'Openbell', payoutStructure:'winner',
      participants:[], picks:{}, week:wn, created:new Date().toISOString(), code:'SECTOR-W'+wn},
+    // ── NEW GAME MODES ──
+    {id:weekId('pub_onepick'),    baseId:'pub_onepick',    name:'The One Pick',
+     desc:'$5 entry. Pick ONE stock. Pure conviction — highest single return wins.',
+     fee:5,  maxPlayers:100, isPublic:true, isFeatured:true, organizer:'Openbell',
+     payoutStructure:'winner', maxPicks:1,
+     participants:[], picks:{}, week:wn, created:new Date().toISOString(), code:'ONE-W'+wn},
+    {id:weekId('pub_contrarian'), baseId:'pub_contrarian', name:'Contrarian Mode',
+     desc:'$20 entry. The LOWEST portfolio return wins. Bet against the market.',
+     fee:20, maxPlayers:40,  isPublic:true, isFeatured:true, organizer:'Openbell',
+     payoutStructure:'winner', contrarian:true,
+     participants:[], picks:{}, week:wn, created:new Date().toISOString(), code:'CONTRA-W'+wn},
+    {id:weekId('pub_beater'),     baseId:'pub_beater',     name:'Beat the Market',
+     desc:'$15 entry. Outperform SPY this week. Everyone who beats the index splits the pot.',
+     fee:15, maxPlayers:60,  isPublic:true, isFeatured:true, organizer:'Openbell',
+     payoutStructure:'beater',
+     participants:[], picks:{}, week:wn, created:new Date().toISOString(), code:'BEAT-W'+wn},
   ];
 
   // Overlay ONLY by exact ID match (no legacy fallbacks that cause duplicates)
@@ -5673,6 +5934,10 @@ function pubCard(l, myName, isFeat) {
   const sizeLbl = cap >= 25 ? 'Large' : cap <= 10 ? 'Small' : 'Mid';
   const sizeClass = cap >= 25 ? 'size-large' : 'size-small';
 
+  // Game mode badge
+  const gameModeBadge = l.maxPicks === 1 ? '<span class="prize-badge" style="background:#7c3aed;color:#fff">1-PICK</span>' :
+    l.contrarian ? '<span class="prize-badge" style="background:#dc2626;color:#fff">CONTRARIAN</span>' :
+    l.payoutStructure === 'beater' ? '<span class="prize-badge" style="background:#0284c7;color:#fff">BEAT INDEX</span>' : '';
   const payoutBadge = isTop3
     ? `<span class="prize-badge">Top 3 paid</span>`
     : `<span class="prize-badge">$${pay1} pot</span>`;
