@@ -6445,7 +6445,10 @@ async function doLogin() {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ action: 'login', data: { email } })
-    }).then(r => r.json()).catch(() => null);
+    }).then(function(r) {
+      if (!r.ok) { console.warn('[Openbell] /db login HTTP', r.status); return null; }
+      return r.json();
+    }).catch(function(e) { console.warn('[Openbell] /db login fetch error:', e); return null; });
 
     if (dbRes && dbRes.user) {
       const u = dbRes.user;
@@ -9753,7 +9756,11 @@ try { applyProState(); } catch(e) {}
 
 // loginWithGoogle is defined by the module script below.
 // This stub prevents "not defined" errors if clicked early.
+var _googleSignInPending = false;
 function loginWithGoogle() {
+  if (_googleSignInPending) { toast('Sign-in already in progress…'); return; }
+  _googleSignInPending = true;
+  setTimeout(function(){ _googleSignInPending = false; }, 5000);
   // Delegate to the modular Firebase SDK exposed by the module script below
   if (typeof window._googleSignIn === 'function') {
     window._googleSignIn();
@@ -11185,8 +11192,10 @@ function getAllKnownPlayers() {
       }
     });
   } catch(e){}
-  // Known bot names for demo
-  ['Marcus Webb','Ryan Callahan','J. Torres','Alex Kim','Sam Park','Mike Chen','BradyBags','Jordan Lee','Taylor Morgan','Casey Smith'].forEach(function(n) {
+  // Demo community players (always searchable)
+  ['Marcus Webb','Ryan Callahan','J. Torres','Alex Kim','Sam Park','Mike Chen',
+   'BradyBags','Jordan Lee','Taylor Morgan','Casey Smith','Hunter Davis',
+   'Blake Wilson','Drew Martinez','Connor Hughes','Riley Thompson'].forEach(function(n) {
     if (!seen.has(n.toLowerCase())) {
       seen.add(n.toLowerCase());
       players.push({name: n, uid: '', league: 'Openbell Community'});
@@ -11474,6 +11483,11 @@ var _depositCardEl = null;
 
 function openDeposit() {
   _depositAmt = 100;
+  // Always reset button state
+  var btn = document.getElementById('deposit-confirm-btn');
+  if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
+  var errEl = document.getElementById('deposit-card-errors');
+  if (errEl) errEl.textContent = '';
   om('deposit');
   updateDepositSummary();
   // Wait for Stripe.js to be ready — retry up to 3 times
@@ -11558,6 +11572,9 @@ function creditBalance(amt) {
   localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
   updateBalanceDisplay();
   cm('deposit');
+  // Reset button for next use
+  var btn = document.getElementById('deposit-confirm-btn');
+  if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
   toast('✓ $' + parseFloat(amt).toFixed(2) + ' added to your balance!');
   renderDashboard();
 }
@@ -11621,48 +11638,7 @@ function updateBalanceDisplay() {
 
 
 <!-- ══ DEPOSIT MODAL ══ -->
-<div class="ov" id="ov-deposit">
-  <div class="modal" style="width:420px;padding:0;overflow:hidden;border-radius:14px">
-    <div style="height:4px;background:var(--accent)"></div>
-    <div style="padding:22px 24px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:5px">Openbell Wallet</div>
-        <div style="font-family:Figtree,sans-serif;font-weight:800;font-size:24px;letter-spacing:-.02em">Deposit Cash</div>
-      </div>
-      <div onclick="cm('deposit')" style="cursor:pointer;font-size:18px;color:var(--muted);padding:4px 8px;border-radius:6px" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">✕</div>
-    </div>
-    <div style="padding:18px 24px 0">
-      <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:10px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Select amount</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
-        <button onclick="setDepositAmt(25,this)" class="dep-amt-btn" style="background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px 0;font-family:IBM Plex Mono,monospace;font-weight:700;font-size:14px;cursor:pointer;color:var(--ink);transition:all .15s">$25</button>
-        <button onclick="setDepositAmt(50,this)" class="dep-amt-btn" style="background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px 0;font-family:IBM Plex Mono,monospace;font-weight:700;font-size:14px;cursor:pointer;color:var(--ink);transition:all .15s">$50</button>
-        <button onclick="setDepositAmt(100,this)" class="dep-amt-btn" style="background:#00c087;border:1.5px solid #00c087;border-radius:8px;padding:10px 0;font-family:IBM Plex Mono,monospace;font-weight:700;font-size:14px;cursor:pointer;color:#000;transition:all .15s">$100</button>
-        <button onclick="setDepositAmt(250,this)" class="dep-amt-btn" style="background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px 0;font-family:IBM Plex Mono,monospace;font-weight:700;font-size:14px;cursor:pointer;color:var(--ink);transition:all .15s">$250</button>
-      </div>
-      <div style="position:relative;margin-bottom:16px">
-        <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-family:IBM Plex Mono,monospace;font-weight:700;font-size:16px;color:var(--muted);pointer-events:none">$</span>
-        <input class="fi" id="deposit-custom-amt" type="number" min="5" max="1000" placeholder="Custom amount" style="width:100%;box-sizing:border-box;padding-left:32px;font-family:IBM Plex Mono,monospace;font-weight:700;font-size:16px" oninput="_depositAmt=parseFloat(this.value)||0;updateDepositSummary()">
-      </div>
-      <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:8px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Card details</div>
-      <div id="deposit-card-element" style="padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);margin-bottom:6px;min-height:44px"></div>
-      <div id="deposit-card-errors" style="color:var(--neg);font-size:11px;min-height:16px;margin-bottom:12px"></div>
-      <div style="background:var(--surface2);border-radius:9px;padding:12px 14px;margin-bottom:16px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-          <span style="font-size:12px;color:var(--muted)">Deposit</span>
-          <span id="dep-summary-amt" style="font-family:IBM Plex Mono,monospace;font-weight:700">$100.00</span>
-        </div>
-        <div style="display:flex;justify-content:space-between">
-          <span style="font-size:12px;color:var(--muted)">Balance after</span>
-          <span id="dep-summary-after" style="font-family:IBM Plex Mono,monospace;font-weight:700;color:var(--pos)">—</span>
-        </div>
-      </div>
-    </div>
-    <div style="padding:0 24px 20px;display:flex;gap:10px">
-      <button class="btn btn-outline" style="flex:1" onclick="cm('deposit')">Cancel</button>
-      <button id="deposit-confirm-btn" onclick="confirmDeposit()" style="flex:2;background:#00c087;color:#000;font-weight:700;border:none;border-radius:8px;padding:11px;cursor:pointer;font-size:14px">Deposit →</button>
-    </div>
-  </div>
-</div>
+
 <script>
 // ════════════════════════════════
 // DEPOSIT SYSTEM
@@ -11672,6 +11648,11 @@ var _depositCardEl = null;
 
 function openDeposit() {
   _depositAmt = 100;
+  // Always reset button state
+  var btn = document.getElementById('deposit-confirm-btn');
+  if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
+  var errEl = document.getElementById('deposit-card-errors');
+  if (errEl) errEl.textContent = '';
   om('deposit');
   updateDepositSummary();
   // Wait for Stripe.js to be ready — retry up to 3 times
@@ -11756,6 +11737,9 @@ function creditBalance(amt) {
   localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
   updateBalanceDisplay();
   cm('deposit');
+  // Reset button for next use
+  var btn = document.getElementById('deposit-confirm-btn');
+  if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
   toast('✓ $' + parseFloat(amt).toFixed(2) + ' added to your balance!');
   renderDashboard();
 }
