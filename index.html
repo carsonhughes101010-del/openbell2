@@ -8450,44 +8450,40 @@ try { applyProState(); } catch(e) {}
 // loginWithGoogle is defined by the module script below.
 // This stub prevents "not defined" errors if clicked early.
 function loginWithGoogle() {
-  try {
-    if (!firebase || !firebase.auth) { toast('Loading — try again in a moment'); return; }
-    var provider = new firebase.auth.GoogleAuthProvider();
-    provider.addScope('email');
-    provider.addScope('profile');
-    firebase.auth().signInWithPopup(provider).then(function(result) {
-      var u = result.user;
-      var nameParts = (u.displayName || 'User').split(' ');
-      var firstName = nameParts[0] || 'User';
-      var lastName = nameParts.slice(1).join(' ') || '';
-      var sessionUser = {
-        uid: u.uid, firstName: firstName, lastName: lastName,
-        email: u.email || '', phone: '', dob: '', state: ''
-      };
-      var allU = JSON.parse(localStorage.getItem('sd_all_users') || '[]');
-      if (!allU.find(function(x){ return x.email === u.email; })) {
-        allU.push(sessionUser);
-        localStorage.setItem('sd_all_users', JSON.stringify(allU));
-      }
-      _setSession(sessionUser);
-      cm('login'); cm('signup');
-      updateNavUser();
-      renderDashboard();
-      toast('✓ Signed in as ' + firstName);
-    }).catch(function(err) {
-      console.warn('[Openbell] Google sign-in error:', err.code, err.message);
-      if (err.code === 'auth/popup-blocked') {
-        toast('Pop-up blocked — allow pop-ups for this site in your browser settings');
-      } else if (err.code === 'auth/unauthorized-domain') {
-        toast('Domain not authorized — add openbell.pages.dev to Firebase authorized domains');
+  // Delegate to the modular Firebase SDK exposed by the module script below
+  if (typeof window._googleSignIn === 'function') {
+    window._googleSignIn();
+  } else {
+    // Not loaded yet — retry once after short delay
+    setTimeout(function() {
+      if (typeof window._googleSignIn === 'function') {
+        window._googleSignIn();
       } else {
-        toast('Google Sign-In failed: ' + (err.message || err.code));
+        toast('Google Sign-In is loading — try again in a moment');
       }
-    });
-  } catch(e) {
-    console.warn('[Openbell] Google auth exception:', e);
-    toast('Google Sign-In unavailable — use email/password instead');
+    }, 800);
   }
+}
+
+// Called by Firebase module script after successful Google sign-in
+function _applyFirebaseUser(user, showToast) {
+  var nameParts = (user.displayName || 'User').split(' ');
+  var firstName = nameParts[0] || 'User';
+  var lastName  = nameParts.slice(1).join(' ') || '';
+  var sessionUser = {
+    uid: user.uid, firstName: firstName, lastName: lastName,
+    email: user.email || '', phone: '', dob: '', state: ''
+  };
+  var allU = JSON.parse(localStorage.getItem('sd_all_users') || '[]');
+  if (!allU.find(function(x){ return x.email === sessionUser.email; })) {
+    allU.push(sessionUser);
+    localStorage.setItem('sd_all_users', JSON.stringify(allU));
+  }
+  _setSession(sessionUser);
+  cm('login'); cm('signup');
+  updateNavUser();
+  renderDashboard();
+  if (showToast) toast('✓ Signed in as ' + firstName);
 }
 
 function googleSignOut() {
