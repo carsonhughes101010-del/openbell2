@@ -3404,12 +3404,8 @@ async function submitToSheets(sheetName, data) {
 }
 
 async function submitToFormspree(data) {
-  if (!CFG.formspreeId) return;
-  fetch(`https://formspree.io/f/${CFG.formspreeId}`, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json', 'Accept':'application/json'},
-    body: JSON.stringify(data)
-  }).catch(()=>{}); // fire-and-forget, never surface errors
+  // Disabled — formspree not configured (was causing 422 errors)
+  return;
 }
 
 async function logEvent(sheetName, data) {
@@ -3856,9 +3852,30 @@ function genCode() {
   return `${w}-${n}`;
 }
 
-function getWN() { // week number
-  const d = new Date(); const s = new Date(d.getFullYear(),0,1);
-  return Math.ceil((((d-s)/86400000)+s.getDay()+1)/7);
+function getWN() {
+  // Return the CURRENT competition week.
+  // After Monday 9:00 AM ET, advance to next week.
+  const now = new Date();
+  // Convert to ET (UTC-5 standard, UTC-4 daylight)
+  const etOffset = isDST(now) ? -4 : -5;
+  const et = new Date(now.getTime() + (etOffset * 60 + now.getTimezoneOffset()) * 60000);
+  const day = et.getDay(); // 0=Sun, 1=Mon
+  const hour = et.getHours();
+  // Base ISO week
+  const s = new Date(et.getFullYear(), 0, 1);
+  const baseWk = Math.ceil((((et - s) / 86400000) + s.getDay() + 1) / 7);
+  // If it's Monday at or after 9AM, or any day after Monday, we're drafting for NEXT week
+  // So the "current" competition week has already flipped
+  if (day === 1 && hour >= 9) return baseWk; // Monday 9AM+ = new week starts
+  if (day > 1 && day < 6) return baseWk;     // Tue–Fri = current week live
+  if (day === 6 || day === 0) return baseWk; // Sat–Sun = still current week
+  return baseWk - 1; // Monday before 9AM = still last week
+}
+
+function isDST(d) {
+  const jan = new Date(d.getFullYear(), 0, 1).getTimezoneOffset();
+  const jul = new Date(d.getFullYear(), 6, 1).getTimezoneOffset();
+  return Math.min(jan, jul) === d.getTimezoneOffset();
 }
 
 // Convert a stored week number back to Mon–Fri date strings
@@ -5086,10 +5103,12 @@ function doSignup() {
       action: 'signup',
       data: { uid, email, firstName, lastName, passwordHash, phone, dob, state, age: userAge, isRestricted }
     })
-  }).then(r => r.json()).then(res => {
-    console.log('[Openbell] Supabase signup result:', JSON.stringify(res));
-    if (res && res.error && res.error !== 'Email already registered') console.warn('[Openbell] Supabase signup error:', res.error);
-  }).catch(err => console.error('[Openbell] Supabase signup failed:', err));
+  }).then(function(r) {
+    if (!r.ok) { console.warn('[Openbell] /db returned', r.status); return {}; }
+    return r.json();
+  }).then(function(res) {
+    console.log('[Openbell] Supabase result:', JSON.stringify(res));
+  }).catch(function(err) { console.warn('[Openbell] Supabase error (non-blocking):', err.message); });
 
   // Log to USERS sheet
   logEvent('USERS', {
@@ -8431,15 +8450,43 @@ try { applyProState(); } catch(e) {}
 // loginWithGoogle is defined by the module script below.
 // This stub prevents "not defined" errors if clicked early.
 function loginWithGoogle() {
-  // Use redirect mode instead of popup to avoid COOP errors
   try {
+    if (!firebase || !firebase.auth) { toast('Loading — try again in a moment'); return; }
     var provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithRedirect(provider)
-      .catch(function(err) {
-        toast('Google Sign-In failed: ' + (err.message || 'unknown error'));
-      });
+    provider.addScope('email');
+    provider.addScope('profile');
+    firebase.auth().signInWithPopup(provider).then(function(result) {
+      var u = result.user;
+      var nameParts = (u.displayName || 'User').split(' ');
+      var firstName = nameParts[0] || 'User';
+      var lastName = nameParts.slice(1).join(' ') || '';
+      var sessionUser = {
+        uid: u.uid, firstName: firstName, lastName: lastName,
+        email: u.email || '', phone: '', dob: '', state: ''
+      };
+      var allU = JSON.parse(localStorage.getItem('sd_all_users') || '[]');
+      if (!allU.find(function(x){ return x.email === u.email; })) {
+        allU.push(sessionUser);
+        localStorage.setItem('sd_all_users', JSON.stringify(allU));
+      }
+      _setSession(sessionUser);
+      cm('login'); cm('signup');
+      updateNavUser();
+      renderDashboard();
+      toast('✓ Signed in as ' + firstName);
+    }).catch(function(err) {
+      console.warn('[Openbell] Google sign-in error:', err.code, err.message);
+      if (err.code === 'auth/popup-blocked') {
+        toast('Pop-up blocked — allow pop-ups for this site in your browser settings');
+      } else if (err.code === 'auth/unauthorized-domain') {
+        toast('Domain not authorized — add openbell.pages.dev to Firebase authorized domains');
+      } else {
+        toast('Google Sign-In failed: ' + (err.message || err.code));
+      }
+    });
   } catch(e) {
-    toast('Google Sign-In not available — please use email/password');
+    console.warn('[Openbell] Google auth exception:', e);
+    toast('Google Sign-In unavailable — use email/password instead');
   }
 }
 
