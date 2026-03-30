@@ -1506,6 +1506,8 @@ body.dark #ov-how .modal { background: var(--surface) !important; }
 body.dark #ov-how [style*="background:var(--paper)"] { background: var(--surface2) !important; }
 body.dark #ov-how [style*="color:var(--orange)"] { color: var(--red) !important; }
 body.dark #ov-how [style*="background:var(--orange)"] { background: var(--red) !important; }
+.ns-row:hover{background:var(--surface2)!important}
+.msg-card:hover{transform:translateY(-1px)}
 </style>
 <style id="overhaul">
 :root {
@@ -1987,6 +1989,11 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
     <button class="btn btn-ghost" id="nav-btn-dashboard" onclick="go('dashboard')">Dashboard</button>
     <button class="btn btn-ghost" id="nav-btn-public" onclick="go('public')">Public Pools</button>
     <button class="btn btn-ghost" id="nav-btn-draft" onclick="go('draft')">Draft</button>
+    <div style="position:relative;display:flex;align-items:center" id="nav-player-search-wrap">
+      <input id="nav-player-search-input" placeholder="Search players…" oninput="navSearchPlayers(this.value)" onfocus="document.getElementById('nav-search-dropdown').style.display='block'" onblur="setTimeout(function(){document.getElementById('nav-search-dropdown').style.display='none'},200)" style="font-size:12px;font-family:IBM Plex Mono,monospace;padding:5px 10px 5px 28px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--ink);width:160px;outline:none;transition:border-color .15s" onfocusin="this.style.borderColor='var(--accent)'" onfocusout="this.style.borderColor='var(--border)'">
+      <svg style="position:absolute;left:9px;pointer-events:none" width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="5" cy="5" r="3.5" stroke="var(--muted)" stroke-width="1.2"/><path d="M8 8l2 2" stroke="var(--muted)" stroke-width="1.2" stroke-linecap="round"/></svg>
+      <div id="nav-search-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;width:280px;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:200;max-height:280px;overflow-y:auto;padding:6px"></div>
+    </div>
     <button class="btn btn-ghost" id="nav-btn-resources" onclick="go('resources')">Resources</button>
     <button class="btn btn-ghost" id="nav-btn-rules" onclick="om('how')">Rules</button>
     <div class="dark-toggle" onclick="toggleDark()" title="Toggle dark mode" style="margin-right:8px">
@@ -2284,31 +2291,31 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 
       <!-- SOCIAL / MESSAGES PANEL -->
       <div id="dash-social" style="display:none">
-        <!-- Search Players -->
-        <div class="card" style="padding:16px 18px;margin-bottom:14px">
-          <div style="font-weight:700;font-size:14px;margin-bottom:12px">🔍 Find Players</div>
-          <div style="position:relative;margin-bottom:12px">
-            <input class="fi" id="player-search" placeholder="Search by name or username…" oninput="searchPlayers(this.value)" style="width:100%;box-sizing:border-box;padding-left:36px">
-            <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%)" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="var(--muted)" stroke-width="1.2"/><path d="M10 10l2 2" stroke="var(--muted)" stroke-width="1.2" stroke-linecap="round"/></svg>
+
+        <!-- Search -->
+        <div class="card" style="padding:16px 18px;margin-bottom:12px">
+          <div style="font-family:Figtree,sans-serif;font-weight:700;font-size:14px;margin-bottom:12px">🔍 Find Players</div>
+          <div style="position:relative">
+            <input class="fi" id="player-search" placeholder="Search by name…" oninput="searchPlayers(this.value)" style="width:100%;box-sizing:border-box;padding-left:34px">
+            <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none" width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="var(--muted)" stroke-width="1.3"/><path d="M9 9l2.5 2.5" stroke="var(--muted)" stroke-width="1.3" stroke-linecap="round"/></svg>
           </div>
-          <div id="player-search-results" style="max-height:200px;overflow-y:auto"></div>
+          <div id="player-search-results" style="margin-top:8px"></div>
         </div>
 
         <!-- Friends -->
-        <div class="card" style="padding:16px 18px;margin-bottom:14px">
+        <div class="card" style="padding:16px 18px;margin-bottom:12px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <div style="font-weight:700;font-size:14px">👥 Friends</div>
-            <span id="friend-req-count" style="display:none;background:var(--neg);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px"></span>
+            <div style="font-family:Figtree,sans-serif;font-weight:700;font-size:14px">👥 Friends <span id="friend-req-count" style="display:none;background:var(--neg);color:#fff;font-size:9px;padding:2px 6px;border-radius:10px;margin-left:4px"></span></div>
           </div>
-          <div id="friend-requests" style="margin-bottom:10px"></div>
-          <div id="friends-list"><div style="font-size:12px;color:var(--muted);font-style:italic;padding:6px 0">No friends yet — search to add someone</div></div>
+          <div id="friend-requests"></div>
+          <div id="friends-list"><div style="font-size:12px;color:var(--muted);font-style:italic">No friends yet — search to find players</div></div>
         </div>
 
-        <!-- Messages / Challenges -->
+        <!-- Messages -->
         <div class="card" style="padding:16px 18px">
-          <div style="font-weight:700;font-size:14px;margin-bottom:12px">💬 Messages & Challenges</div>
-          <div id="messages-list" style="max-height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:10px">
-            <div style="font-size:12px;color:var(--muted);font-style:italic;padding:6px 0">No messages yet</div>
+          <div style="font-family:Figtree,sans-serif;font-weight:700;font-size:14px;margin-bottom:12px">💬 Messages</div>
+          <div id="messages-list" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
+            <div style="font-size:12px;color:var(--muted);font-style:italic">No messages yet</div>
           </div>
         </div>
       </div>
@@ -3706,7 +3713,176 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 </div>
 
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
+// ════════════════════════════════════════
+// CHART MODAL — TradingView embed
+// ════════════════════════════════════════
+var _chartSym = 'SPY';
+var _chartPeriod = '1D';
+var _chartNames = {SPY:'S&P 500 ETF',QQQ:'Nasdaq 100 ETF',IWM:'Russell 2000 ETF',DIA:'Dow Jones ETF'};
+
+function openChart(sym) {
+  _chartSym = sym || 'SPY';
+  var el = document.getElementById('ov-chart');
+  if (!el) { console.warn('ov-chart not found'); return; }
+  el.style.display = 'flex';
+
+  // Header
+  var symEl = document.getElementById('chart-sym');
+  var nameEl = document.getElementById('chart-name');
+  if (symEl) symEl.textContent = _chartSym;
+  if (nameEl) nameEl.textContent = _chartNames[_chartSym] || _chartSym;
+
+  // Ticker buttons
+  ['SPY','QQQ','IWM','DIA'].forEach(function(t) {
+    var btn = document.getElementById('chart-btn-' + t);
+    if (!btn) return;
+    var active = t === _chartSym;
+    btn.style.background = active ? '#00c087' : 'transparent';
+    btn.style.color = active ? '#000' : 'var(--muted)';
+    btn.style.borderColor = active ? '#00c087' : 'var(--border)';
+  });
+
+  // Stats from live data
+  var d = LD[_chartSym] || FALLBACK[_chartSym] || {};
+  var fmt = function(v){ return v!=null ? (v>=0?'+':'')+parseFloat(v).toFixed(2)+'%' : '—'; };
+  var fmtC = function(v){ return v!=null && v>=0 ? 'var(--pos)' : 'var(--neg)'; };
+  var priceEl=document.getElementById('chart-price');
+  var chgEl=document.getElementById('chart-chg');
+  if (priceEl) priceEl.textContent = d.price ? '$'+parseFloat(d.price).toFixed(2) : '—';
+  if (chgEl) { chgEl.textContent = fmt(d.pct); chgEl.style.color = fmtC(d.pct); }
+  var statMap = {day:d.pct, week:d.weekPct||d.pct, ytd:d.ytdPct, beta:d.beta};
+  ['day','week','ytd'].forEach(function(k){
+    var el2=document.getElementById('cs-'+k);
+    if(el2){el2.textContent=fmt(statMap[k]);el2.style.color=fmtC(statMap[k]);}
+  });
+  var betaEl=document.getElementById('cs-beta');
+  if(betaEl) betaEl.textContent = d.beta!=null ? parseFloat(d.beta).toFixed(2) : '—';
+  var volEl=document.getElementById('cs-vol');
+  if(volEl) volEl.textContent = '—';
+
+  // Reset period buttons
+  document.querySelectorAll('.chart-period-btn').forEach(function(b){
+    var active = b.textContent.trim() === _chartPeriod;
+    b.style.background = active ? '#00c087' : 'transparent';
+    b.style.color = active ? '#000' : 'var(--muted)';
+  });
+
+  loadTVChart();
+}
+
+function closeChart() {
+  var el = document.getElementById('ov-chart');
+  if (el) el.style.display = 'none';
+}
+
+function setChartPeriod(p, btn) {
+  _chartPeriod = p;
+  document.querySelectorAll('.chart-period-btn').forEach(function(b){
+    b.style.background = 'transparent'; b.style.color = 'var(--muted)';
+  });
+  if (btn) { btn.style.background = '#00c087'; btn.style.color = '#000'; }
+  loadTVChart();
+}
+
+function loadTVChart() {
+  var wrap = document.getElementById('chart-canvas-wrap');
+  var loading = document.getElementById('chart-loading');
+  if (!wrap) return;
+  if (loading) loading.style.display = 'flex';
+  wrap.innerHTML = '';
+
+  var rangeMap = {'1D':'1D','1W':'5D','1M':'1M','3M':'3M','1Y':'12M','5Y':'60M'};
+  var range = rangeMap[_chartPeriod] || '1D';
+  var isDark = document.body.classList.contains('dark');
+
+  // TradingView mini widget
+  var container = document.createElement('div');
+  container.className = 'tradingview-widget-container';
+  container.style.cssText = 'width:100%;height:420px';
+  container.innerHTML = '<div class="tradingview-widget-container__widget" style="height:420px;width:100%"></div>';
+  wrap.appendChild(container);
+
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
+  script.async = true;
+  script.innerHTML = JSON.stringify({
+    symbols: [[_chartSym + '|' + range]],
+    chartOnly: false,
+    width: '100%',
+    height: 420,
+    locale: 'en',
+    colorTheme: isDark ? 'dark' : 'light',
+    autosize: true,
+    showVolume: false,
+    showMA: false,
+    hideDateRanges: false,
+    hideMarketStatus: false,
+    hideSymbolLogo: false,
+    scalePosition: 'right',
+    scaleMode: 'Normal',
+    fontFamily: 'IBM Plex Mono, monospace',
+    fontSize: '10',
+    noTimeScale: false,
+    valuesTracking: '1',
+    changeMode: 'price-and-percent',
+    chartType: 'area',
+    lineWidth: 2,
+    lineType: 0,
+    dateRanges: ['1d|1','1w|15','1m|60','3m|1D','12m|1D','60m|1W'],
+    isTransparent: true,
+    lineColor: 'rgba(0,192,135,1)',
+    topColor: 'rgba(0,192,135,0.15)',
+    bottomColor: 'rgba(0,192,135,0)',
+    belowLineFillColorGrow: 'rgba(0,192,135,0.12)',
+    belowLineFillColorFall: 'rgba(230,57,70,0.12)',
+    belowLineFillColorGrowBottom: 'rgba(0,192,135,0)',
+    belowLineFillColorFallBottom: 'rgba(230,57,70,0)',
+    lineColorUp: 'rgba(0,192,135,1)',
+    lineColorDown: 'rgba(230,57,70,1)'
+  });
+  container.appendChild(script);
+  setTimeout(function(){ if(loading) loading.style.display='none'; }, 2500);
+}
+
+function navSearchPlayers(q) {
+  var dd = document.getElementById('nav-search-dropdown');
+  if (!dd) return;
+  q = (q||'').trim().toLowerCase();
+  if (!q) { dd.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--muted)">Type to search…</div>'; return; }
+  var players = [];
+  var seen = new Set();
+  var myName = (getMyData().name||sessionStorage.getItem('sd_username')||'').toLowerCase();
+  try {
+    [...getLeagues(),...getPublicLeagues()].forEach(function(l){
+      (l.participants||[]).forEach(function(p){
+        var n=(p.name||'').trim();
+        if(n&&n.toLowerCase()!==myName&&!p.isBot&&!seen.has(n.toLowerCase())){
+          seen.add(n.toLowerCase()); players.push({name:n,league:l.name||''});
+        }
+      });
+    });
+  } catch(e){}
+  var matches = players.filter(function(p){return p.name.toLowerCase().includes(q);}).slice(0,6);
+  if (!matches.length) { dd.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--muted)">No players found</div>'; return; }
+  var soc = typeof _getSocial==='function' ? _getSocial() : {friends:[]};
+  var myF = (soc.friends||[]).map(function(f){return (f.name||'').toLowerCase();});
+  dd.innerHTML = matches.map(function(p) {
+    var isFriend = myF.includes(p.name.toLowerCase());
+    var addBtn = isFriend
+      ? '<span style="font-size:10px;color:var(--pos)">✓</span>'
+      : '<button data-name="' + p.name + '" onclick="sendFriendRequest(this.dataset.name);this.textContent=String.fromCharCode(10003);this.disabled=true" style="background:var(--ink);color:var(--bg);border:none;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:600">+ Add</button>';
+    var chalBtn = '<button data-name="' + p.name + '" onclick="sendChallenge(this.dataset.name)" style="background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:600">⚔</button>';
+    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px" class="ns-row">' +
+      '<div style="width:26px;height:26px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:700;font-size:11px;flex-shrink:0">' + p.name[0].toUpperCase() + '</div>' +
+      '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + p.name + '</div><div style="font-size:10px;color:var(--muted)">' + p.league + '</div></div>' +
+      '<div style="display:flex;gap:4px">' + addBtn + chalBtn + '</div>' +
+    '</div>';
+  }).join('');
+  dd.style.display = 'block';
+}
+</script><script>
 // ══════════════════════════════════════════════════
 // CONFIG — set by user in Setup Wizard
 // ══════════════════════════════════════════════════
@@ -4805,7 +4981,7 @@ async function joinLeague() {
     toast(`✓ Paid & joined "${league.name}"! Now pick your 5 stocks.`);
     ['j-name','j-email','j-code'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
     const prev = document.getElementById('j-preview'); if(prev) prev.style.display='none';
-    setTimeout(()=>{ activeDraftLeagueId=league.id; go('draft'); },1200);
+    setTimeout(function(){ activeDraftLeagueId=league.id; if(typeof go==='function') go('draft'); },1200);
   });
 }
 
@@ -6602,12 +6778,13 @@ function renderPricesGrid() {
   const top4 = ['SPY','QQQ','IWM','DIA'];
   const el = document.getElementById('pricesGrid'); if (!el) return;
   el.innerHTML = top4.map(s => {
-    const d = LD[s] || FALLBACK[s]; const p = d.pct >= 0;
-    return `<div class="pc" data-sym="${s}">
+    const d = LD[s] || FALLBACK[s]; if(!d) return '';
+    const p = (d.pct||0) >= 0;
+    return `<div class="pc" data-sym="${s}" onclick="openChart('${s}')" style="cursor:pointer;transition:box-shadow .15s,transform .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0,0,0,.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
       <div class="pc-s">${s}</div>
-      <div class="pc-p">$${d.price.toFixed(2)}</div>
-      <div class="pc-c ${p?'pos':'neg'}">${p?'+':''}${d.pct.toFixed(2)}%</div>
-      <div style="font-family:monospace;font-size:8px;color:var(--muted);margin-top:1px">Day</div>
+      <div class="pc-p">$${(d.price||0).toFixed(2)}</div>
+      <div class="pc-c ${p?'pos':'neg'}">${p?'+':''}${(d.pct||0).toFixed(2)}%</div>
+      <div style="font-family:monospace;font-size:8px;color:var(--muted);margin-top:1px;display:flex;align-items:center;gap:3px">Day <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 7l2.5-3L5 5.5 7 2" stroke="var(--muted)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>`;
   }).join('');
   flashPrices(LD);
@@ -10307,9 +10484,12 @@ nt.trim();
 // ════════════════════════════════════════════
 
 function _getSocial() {
-  return JSON.parse(localStorage.getItem('sd_social') || '{"friends":[],"requests":[],"messages":[],"challenges":[]}');
+  try { return JSON.parse(localStorage.getItem('sd_social') || '{"friends":[],"requests":[],"messages":[]}'); }
+  catch(e) { return {friends:[],requests:[],messages:[]}; }
 }
-function _saveSocial(d) { localStorage.setItem('sd_social', JSON.stringify(d)); }
+function _saveSocial(d) {
+  try { localStorage.setItem('sd_social', JSON.stringify(d)); } catch(e){}
+}
 
 function renderSocial() {
   renderFriends();
@@ -10317,163 +10497,183 @@ function renderSocial() {
   updateMsgBadge();
 }
 
+// ── All known players from joined leagues ──
+function getAllKnownPlayers() {
+  var seen = new Set();
+  var players = [];
+  var myName = (getMyData().name || sessionStorage.getItem('sd_username') || '').toLowerCase();
+  try {
+    [...getLeagues(), ...getPublicLeagues()].forEach(function(l) {
+      (l.participants || []).forEach(function(p) {
+        var n = (p.name || '').trim();
+        if (n && n.toLowerCase() !== myName && !seen.has(n.toLowerCase())) {
+          seen.add(n.toLowerCase());
+          players.push({name: n, uid: p.uid || '', league: l.name || ''});
+        }
+      });
+    });
+  } catch(e){}
+  return players;
+}
+
 // ── Player Search ──
 function searchPlayers(q) {
-  const el = document.getElementById('player-search-results');
+  var el = document.getElementById('player-search-results');
   if (!el) return;
-  q = (q||'').trim().toLowerCase();
+  q = (q || '').trim().toLowerCase();
   if (!q) { el.innerHTML = ''; return; }
 
-  // Gather all known players from leagues + bots
-  const allPlayers = [];
-  const seen = new Set();
-  const myName = getMyData().name || sessionStorage.getItem('sd_username') || '';
-  [...getLeagues(), ...getPublicLeagues()].forEach(function(l) {
-    (l.participants||[]).forEach(function(p) {
-      const n = p.name || '';
-      if (n && !seen.has(n) && n !== myName) {
-        seen.add(n);
-        allPlayers.push({name: n, uid: p.uid || '', league: l.name});
-      }
-    });
-  });
-
-  const matches = allPlayers.filter(function(p) {
+  var players = getAllKnownPlayers().filter(function(p) {
     return p.name.toLowerCase().includes(q);
-  }).slice(0, 8);
+  }).slice(0, 6);
 
-  if (!matches.length) {
-    el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px 0">No players found</div>';
+  if (!players.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:6px 0">No players found matching "' + q + '"</div>';
     return;
   }
 
-  const soc = _getSocial();
-  const myFriends = soc.friends.map(function(f){return f.name;});
-  const pendingOut = soc.requests.filter(function(r){return r.dir==='out';}).map(function(r){return r.name;});
+  var soc = _getSocial();
+  var myFriends = (soc.friends || []).map(function(f){return (f.name||'').toLowerCase();});
+  var pending = (soc.requests || []).filter(function(r){return r.dir==='out';}).map(function(r){return (r.name||'').toLowerCase();});
 
-  el.innerHTML = matches.map(function(p) {
-    const isFriend = myFriends.includes(p.name);
-    const isPending = pendingOut.includes(p.name);
-    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">' +
-      '<div>' +
-        '<div style="font-weight:600;font-size:13px">' + p.name + '</div>' +
-        '<div style="font-size:10px;color:var(--muted);font-family:IBM Plex Mono,monospace">' + p.league + '</div>' +
+  el.innerHTML = players.map(function(p) {
+    var isFriend = myFriends.includes(p.name.toLowerCase());
+    var isPending = pending.includes(p.name.toLowerCase());
+    var initials = p.name[0].toUpperCase();
+    var addBtn = isFriend
+      ? '<span style="font-size:10px;color:var(--pos);font-weight:600">✓ Friends</span>'
+      : isPending
+        ? '<span style="font-size:10px;color:var(--muted)">Pending</span>'
+        : '<button data-name="' + p.name + '" onclick="sendFriendRequest(this.dataset.name);_refreshSearch()" style="background:var(--ink);color:var(--bg);border:none;border-radius:5px;padding:3px 10px;cursor:pointer;font-size:11px;font-weight:600">+ Add</button>';
+
+    return '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)">' +
+      '<div style="width:30px;height:30px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:700;font-size:12px;flex-shrink:0">' + initials + '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-weight:600;font-size:12px">' + p.name + '</div>' +
+        '<div style="font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + p.league + '</div>' +
       '</div>' +
-      '<div style="display:flex;gap:6px">' +
-        (isFriend
-          ? '<span style="font-size:10px;color:var(--pos);font-weight:600">✓ Friends</span>'
-          : isPending
-            ? '<span style="font-size:10px;color:var(--muted)">Pending…</span>'
-            : '<button data-name="" + p.name + "" onclick="sendFriendRequest(this.dataset.name)" style="background:var(--ink);color:#fff;border:none;border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px;font-weight:600">Add</button>') +
-        '<button data-name="" + p.name + "" onclick="sendChallenge(this.dataset.name)" style="background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px;font-weight:600">⚔ Challenge</button>' +
+      '<div style="display:flex;gap:5px;flex-shrink:0">' + addBtn +
+        '<button data-name="' + p.name + '" onclick="sendChallenge(this.dataset.name)" style="background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:3px 8px;cursor:pointer;font-size:11px;font-weight:600">⚔</button>' +
       '</div>' +
     '</div>';
   }).join('');
 }
 
+// ── Friend Requests ──
 function sendFriendRequest(name) {
-  const soc = _getSocial();
-  if (soc.friends.find(function(f){return f.name===name;})) { toast(name + ' is already a friend'); return; }
-  if (soc.requests.find(function(r){return r.name===name&&r.dir==='out';})) { toast('Request already sent'); return; }
+  if (!name) return;
+  var soc = _getSocial();
+  if ((soc.friends||[]).find(function(f){return f.name===name;})) { toast(name + ' is already a friend'); return; }
+  if ((soc.requests||[]).find(function(r){return r.name===name&&r.dir==='out';})) { toast('Request already sent'); return; }
+  if (!soc.requests) soc.requests = [];
   soc.requests.push({name: name, dir: 'out', ts: Date.now()});
-  // Simulate them receiving it — auto-add as pending incoming for demo
+  // Simulate incoming (demo — in production this would be server-side)
   soc.requests.push({name: name, dir: 'in', ts: Date.now()});
   _saveSocial(soc);
   toast('Friend request sent to ' + name + ' ✓');
-  searchPlayers(document.getElementById('player-search')?.value || '');
   renderFriends();
   updateMsgBadge();
 }
 
 function acceptFriend(name) {
-  const soc = _getSocial();
-  soc.requests = soc.requests.filter(function(r){return !(r.name===name&&r.dir==='in');});
+  var soc = _getSocial();
+  soc.requests = (soc.requests||[]).filter(function(r){return !(r.name===name&&r.dir==='in');});
+  if (!soc.friends) soc.friends = [];
   if (!soc.friends.find(function(f){return f.name===name;})) {
     soc.friends.push({name: name, since: Date.now()});
   }
   _saveSocial(soc);
-  toast('You and ' + name + ' are now friends! 🤝');
+  toast('You and ' + name + ' are now friends 🤝');
   renderFriends();
   updateMsgBadge();
 }
 
 function declineFriend(name) {
-  const soc = _getSocial();
-  soc.requests = soc.requests.filter(function(r){return !(r.name===name&&r.dir==='in');});
+  var soc = _getSocial();
+  soc.requests = (soc.requests||[]).filter(function(r){return !(r.name===name&&r.dir==='in');});
   _saveSocial(soc);
   renderFriends();
+  updateMsgBadge();
 }
 
 function renderFriends() {
-  const soc = _getSocial();
-  const reqEl = document.getElementById('friend-requests');
-  const listEl = document.getElementById('friends-list');
-  const cntEl = document.getElementById('friend-req-count');
-  
-  // Incoming requests
-  const incoming = soc.requests.filter(function(r){return r.dir==='in';});
-  if (cntEl) { cntEl.style.display = incoming.length ? 'inline' : 'none'; cntEl.textContent = incoming.length + ' new'; }
+  var soc = _getSocial();
+  var reqEl = document.getElementById('friend-requests');
+  var listEl = document.getElementById('friends-list');
+  var cntEl = document.getElementById('friend-req-count');
+
+  var incoming = (soc.requests||[]).filter(function(r){return r.dir==='in';});
+  if (cntEl) {
+    cntEl.style.display = incoming.length ? 'inline' : 'none';
+    cntEl.textContent = incoming.length + ' new';
+  }
+
   if (reqEl) {
     reqEl.innerHTML = incoming.map(function(r) {
       return '<div style="background:var(--accent-bg);border:1px solid var(--accent-bd);border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">' +
-        '<div>' +
-          '<div style="font-size:12px;font-weight:600">' + r.name + ' wants to be friends</div>' +
-        '</div>' +
+        '<div style="font-size:12px;font-weight:600">' + r.name + ' sent you a friend request</div>' +
         '<div style="display:flex;gap:6px">' +
-          '<button data-name="" + r.name + "" onclick="acceptFriend(this.dataset.name)" style="background:#00c087;color:#000;border:none;border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px;font-weight:700">Accept</button>' +
-          '<button data-name="" + r.name + "" onclick="declineFriend(this.dataset.name)" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px">Decline</button>' +
+          '<button data-name="' + r.name + '" onclick="acceptFriend(this.dataset.name)" style="background:#00c087;color:#000;border:none;border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px;font-weight:700">Accept</button>' +
+          '<button data-name="' + r.name + '" onclick="declineFriend(this.dataset.name)" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px">Decline</button>' +
         '</div>' +
       '</div>';
     }).join('');
   }
-  
+
   if (listEl) {
-    if (!soc.friends.length) {
-      listEl.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic;padding:6px 0">No friends yet — search to add someone</div>';
+    var friends = soc.friends || [];
+    if (!friends.length) {
+      listEl.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic">No friends yet</div>';
     } else {
-      listEl.innerHTML = soc.friends.map(function(f) {
+      listEl.innerHTML = friends.map(function(f) {
         return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">' +
-          '<div style="display:flex;align-items:center;gap:10px">' +
-            '<div style="width:32px;height:32px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--bg)">' + f.name[0].toUpperCase() + '</div>' +
+          '<div style="display:flex;align-items:center;gap:9px">' +
+            '<div style="width:32px;height:32px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:700;font-size:13px">' + f.name[0].toUpperCase() + '</div>' +
             '<div style="font-weight:600;font-size:13px">' + f.name + '</div>' +
           '</div>' +
-          '<button data-name="" + f.name + "" onclick="sendChallenge(this.dataset.name)" style="background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:4px 10px;cursor:pointer;font-size:11px;font-weight:600">⚔ Challenge</button>' +
+          '<button data-name="' + f.name + '" onclick="sendChallenge(this.dataset.name)" style="background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:11px;font-weight:600">⚔ Challenge</button>' +
         '</div>';
       }).join('');
     }
   }
 }
 
-// ── Challenges ──
+// ── Challenges & Messages ──
 function sendChallenge(name) {
-  const myName = getMyData().name || sessionStorage.getItem('sd_username') || 'You';
-  const soc = _getSocial();
-  const msg = {
-    id: 'ch_' + Date.now(),
-    type: 'challenge',
-    from: myName,
-    to: name,
-    dir: 'out',
-    ts: Date.now(),
-    status: 'pending',
-    text: myName + ' challenged you to a head-to-head! $25 entry — best portfolio by Friday wins.'
-  };
-  soc.messages.push(msg);
-  // Simulate incoming challenge from them for demo
-  soc.messages.push({...msg, id: 'ch_in_'+Date.now(), dir:'in', from:name, to:myName, status:'pending'});
+  if (!name) return;
+  var myName = getMyData().name || sessionStorage.getItem('sd_username') || 'You';
+  var soc = _getSocial();
+  if (!soc.messages) soc.messages = [];
+  var id = 'ch_' + Date.now();
+  // Outgoing (my view)
+  soc.messages.push({
+    id: id + '_out', type: 'challenge', from: myName, to: name,
+    dir: 'out', ts: Date.now(), status: 'pending',
+    text: 'You challenged ' + name + ' to a head-to-head. $25 entry — best portfolio by Friday wins.'
+  });
+  // Incoming (simulated — what they would see)
+  soc.messages.push({
+    id: id, type: 'challenge', from: name, to: myName,
+    dir: 'in', ts: Date.now(), status: 'pending',
+    text: name + ' challenged you to a head-to-head! $25 entry — best portfolio by Friday wins. Accept to create a private pool.'
+  });
   _saveSocial(soc);
   toast('⚔ Challenge sent to ' + name + '!');
   renderMessages();
   updateMsgBadge();
+  // Switch to messages tab so they see it
+  sbNav(document.querySelector('[onclick*="dash-social"]'), 'dash-social');
+  renderSocial();
 }
 
 function respondChallenge(id, accept) {
-  const soc = _getSocial();
-  const msg = soc.messages.find(function(m){return m.id===id;});
-  if (msg) msg.status = accept ? 'accepted' : 'declined';
+  var soc = _getSocial();
+  var msg = (soc.messages||[]).find(function(m){return m.id===id;});
+  if (!msg) return;
+  msg.status = accept ? 'accepted' : 'declined';
   _saveSocial(soc);
   if (accept) {
-    toast('Challenge accepted! Pool created — head to Draft to submit picks 🔥');
+    toast('Challenge accepted! 🔥 Head to Draft to submit your picks.');
   } else {
     toast('Challenge declined');
   }
@@ -10481,396 +10681,109 @@ function respondChallenge(id, accept) {
 }
 
 function renderMessages() {
-  const el = document.getElementById('messages-list');
+  var el = document.getElementById('messages-list');
   if (!el) return;
-  const soc = _getSocial();
-  const msgs = soc.messages.slice().reverse();
+  var soc = _getSocial();
+  var msgs = (soc.messages || []).slice().reverse();
+
   if (!msgs.length) {
-    el.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic;padding:6px 0">No messages yet</div>';
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic;padding:8px 0">No messages yet. Challenge a friend to get started.</div>';
     return;
   }
+
   el.innerHTML = msgs.map(function(m) {
-    const isIn = m.dir === 'in';
-    const time = new Date(m.ts).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    if (m.type === 'challenge') {
-      const isPending = m.status === 'pending';
-      const statusColor = m.status === 'accepted' ? 'var(--pos)' : m.status === 'declined' ? 'var(--neg)' : 'var(--accent)';
-      const fromLabel = isIn ? (m.from + ' challenged you!') : ('Challenge sent to ' + m.to);
-      const btns = (isIn && isPending)
-        ? '<div style="display:flex;gap:8px;margin-top:8px">' +
-            '<button data-id="' + m.id + '" data-accept="1" onclick="respondChallenge(this.dataset.id,true)" style="flex:1;background:#00c087;color:#000;border:none;border-radius:6px;padding:7px;cursor:pointer;font-size:11px;font-weight:700">✓ Accept</button>' +
-            '<button data-id="' + m.id + '" onclick="respondChallenge(this.dataset.id,false)" style="flex:1;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:7px;cursor:pointer;font-size:11px">Decline</button>' +
-          '</div>'
-        : '';
-      return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px">' +
-        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
-          '<span style="font-size:16px">⚔</span>' +
-          '<div><div style="font-weight:700;font-size:12px">' + fromLabel + '</div>' +
-          '<div style="font-size:10px;color:var(--muted)">' + time + '</div></div>' +
-          '<span style="margin-left:auto;font-size:10px;font-weight:700;color:' + statusColor + '">' + m.status.toUpperCase() + '</span>' +
+    var isIn = m.dir === 'in';
+    var time = new Date(m.ts).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    var isPending = m.status === 'pending';
+    var statusColor = m.status === 'accepted' ? 'var(--pos)' : m.status === 'declined' ? 'var(--neg)' : 'var(--accent)';
+    var statusLabel = m.status === 'pending' ? 'PENDING' : m.status.toUpperCase();
+
+    var header = isIn
+      ? '<strong>' + m.from + '</strong> challenged you!'
+      : 'Challenge sent to <strong>' + m.to + '</strong>';
+
+    var actionBtns = (isIn && isPending)
+      ? '<div style="display:flex;gap:8px;margin-top:10px">' +
+          '<button data-id="' + m.id + '" onclick="respondChallenge(this.dataset.id,true)" style="flex:1;background:#00c087;color:#000;border:none;border-radius:7px;padding:8px;cursor:pointer;font-size:12px;font-weight:700">✓ Accept Challenge</button>' +
+          '<button data-id="' + m.id + '" onclick="respondChallenge(this.dataset.id,false)" style="flex:1;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:7px;padding:8px;cursor:pointer;font-size:12px">Decline</button>' +
+        '</div>'
+      : '';
+
+    return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;transition:transform .15s ease" class="msg-card">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">' +
+        '<div style="display:flex;align-items:center;gap:8px">' +
+          '<span style="font-size:18px">⚔</span>' +
+          '<div>' +
+            '<div style="font-size:12px">' + header + '</div>' +
+            '<div style="font-size:10px;color:var(--faint)">' + time + '</div>' +
+          '</div>' +
         '</div>' +
-        '<div style="font-size:11px;color:var(--muted);line-height:1.5">' + m.text + '</div>' +
-        btns +
-      '</div>';
-    }
-    return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px">' +
-      '<div style="font-size:11px;color:var(--muted)">' + m.from + ' · ' + time + '</div>' +
-      '<div style="font-size:12px;margin-top:3px">' + m.text + '</div>' +
+        '<span style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;color:' + statusColor + ';background:' + statusColor.replace('var(','var(--') .replace(')','-bg)') + ';padding:2px 7px;border-radius:4px">' + statusLabel + '</span>' +
+      '</div>' +
+      '<div style="font-size:11px;color:var(--muted);line-height:1.6">' + m.text + '</div>' +
+      actionBtns +
     '</div>';
   }).join('');
 }
 
-
 function updateMsgBadge() {
-  const soc = _getSocial();
-  const unread = soc.messages.filter(function(m){return m.dir==='in'&&m.status==='pending';}).length +
-    soc.requests.filter(function(r){return r.dir==='in';}).length;
-  const badge = document.getElementById('msg-badge');
-  if (badge) badge.style.display = unread ? 'inline' : 'none';
-}
-
-
-// ════════════════════════════════
-// CHART MODAL
-// ════════════════════════════════
-var _chartSym = 'SPY';
-var _chartPeriod = '1D';
-var _chartTV = null;
-
-var _chartNames = {
-  SPY: 'SPDR S&P 500 ETF', QQQ: 'Invesco QQQ Trust',
-  IWM: 'iShares Russell 2000', DIA: 'SPDR Dow Jones ETF'
-};
-
-function openChart(sym) {
-  _chartSym = sym || 'SPY';
-  om('chart');
-  // Update header
-  var symEl = document.getElementById('chart-sym');
-  var nameEl = document.getElementById('chart-name');
-  if (symEl) symEl.textContent = _chartSym;
-  if (nameEl) nameEl.textContent = _chartNames[_chartSym] || _chartSym;
-  // Update ticker buttons
-  ['SPY','QQQ','IWM','DIA'].forEach(function(t) {
-    var btn = document.getElementById('chart-btn-' + t);
-    if (!btn) return;
-    var active = t === _chartSym;
-    btn.style.background = active ? 'var(--accent)' : 'transparent';
-    btn.style.color = active ? '#000' : 'var(--muted)';
-    btn.style.borderColor = active ? 'var(--accent)' : 'var(--border)';
-  });
-  // Stats from LD
-  var d = LD[_chartSym] || FALLBACK[_chartSym] || {};
-  var pct = d.pct; var wpct = d.weekPct; var ytd = d.ytdPct; var beta = d.beta; var price = d.price;
-  var fmt = function(v,sfx){ return v!=null ? ((v>=0?'+':'')+v.toFixed(2)+(sfx||'%')) : '—'; };
-  var fmtC = function(v){ return v!=null ? (v>=0?'var(--pos)':'var(--neg)') : 'var(--muted)'; };
-  var priceEl = document.getElementById('chart-price');
-  var chgEl = document.getElementById('chart-chg');
-  if (priceEl) priceEl.textContent = price ? '$' + price.toFixed(2) : '—';
-  if (chgEl) { chgEl.textContent = fmt(pct); chgEl.style.color = fmtC(pct); }
-  var cs = {day:pct,week:wpct,ytd:ytd,beta:beta,vol:null};
-  ['day','week','ytd'].forEach(function(k){
-    var el=document.getElementById('cs-'+k); if(el){el.textContent=fmt(cs[k]);el.style.color=fmtC(cs[k]);}
-  });
-  var betaEl=document.getElementById('cs-beta'); if(betaEl) betaEl.textContent = beta!=null?beta.toFixed(2):'—';
-  var volEl=document.getElementById('cs-vol'); if(volEl) volEl.textContent = '—';
-  // Load TradingView
-  loadTVChart();
-}
-
-function setChartPeriod(p, btn) {
-  _chartPeriod = p;
-  document.querySelectorAll('.chart-period-btn').forEach(function(b) {
-    b.style.background = 'transparent'; b.style.color = 'var(--muted)';
-  });
-  if (btn) { btn.style.background = '#00c087'; btn.style.color = '#000'; }
-  loadTVChart();
-}
-
-function loadTVChart() {
-  var wrap = document.getElementById('chart-canvas-wrap');
-  var loading = document.getElementById('chart-loading');
-  if (!wrap) return;
-  if (loading) loading.style.display = 'flex';
-  wrap.innerHTML = '';
-
-  var periodMap = {'1D':'1','1W':'W','1M':'M','3M':'3M','1Y':'12M','5Y':'60M'};
-  var interval = periodMap[_chartPeriod] || 'D';
-  var rangeMap = {'1D':'1D','1W':'5D','1M':'1M','3M':'3M','1Y':'12M','5Y':'60M'};
-  var range = rangeMap[_chartPeriod] || '1D';
-
-  // Use TradingView mini widget
-  var isDark = document.body.classList.contains('dark');
-  var script = document.createElement('script');
-  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
-  script.async = true;
-  script.innerHTML = JSON.stringify({
-    "symbol": _chartSym,
-    "width": "100%",
-    "height": "400",
-    "locale": "en",
-    "dateRange": range,
-    "colorTheme": isDark ? "dark" : "light",
-    "isTransparent": true,
-    "autosize": true,
-    "largeChartUrl": ""
-  });
-  wrap.appendChild(script);
-  setTimeout(function(){ if(loading) loading.style.display='none'; }, 1800);
-}
-
-// Add @keyframes spin
-(function(){
-  var s=document.createElement('style');
-  s.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
-  document.head.appendChild(s);
-})();
-
-// ════════════════════════════════════
-// DEPOSIT SYSTEM
-// ════════════════════════════════════
-var _depositAmt = 100;
-var _depositCardEl = null;
-
-function openDeposit() {
-  _depositAmt = 100;
-  om('deposit');
-  // Update summary
-  updateDepositSummary();
-  // Mount Stripe card
-  var stripe = getStripe();
-  if (stripe) {
-    if (_depositCardEl) { try { _depositCardEl.unmount(); } catch(e){} }
-    if (_stripeCardEl) { try { _stripeCardEl.unmount(); _stripeCardEl = null; } catch(e){} }
-    var els = stripe.elements({locale:'en'});
-    _depositCardEl = els.create('card', {
-      style: { base: { fontFamily: 'IBM Plex Mono, monospace', fontSize: '14px', color: '#0a0a0f', '::placeholder': {color:'#9999ad'} }, invalid: {color:'#e63946'} },
-      hidePostalCode: true, disableLink: true
-    });
-    _depositCardEl.mount('#deposit-card-element');
-  }
-}
-
-function setDepositAmt(amt, btn) {
-  _depositAmt = amt;
-  // Update button states
-  document.querySelectorAll('.dep-amt-btn').forEach(function(b) {
-    b.style.background = 'var(--surface2)';
-    b.style.borderColor = 'var(--border)';
-    b.style.color = 'var(--ink)';
-  });
-  if (btn) {
-    btn.style.background = 'var(--accent)';
-    btn.style.borderColor = 'var(--accent)';
-    btn.style.color = '#000';
-  }
-  // Sync custom input
-  var inp = document.getElementById('deposit-custom-amt');
-  if (inp && btn) inp.value = '';
-  updateDepositSummary();
-}
-
-function updateDepositSummary() {
-  var amt = _depositAmt || 0;
-  var bal = getBalance();
-  var sumAmt = document.getElementById('dep-summary-amt');
-  var sumAfter = document.getElementById('dep-summary-after');
-  if (sumAmt) sumAmt.textContent = '$' + amt.toFixed(2);
-  if (sumAfter) sumAfter.textContent = '$' + (bal + amt).toFixed(2);
-}
-
-async function confirmDeposit() {
-  var btn = document.getElementById('deposit-confirm-btn');
-  var errEl = document.getElementById('deposit-card-errors');
-  if (!_depositAmt || _depositAmt < 1) { if(errEl) errEl.textContent = 'Enter a valid amount'; return; }
-  if (btn) { btn.disabled = true; btn.textContent = 'Processing…'; }
-  if (errEl) errEl.textContent = '';
-
   try {
-    var stripe = getStripe();
-    if (!stripe || !_depositCardEl) {
-      // Stripe not loaded — add to balance anyway (dev mode)
-      console.warn('[Openbell] Stripe not available — crediting balance directly');
-      creditBalance(_depositAmt);
-      return;
-    }
-
-    var result = await stripe.createToken(_depositCardEl, {
-      name: sessionStorage.getItem('sd_username') || 'User'
-    });
-
-    if (result.error) {
-      if (errEl) errEl.textContent = result.error.message;
-      if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
-      return;
-    }
-
-    // Charge via Cloudflare function
-    var res = await fetch('/charge-card', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        token: result.token.id,
-        amount: _depositAmt,
-        email: sessionStorage.getItem('sd_useremail') || '',
-        fundName: 'Openbell Deposit'
-      })
-    }).then(function(r){ return r.json(); }).catch(function(){ return null; });
-
-    if (!res || !res.success) {
-      if (errEl) errEl.textContent = (res && res.error) ? res.error : 'Payment failed — please try again';
-      if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
-      return;
-    }
-
-    creditBalance(_depositAmt);
-
-  } catch(err) {
-    if (errEl) errEl.textContent = 'Something went wrong — please try again';
-    if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
-  }
+    var soc = _getSocial();
+    var unread = (soc.messages||[]).filter(function(m){return m.dir==='in'&&m.status==='pending';}).length +
+      (soc.requests||[]).filter(function(r){return r.dir==='in';}).length;
+    var badge = document.getElementById('msg-badge');
+    if (badge) badge.style.display = unread ? 'inline' : 'none';
+  } catch(e){}
 }
 
-function creditBalance(amt) {
-  var newBal = getBalance() + parseFloat(amt);
-  localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
-  updateBalanceDisplay();
-  cm('deposit');
-  toast('✓ $' + parseFloat(amt).toFixed(2) + ' added to your balance!');
-  // Save card last4 for display
-  renderDashboard();
-}
-
-function updateBalanceDisplay() {
-  var bal = getBalance();
-  var els = ['sb-wins', 'wd-balance'];
-  els.forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.textContent = '$' + bal.toFixed(2);
-  });
+function _refreshSearch() {
+  var si = document.getElementById('player-search');
+  if (si && typeof searchPlayers === 'function') searchPlayers(si.value || '');
 }
 </script>
-  <!-- Firebase loaded at end of body to not block page render -->
+</body>
+</html
 
-
-  <!-- Stripe.js -->
-  <!-- Firebase Modular SDK -->
-  <script type="module">
-    import { initializeApp }       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAnalytics }        from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut }
-      from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey:            "AIzaSyDaxXzoeAY7QfhmtO4EJIyfPuemLR9uGqw",
-      authDomain:        "openbell-288e6.firebaseapp.com",
-      projectId:         "openbell-288e6",
-      storageBucket:     "openbell-288e6.firebasestorage.app",
-      messagingSenderId: "88688297780",
-      appId:             "1:88688297780:web:7e72da577da7d54e5b0761",
-      measurementId:     "G-K1240WY79P"
-    };
-
-    const app       = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const auth      = getAuth(app);
-
-    // Auto-restore session on reload
-    onAuthStateChanged(auth, function(user) {
-      if (user && !sessionStorage.getItem('sd_username')) {
-        if (typeof _applyFirebaseUser === 'function') {
-          _applyFirebaseUser(user, false);
-        }
-      }
-    });
-
-    // Expose sign-in to the main script
-    window._googleSignIn = function() {
-      const provider = new GoogleAuthProvider();
-      provider.addScope('email');
-      provider.addScope('profile');
-      signInWithPopup(auth, provider)
-        .then(function(result) {
-          if (typeof _applyFirebaseUser === 'function') {
-            _applyFirebaseUser(result.user, true);
-          }
-        })
-        .catch(function(err) {
-          if (err.code === 'auth/popup-blocked') {
-            if (typeof toast === 'function') toast('Popup blocked — please allow popups for this site.');
-          } else if (err.code !== 'auth/popup-closed-by-user') {
-            if (typeof toast === 'function') toast('Google sign-in failed: ' + (err.message || err.code));
-          }
-        });
-    };
-
-    // Expose sign-out
-    window._googleSignOut = function() {
-      signOut(auth).catch(function(){});
-      if (typeof doSignOut === 'function') doSignOut();
-    };
-  </script>
-
-
-<!-- ══ WITHDRAW MODAL ══ -->
-<div class="ov" id="ov-withdraw">
-  <div class="modal" style="width:420px;padding:0;overflow:hidden">
-    <div style="padding:22px 24px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="font-family:monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:4px">Withdraw Funds</div>
-        <div style="font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:24px">Request Withdrawal</div>
+<div id="ov-chart" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);z-index:500;align-items:center;justify-content:center;padding:16px;box-sizing:border-box">
+  <div style="background:var(--surface);width:100%;max-width:980px;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;max-height:90vh;animation:modalIn .25s cubic-bezier(.34,1.2,.64,1) both">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div><div id="chart-sym" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:20px">SPY</div><div id="chart-name" style="font-size:11px;color:var(--muted)">S&amp;P 500 ETF</div></div>
+        <div style="background:var(--surface2);border-radius:8px;padding:6px 11px"><div id="chart-price" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:17px">—</div><div id="chart-chg" style="font-family:IBM Plex Mono,monospace;font-size:11px">—</div></div>
       </div>
-      <div onclick="cm('withdraw')" style="cursor:pointer;font-size:18px;color:var(--muted);padding:4px 8px;border-radius:6px" onmouseover="this.style.background='var(--paper)'" onmouseout="this.style.background='transparent'">✕</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div style="display:flex;gap:2px;background:var(--surface2);border-radius:7px;padding:3px">
+          <button onclick="setChartPeriod('1D',this)" class="chart-period-btn" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:4px 8px;border:none;border-radius:5px;cursor:pointer;background:#00c087;color:#000;transition:all .12s">1D</button>
+          <button onclick="setChartPeriod('1W',this)" class="chart-period-btn" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:4px 8px;border:none;border-radius:5px;cursor:pointer;background:transparent;color:var(--muted);transition:all .12s">1W</button>
+          <button onclick="setChartPeriod('1M',this)" class="chart-period-btn" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:4px 8px;border:none;border-radius:5px;cursor:pointer;background:transparent;color:var(--muted);transition:all .12s">1M</button>
+          <button onclick="setChartPeriod('3M',this)" class="chart-period-btn" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:4px 8px;border:none;border-radius:5px;cursor:pointer;background:transparent;color:var(--muted);transition:all .12s">3M</button>
+          <button onclick="setChartPeriod('1Y',this)" class="chart-period-btn" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:4px 8px;border:none;border-radius:5px;cursor:pointer;background:transparent;color:var(--muted);transition:all .12s">1Y</button>
+          <button onclick="setChartPeriod('5Y',this)" class="chart-period-btn" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:4px 8px;border:none;border-radius:5px;cursor:pointer;background:transparent;color:var(--muted);transition:all .12s">5Y</button>
+        </div>
+        <div style="display:flex;gap:3px">
+          <button onclick="openChart('SPY')" id="chart-btn-SPY" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:5px 9px;border:1.5px solid #00c087;border-radius:6px;cursor:pointer;background:#00c087;color:#000">SPY</button>
+          <button onclick="openChart('QQQ')" id="chart-btn-QQQ" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:5px 9px;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;background:transparent;color:var(--muted)">QQQ</button>
+          <button onclick="openChart('IWM')" id="chart-btn-IWM" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:5px 9px;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;background:transparent;color:var(--muted)">IWM</button>
+          <button onclick="openChart('DIA')" id="chart-btn-DIA" style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;padding:5px 9px;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;background:transparent;color:var(--muted)">DIA</button>
+        </div>
+        <button onclick="closeChart()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px 8px;border-radius:6px">✕</button>
+      </div>
     </div>
-    <div style="padding:18px 24px;display:flex;flex-direction:column;gap:14px">
-      <div style="background:var(--paper);border-radius:10px;padding:16px;display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:3px">Available balance</div>
-          <div style="font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:28px;color:var(--green)" id="wd-balance">$0.00</div>
-        </div>
-        <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="var(--green)" stroke-width="1.5"/><path d="M18 10v16M11 17l7-7 7 7" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div style="flex:1;min-height:380px;position:relative;background:var(--bg)">
+      <div id="chart-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;z-index:2;background:var(--bg)">
+        <div style="width:28px;height:28px;border:3px solid var(--border);border-top-color:#00c087;border-radius:50%;animation:spin .8s linear infinite"></div>
+        <div style="font-size:12px;color:var(--muted)">Loading chart…</div>
       </div>
-      <div>
-        <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Amount to withdraw</div>
-        <div style="position:relative">
-          <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--muted)">$</span>
-          <input class="fi" id="wd-amount" type="number" min="1" step="0.01" placeholder="0.00" style="width:100%;box-sizing:border-box;padding-left:28px;font-family:monospace;font-size:15px" onkeydown="if(event.key==='Enter')requestWithdraw()">
-        </div>
-      </div>
-      <div>
-        <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Send to (bank / debit card)</div>
-        <input class="fi" id="wd-destination" type="text" placeholder="Bank account or debit card on file" style="width:100%;box-sizing:border-box" readonly>
-        <div style="font-size:10px;color:var(--muted);margin-top:5px">Payouts processed within 1–3 business days via Stripe.</div>
-      </div>
-      <div id="wd-error" style="display:none;background:var(--red-bg);color:var(--red      } else {
-      // Public/featured league — persist picks into stored leagues so getFeaturedSlates() sees them
-      const stored = getLeagues();
-      const sIdx = stored.findIndex(l => l.id === activeDraftLeagueId);
-      if (sIdx >= 0) {
-        if (!stored[sIdx].picks) stored[sIdx].picks = {};
-        stored[sIdx].picks[_uid]  = [...userPicks];
-        stored[sIdx].picks[_name] = [...userPicks];
-        saveLeagues(stored);
-      } else {
-        // Pull the featured pool definition and store it with picks
-        const featured = getPublicLeagues().find(l => l.id === activeDraftLeagueId);
-        if (featured) {
-          const copy = {...featured};
-          if (!copy.picks) copy.picks = {};
-          copy.picks[_uid]  = [...userPicks];
-          copy.picks[_name] = [...userPicks];
-          stored.push(copy);
-          saveLeagues(stored);
-        }
-      }
-    }
-  gtag('js', new Date());
-  gtag('config', 'G-XXXXXXXXXX', {
-    page_title: 'Openbell',
-    page_location: window.location.href
-  });
-  // Track key events
-  window._track = function(event, params) {
-    try { gtag('event', event, params || {}); } catch(e) {}
-  };
-</script>
+      <div id="chart-canvas-wrap" style="width:100%;height:420px"></div>
+    </div>
+    <div style="padding:10px 18px;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);flex-shrink:0">
+      <div style="text-align:center;border-right:1px solid var(--border)"><div style="font-family:IBM Plex Mono,monospace;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);margin-bottom:2px">Day</div><div id="cs-day" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:13px">—</div></div>
+      <div style="text-align:center;border-right:1px solid var(--border)"><div style="font-family:IBM Plex Mono,monospace;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);margin-bottom:2px">Week</div><div id="cs-week" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:13px">—</div></div>
+      <div style="text-align:center;border-right:1px solid var(--border)"><div style="font-family:IBM Plex Mono,monospace;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);margin-bottom:2px">YTD</div><div id="cs-ytd" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:13px">—</div></div>
+      <div style="text-align:center;border-right:1px solid var(--border)"><div style="font-family:IBM Plex Mono,monospace;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);margin-bottom:2px">Beta</div><div id="cs-beta" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:13px">—</div></div>
+      <div style="text-align:center"><div style="font-family:IBM Plex Mono,monospace;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);margin-bottom:2px">Vol</div><div id="cs-vol" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:13px">—</div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
