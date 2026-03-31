@@ -6391,6 +6391,25 @@ function doSignup() {
 
 // Legacy stub so any old openLogin() calls still work
 function signIn()  { openLogin(); }
+
+// ════════════════════════════════════
+// SIGN OUT
+// ════════════════════════════════════
+function doSignOut() {
+  try { if (typeof window._googleSignOut === 'function') window._googleSignOut(); } catch(e){}
+  // Clear all session state
+  sessionStorage.clear();
+  ['sd_uid','sd_mydata'].forEach(function(k){ localStorage.removeItem(k); });
+  // Reset draft state
+  userPicks = [];
+  activeDraftLeagueId = null;
+  // Close any open modals
+  document.querySelectorAll('.ov').forEach(function(el){ el.style.display='none'; });
+  updateNavUser();
+  go('landing');
+  toast('Signed out successfully');
+}
+
 function signOut() { doSignOut(); }
 
 function updateNavUser() {
@@ -7985,10 +8004,23 @@ function showPaymentModal(league, onConfirm) {
 function confirmBalanceJoin() {
   var btn = document.getElementById('bal-confirm-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Joining…'; }
-  // Deduct from balance and run the pending action
-  var newBal = Math.max(0, getBalance() - (_pendingLeagueFee || 0));
+  var prevBal = getBalance();
+  var fee = _pendingLeagueFee || 0;
+  var newBal = Math.max(0, prevBal - fee);
   localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
   updateBalanceDisplay();
+  // Log deduction to Supabase
+  var uid = getUserId(); var email = sessionStorage.getItem('sd_useremail')||'';
+  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action: 'balance_tx', data: {
+      uid: uid, email: email, type: 'pool_entry',
+      amount: -parseFloat(fee.toFixed(2)),
+      balance_before: parseFloat(prevBal.toFixed(2)),
+      balance_after: parseFloat(newBal.toFixed(2)),
+      note: 'Entry fee: ' + (_pendingLeagueName||'Pool')
+    }})
+  }).catch(function(){});
   var overlay = document.getElementById('ov-balance-confirm');
   if (overlay) overlay.remove();
   if (typeof _pendingPaymentAction === 'function') {
@@ -11474,15 +11506,27 @@ async function confirmDeposit() {
 }
 
 function creditBalance(amt) {
-  var newBal = getBalance() + parseFloat(amt);
+  var prevBal = getBalance();
+  var newBal = prevBal + parseFloat(amt);
   localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
   updateBalanceDisplay();
   cm('deposit');
-  // Reset button for next use
   var btn = document.getElementById('deposit-confirm-btn');
   if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
   toast('✓ $' + parseFloat(amt).toFixed(2) + ' added to your balance!');
   renderDashboard();
+  // Log to Supabase
+  var uid = getUserId(); var email = sessionStorage.getItem('sd_useremail')||'';
+  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action: 'balance_tx', data: {
+      uid: uid, email: email, type: 'deposit',
+      amount: parseFloat(parseFloat(amt).toFixed(2)),
+      balance_before: parseFloat(prevBal.toFixed(2)),
+      balance_after: parseFloat(newBal.toFixed(2)),
+      note: 'Stripe deposit'
+    }})
+  }).catch(function(){});
 }
 
 function updateBalanceDisplay() {
@@ -11735,15 +11779,27 @@ async function confirmDeposit() {
 }
 
 function creditBalance(amt) {
-  var newBal = getBalance() + parseFloat(amt);
+  var prevBal = getBalance();
+  var newBal = prevBal + parseFloat(amt);
   localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
   updateBalanceDisplay();
   cm('deposit');
-  // Reset button for next use
   var btn = document.getElementById('deposit-confirm-btn');
   if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
   toast('✓ $' + parseFloat(amt).toFixed(2) + ' added to your balance!');
   renderDashboard();
+  // Log to Supabase
+  var uid = getUserId(); var email = sessionStorage.getItem('sd_useremail')||'';
+  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action: 'balance_tx', data: {
+      uid: uid, email: email, type: 'deposit',
+      amount: parseFloat(parseFloat(amt).toFixed(2)),
+      balance_before: parseFloat(prevBal.toFixed(2)),
+      balance_after: parseFloat(newBal.toFixed(2)),
+      note: 'Stripe deposit'
+    }})
+  }).catch(function(){});
 }
 
 function updateBalanceDisplay() {
