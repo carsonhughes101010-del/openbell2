@@ -6354,7 +6354,7 @@ function doSignup() {
   localStorage.setItem('sd_all_users', JSON.stringify(allUsers));
   // Write to Supabase
   console.log('[Openbell] Saving to Supabase:', email);
-  fetch('/db', {
+  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
@@ -6441,7 +6441,7 @@ async function doLogin() {
 
     // 2. Not in Supabase
   try {
-    const dbRes = await fetch('/db', {
+    const dbRes = await fetch('https://opbell-db.carsonhughes101010.workers.dev', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ action: 'login', data: { email } })
