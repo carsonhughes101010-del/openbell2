@@ -6396,14 +6396,14 @@ function doSignup() {
     console.log('[Openbell] Supabase result:', JSON.stringify(res));
   }).catch(function(err) { console.warn('[Openbell] Supabase error (non-blocking):', err.message); });
 
-  // User already saved to Supabase via /db signup action above
-  // Reset UI state
-  userPicks = [];
-  activeDraftLeagueId = null;
-  cm('account');
+  // Complete signup — set session and go to dashboard
+  _setSession(userData);
+  if (btn) { btn.disabled = false; btn.textContent = 'Create Account →'; }
+  cm('signup');
   updateNavUser();
-  go('landing');
-  toast('Signed out successfully');
+  renderDashboard();
+  go('dashboard');
+  toast('✓ Welcome to Openbell, ' + firstName + '!');
 }
 
 // Legacy stub so any old openLogin() calls still work
@@ -8692,6 +8692,8 @@ function directJoin(id) {
 
   // Show payment overlay
   _joinTargetId = id;
+  _pendingLeagueFee = league.fee || 0;
+  _pendingLeagueName = league.name || '';
   var ov = getOrCreatePayOverlay();
   var isTop3 = league.payoutStructure === 'top3';
   var filled = league.participants.length;
@@ -8813,7 +8815,7 @@ function payAndJoin() {
 
   // Check if paying with balance
   var useBalance = document.getElementById('poi-use-balance')?.checked;
-  var feeAmt = parseFloat((document.getElementById('poi-fee-btn')||{}).textContent||'0');
+  var feeAmt = _pendingLeagueFee > 0 ? _pendingLeagueFee : parseFloat(((document.getElementById('poi-fee')||{}).textContent||'0').replace('$',''))||0;
   var userBal = parseFloat(localStorage.getItem(_uidKey('sd_balance'))||'0');
 
   if (useBalance && userBal >= feeAmt) {
