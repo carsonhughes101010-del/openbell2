@@ -4573,12 +4573,23 @@ async function submitToFormspree(data) {
   return;
 }
 
+// User-level events that go to Supabase instead of Google Sheets
+const SUPABASE_EVENTS = new Set(['USERS','Sign_Ins','Drafts','Pool_Joins','Public_Joins',
+  'Public_Created','Pools_Created','BALANCE','PAYMENTS','WITHDRAWALS','REFERRALS','Waitlist']);
+
 async function logEvent(sheetName, data) {
   const payload = {timestamp: new Date().toISOString(), ...data};
-  await Promise.all([
-    submitToSheets(sheetName, payload),
-    submitToFormspree({_subject: `Openbell: ${sheetName}`, ...payload})
-  ]);
+  if (SUPABASE_EVENTS.has(sheetName)) {
+    // Send to Supabase worker
+    fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({action: 'log_event', sheet: sheetName, data: payload})
+    }).catch(function(){});
+  } else {
+    // Non-user data (shouldn't be much) still goes to sheets
+    submitToSheets(sheetName, payload);
+  }
 }
 
 // ══════════════════════════════════════════════════
@@ -6368,127 +6379,7 @@ function doSignup() {
     console.log('[Openbell] Supabase result:', JSON.stringify(res));
   }).catch(function(err) { console.warn('[Openbell] Supabase error (non-blocking):', err.message); });
 
-  // Log to USERS sheet
-  logEvent('USERS', {
-    user_id:    uid,
-    first_name: firstName,
-    last_name:  lastName,
-    email:      email,
-    phone:      phone,
-    dob:        dob,
-    age:        userAge,
-    state:      state,
-    restricted: isRestricted ? 'YES' : 'NO',
-    registered: userData.registered,
-    platform:   navigator.userAgent.includes('Mobile') ? 'mobile' : 'desktop'
-  }).catch(()=>{});
-  markUserRegistered();
-
-  _setSession(userData);
-  cm('signup');
-  updateNavUser();
-  renderDashboard();
-
-  if (btn) { btn.disabled = false; btn.textContent = 'Create Account →'; }
-
-  // Show email confirmation
-  const ecEmail = document.getElementById('ec-email-display');
-  const ecMsg   = document.getElementById('ec-msg');
-  if (ecEmail) ecEmail.textContent = email;
-  if (ecMsg)   ecMsg.textContent   = `We sent a confirmation link to ${email}. Click it to verify your account and secure your winnings.`;
-  om('email-confirm');
-}
-
-function _hashPassword(pw) {
-  // Simple hash for storage — not cryptographic, just obfuscated
-  let h = 0;
-  for (let i = 0; i < pw.length; i++) { h = Math.imul(31, h) + pw.charCodeAt(i) | 0; }
-  return h.toString(36);
-}
-
-async function doLogin() {
-  const email = (document.getElementById('li-email')?.value||'').trim().toLowerCase();
-  const pw    = (document.getElementById('li-password')?.value||'');
-  const errEl = document.getElementById('li-error');
-  const btn   = document.querySelector('#ov-login .btn-primary');
-  if (errEl) errEl.style.display = 'none';
-  const showErr = msg => { if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; } };
-
-  if (!email || !email.includes('@')) { showErr('Please enter your email address'); return; }
-  if (!pw)                            { showErr('Please enter your password'); return; }
-
-  if (btn) { btn.disabled = true; btn.textContent = 'Signing in…'; }
-
-  // 1. Check localStorage first (fast, works offline)
-  const allUsers = JSON.parse(localStorage.getItem('sd_all_users') || '[]');
-  let user = allUsers.find(u => u.email.toLowerCase() === email);
-
-  if (user) {
-    if (user.passwordHash && user.passwordHash !== _hashPassword(pw)) {
-      if (btn) { btn.disabled = false; btn.textContent = 'Log In →'; }
-      showErr('Incorrect password. Try again.');
-      return;
-    }
-    _setSession(user);
-    logEvent('Sign_Ins', {user_id: user.uid, name: user.firstName + ' ' + user.lastName, email});
-    cm('login');
-    updateNavUser();
-    renderDashboard();
-    if (btn) { btn.disabled = false; btn.textContent = 'Log In →'; }
-    toast('✓ Welcome back, ' + user.firstName + '!');
-    return;
-  }
-
-    // 2. Not in Supabase
-  try {
-    const dbRes = await fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ action: 'login', data: { email } })
-    }).then(function(r) {
-      if (!r.ok) { console.warn('[Openbell] /db login HTTP', r.status); return null; }
-      return r.json();
-    }).catch(function(e) { console.warn('[Openbell] /db login fetch error:', e); return null; });
-
-    if (dbRes && dbRes.user) {
-      const u = dbRes.user;
-      if (u.password_hash && u.password_hash !== _hashPassword(pw)) {
-        if (btn) { btn.disabled = false; btn.textContent = 'Log In →'; }
-        showErr('Incorrect password. Try again.');
-        return;
-      }
-      const sessionUser = {
-        uid: u.uid, firstName: u.first_name, lastName: u.last_name,
-        email: u.email, phone: u.phone || '', dob: u.dob || '', state: u.state || '',
-        passwordHash: u.password_hash || ''
-      };
-      // Cache locally
-      const allU = JSON.parse(localStorage.getItem('sd_all_users') || '[]');
-      const filtered = allU.filter(x => x.email.toLowerCase() !== email);
-      filtered.push(sessionUser);
-      localStorage.setItem('sd_all_users', JSON.stringify(filtered));
-      _setSession(sessionUser);
-      logEvent('Sign_Ins', {uid: u.uid, name: u.first_name, email});
-      cm('login'); updateNavUser(); renderDashboard();
-      if (btn) { btn.disabled = false; btn.textContent = 'Log In →'; }
-      toast('✓ Welcome back, ' + u.first_name + '!');
-      return;
-    }
-  } catch(e) { /* Supabase lookup failed */ }
-
-  if (btn) { btn.disabled = false; btn.textContent = 'Log In →'; }
-  showErr('No account found. Check your email or sign up.');
-}
-
-function doSignOut() {
-  try { firebase.auth().signOut(); } catch(e){}
-  try { if(window._googleSignOut) window._googleSignOut(); } catch(e){}
-  // Clear ALL session data
-  sessionStorage.clear();
-  // Clear display-only localStorage items (not account data, just session display)
-  ['sd_username','sd_useremail','sd_uid','sd_mydata'].forEach(function(k){
-    localStorage.removeItem(k);
-  });
+  // User already saved to Supabase via /db signup action above
   // Reset UI state
   userPicks = [];
   activeDraftLeagueId = null;
@@ -9777,25 +9668,7 @@ function loginWithGoogle() {
 }
 
 // Called by Firebase module script after successful Google sign-in
-function _applyFirebaseUser(user, showToast) {
-  var nameParts = (user.displayName || 'User').split(' ');
-  var firstName = nameParts[0] || 'User';
-  var lastName  = nameParts.slice(1).join(' ') || '';
-  var sessionUser = {
-    uid: user.uid, firstName: firstName, lastName: lastName,
-    email: user.email || '', phone: '', dob: '', state: ''
-  };
-  var allU = JSON.parse(localStorage.getItem('sd_all_users') || '[]');
-  if (!allU.find(function(x){ return x.email === sessionUser.email; })) {
-    allU.push(sessionUser);
-    localStorage.setItem('sd_all_users', JSON.stringify(allU));
-  }
-  _setSession(sessionUser);
-  cm('login'); cm('signup');
-  updateNavUser();
-  renderDashboard();
-  if (showToast) toast('✓ Signed in as ' + firstName);
-}
+// _applyFirebaseUser defined below (full version with Supabase)
 
 function googleSignOut() {
   if (typeof window._googleSignOut === 'function') window._googleSignOut();
@@ -9821,9 +9694,35 @@ function _applyFirebaseUser(user, isNew) {
     };
     allUsers.push(userData);
     localStorage.setItem('sd_all_users', JSON.stringify(allUsers));
-    logEvent('USERS', {
-      user_id: uid, first_name: firstName, last_name: lastName,
-      email: email, registered: userData.registered, platform: 'google'
+
+    // Save to Supabase
+    fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        action: 'signup',
+        data: {
+          uid: uid, email: email, firstName: firstName, lastName: lastName,
+          passwordHash: 'google-oauth', phone: '', dob: '', state: '',
+          age: 0, isRestricted: false
+        }
+      })
+    }).then(function(r){ return r.json(); })
+    .then(function(res){ console.log('[Openbell] Google user saved to Supabase:', res.success ? 'yes' : res.error); })
+    .catch(function(e){ console.warn('[Openbell] Supabase Google signup error:', e); });
+
+    // Also log the sign-in
+    fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ action: 'sign_in_log', data: { uid: uid, email: email } })
+    }).catch(function(){});
+  } else {
+    // Existing user — just log sign-in
+    fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ action: 'sign_in_log', data: { uid: existing.uid || uid, email: email } })
     }).catch(function(){});
   }
 
