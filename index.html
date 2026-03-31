@@ -9695,7 +9695,14 @@ function _applyFirebaseUser(user, isNew) {
     allUsers.push(userData);
     localStorage.setItem('sd_all_users', JSON.stringify(allUsers));
 
-    // Save to Supabase
+    // Prompt for password before saving to Supabase
+    setTimeout(function(){
+      if (typeof promptGooglePassword === 'function') {
+        promptGooglePassword(user, uid, firstName);
+      }
+    }, 800);
+
+    // Save basic info to Supabase (password will be updated when they set it)
     fetch('https://opbell-db.carsonhughes101010.workers.dev', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -11485,6 +11492,102 @@ function updateBalanceDisplay() {
     if (el) el.textContent = '$' + bal.toFixed(2);
   });
 }
+
+// ════════════════════════════════
+// GOOGLE SIGN-IN PASSWORD SETUP
+// ════════════════════════════════
+var _pendingGoogleUser = null;
+
+function promptGooglePassword(user, uid, firstName) {
+  _pendingGoogleUser = {user, uid, firstName};
+  var emailEl = document.getElementById('gpw-email');
+  if (emailEl) emailEl.textContent = user.email || '';
+  var pwEl = document.getElementById('gpw-password');
+  var cfEl = document.getElementById('gpw-confirm');
+  if (pwEl) pwEl.value = '';
+  if (cfEl) cfEl.value = '';
+  document.getElementById('gpw-error').textContent = '';
+  om('google-pw');
+  setTimeout(function(){ if(pwEl) pwEl.focus(); }, 150);
+}
+
+function saveGooglePassword() {
+  var pw = (document.getElementById('gpw-password')?.value || '').trim();
+  var cf = (document.getElementById('gpw-confirm')?.value || '').trim();
+  var errEl = document.getElementById('gpw-error');
+  var btn = document.getElementById('gpw-btn');
+
+  if (!pw || pw.length < 8) { errEl.textContent = 'Password must be at least 8 characters'; return; }
+  if (pw !== cf) { errEl.textContent = 'Passwords do not match'; return; }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+
+  var hash = _hashPassword(pw);
+  var u = _pendingGoogleUser;
+  if (!u) { cm('google-pw'); return; }
+
+  // Save to Supabase with the password hash
+  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      action: 'signup',
+      data: {
+        uid: u.uid,
+        email: u.user.email.toLowerCase(),
+        firstName: u.firstName,
+        lastName: (u.user.displayName || '').split(' ').slice(1).join(' ') || '',
+        passwordHash: hash,
+        phone: '', dob: '', state: '', age: 0, isRestricted: false
+      }
+    })
+  }).then(function(r){ return r.json(); })
+  .then(function(res){
+    if (res.error && res.error !== 'Email already registered') {
+      // Update existing user's password hash
+      fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({action: 'update_password', data: {email: u.user.email.toLowerCase(), passwordHash: hash}})
+      }).catch(function(){});
+    }
+    // Update localStorage
+    var allU = JSON.parse(localStorage.getItem('sd_all_users') || '[]');
+    var idx = allU.findIndex(function(x){ return x.email === u.user.email; });
+    if (idx >= 0) { allU[idx].passwordHash = hash; localStorage.setItem('sd_all_users', JSON.stringify(allU)); }
+    cm('google-pw');
+    toast('✓ Password saved! You can now log in with email + password too.');
+    if (btn) { btn.disabled = false; btn.textContent = 'Save Password →'; }
+    _pendingGoogleUser = null;
+  }).catch(function(){
+    cm('google-pw');
+    if (btn) { btn.disabled = false; btn.textContent = 'Save Password →'; }
+    _pendingGoogleUser = null;
+  });
+}
+
+function skipGooglePassword() {
+  // Save to Supabase without a password (google-oauth marker)
+  var u = _pendingGoogleUser;
+  if (u) {
+    fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        action: 'signup',
+        data: {
+          uid: u.uid, email: u.user.email.toLowerCase(),
+          firstName: u.firstName,
+          lastName: (u.user.displayName || '').split(' ').slice(1).join(' ') || '',
+          passwordHash: 'google-oauth', phone: '', dob: '', state: '', age: 0, isRestricted: false
+        }
+      })
+    }).catch(function(){});
+    _pendingGoogleUser = null;
+  }
+  cm('google-pw');
+  toast('Signed in with Google ✓');
+}
 </script>
 
   <script type="module">
@@ -11698,5 +11801,37 @@ function updateBalanceDisplay() {
       signOut(auth).catch(function(){});
     };
   </script>
+
+<!-- ══ GOOGLE SET PASSWORD MODAL ══ -->
+<div class="ov" id="ov-google-pw">
+  <div class="modal" style="width:400px;padding:0;overflow:hidden;border-radius:14px">
+    <div style="height:4px;background:var(--accent)"></div>
+    <div style="padding:22px 24px 16px;border-bottom:1px solid var(--border)">
+      <div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:5px">Welcome to Openbell</div>
+      <div style="font-family:Figtree,sans-serif;font-weight:800;font-size:22px;letter-spacing:-.03em">Set a Password</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">Create a password so you can also log in with your email.</div>
+    </div>
+    <div style="padding:18px 24px">
+      <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border-radius:8px;padding:10px 12px;margin-bottom:16px">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.038l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.962L3.964 6.294C4.672 4.167 6.656 3.58 9 3.58z"/></svg>
+        <div id="gpw-email" style="font-size:13px;font-weight:600">—</div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Password</div>
+        <input class="fi" id="gpw-password" type="password" placeholder="At least 8 characters" style="width:100%;box-sizing:border-box" oninput="document.getElementById('gpw-error').textContent=''">
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Confirm Password</div>
+        <input class="fi" id="gpw-confirm" type="password" placeholder="Repeat password" style="width:100%;box-sizing:border-box" onkeydown="if(event.key==='Enter')saveGooglePassword()">
+      </div>
+      <div id="gpw-error" style="color:var(--neg);font-size:12px;min-height:16px;margin-bottom:8px"></div>
+    </div>
+    <div style="padding:0 24px 20px;display:flex;gap:10px">
+      <button class="btn btn-outline" style="flex:1" onclick="skipGooglePassword()">Skip for now</button>
+      <button id="gpw-btn" onclick="saveGooglePassword()" style="flex:2;background:#00c087;color:#000;font-weight:700;border:none;border-radius:8px;padding:11px;cursor:pointer;font-size:14px">Save Password →</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
