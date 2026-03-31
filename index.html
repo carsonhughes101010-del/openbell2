@@ -5481,14 +5481,23 @@ async function submitDraft() {
   localStorage.setItem(_dck, existing+1);
 
   // Log to Sheets + Formspree
-  await logEvent('Drafts', {
-    session_user: sessionStorage.getItem('sd_username')||'Anonymous',
-    player: myData.name||'Anonymous',
-    email: myData.email||'—',
-    slate: activeDraftLeagueId||'free', user_id: getUserId(),
-    week: getWN(),
-    picks: userPicks.join(', ')
-  });
+  // Save draft to Supabase
+  var _dUid = getUserId();
+  var _dEmail = myData.email||sessionStorage.getItem('sd_useremail')||'';
+  var _dName = myData.name||sessionStorage.getItem('sd_username')||'Anonymous';
+  var _dLg = [...getLeagues(),...getPublicLeagues()].find(function(l){return l.id===activeDraftLeagueId;});
+  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action: 'save_draft', data: {
+      uid: _dUid, email: _dEmail, username: _dName,
+      leagueId: activeDraftLeagueId||'free',
+      leagueName: _dLg ? _dLg.name : (activeDraftLeagueId||'Free Draft'),
+      week: _dLg ? (_dLg.week||getWN()) : getWN(),
+      picks: userPicks
+    }})
+  }).then(function(r){return r.json();})
+    .then(function(res){ console.log('[Openbell] Draft → Supabase:', res.success ? '✓' : res.error); })
+    .catch(function(e){ console.warn('[Openbell] Draft save error:', e); });
 
   // Resolve league name BEFORE using it
   const _lName = activeDraftLeagueId ? (getLeagues().find(l=>l.id===activeDraftLeagueId)||getPublicLeagues().find(l=>l.id===activeDraftLeagueId)||{name:activeDraftLeagueId}).name : 'Free Draft';
@@ -5642,7 +5651,15 @@ async function joinLeague() {
     sessionStorage.setItem('sd_useremail', jemail);
     updateNavUser();
     trackDraftSubmit && trackDraftSubmit(league ? league.name : 'unknown', league ? league.week : 0);
-    await logEvent('Pool_Joins', {session_user:jname, player:jname, email:jemail, pool_name:league.name, access_code:league.code, entry_fee:league.fee});
+    // Save enrollment to Supabase
+    fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ action: 'save_enrollment', data: {
+        uid: getUserId(), email: jemail, username: jname,
+        leagueId: league.id, leagueName: league.name,
+        fee: league.fee, week: league.week || getWN()
+      }})
+    }).catch(function(){});
     renderDashboard();
     toast(`✓ Paid & joined "${league.name}"! Now pick your 5 stocks.`);
     ['j-name','j-email','j-code'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -8151,7 +8168,15 @@ function doJoinFundStripe() {
       stored.push(copy);
       saveLeagues(stored);
     }
-    logEvent('Pool_Joins', {player: myName, email: myEmail, pool_name: league.name, entry_fee: league.fee});
+    // Save enrollment to Supabase
+    fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ action: 'save_enrollment', data: {
+        uid: getUserId(), email: myEmail, username: myName,
+        leagueId: league.id, leagueName: league.name,
+        fee: league.fee, week: league.week || getWN()
+      }})
+    }).catch(function(){});
     renderDashboard();
     toast('✓ Joined ' + league.name + '! Now head to Draft Room.');
     setTimeout(function(){ activeDraftLeagueId = league.id; go('draft'); }, 1200);
@@ -8796,19 +8821,47 @@ function payAndJoin() {
     setTimeout(function() {
       var newBal = userBal - feeAmt;
       localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
-      logEvent('BALANCE', {user_id: getUserId(), name: myName, type: 'debit', amount: -feeAmt, reason: 'Fund entry', bal_after: newBal, ts: new Date().toISOString()}).catch(function(){});
       updateBalanceDisplay();
+      // Log to Supabase balance_transactions
+      var uid = getUserId(); var email2 = sessionStorage.getItem('sd_useremail')||'';
+      var leagueName = '';
+      try { var lg2 = getPublicLeagues().find(function(l){return l.id===_joinTargetId;}); if(lg2) leagueName=lg2.name; } catch(e){}
+      fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ action: 'balance_tx', data: {
+          uid: uid, email: email2, type: 'pool_entry',
+          amount: -parseFloat(feeAmt.toFixed(2)),
+          balance_before: parseFloat(userBal.toFixed(2)),
+          balance_after: parseFloat(newBal.toFixed(2)),
+          note: 'Entry fee: ' + (leagueName || _joinTargetId || 'Pool')
+        }})
+      }).catch(function(){});
       _completeJoin(myName, myEmail, null);
     }, 600);
     return;
   }
 
-  // Card fallback
+  // Card fallback — also log balance change if fee is being taken
   var savedCard = null;
   try { savedCard = JSON.parse(localStorage.getItem('sd_payment') || 'null'); } catch(e) {}
 
   if (savedCard && savedCard.last4) {
     setTimeout(function() {
+      // Log pool entry to Supabase even for card payments
+      var uid3 = getUserId(); var email3 = sessionStorage.getItem('sd_useremail')||'';
+      var prevBal3 = parseFloat(localStorage.getItem(_uidKey('sd_balance'))||'0');
+      var leagueName3 = '';
+      try { var lg3 = getPublicLeagues().find(function(l){return l.id===_joinTargetId;}); if(lg3) leagueName3=lg3.name; } catch(e){}
+      fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ action: 'balance_tx', data: {
+          uid: uid3, email: email3, type: 'pool_entry_card',
+          amount: -parseFloat((feeAmt||0).toFixed(2)),
+          balance_before: prevBal3,
+          balance_after: prevBal3,
+          note: 'Card payment for: ' + (leagueName3 || _joinTargetId || 'Pool')
+        }})
+      }).catch(function(){});
       _completeJoin(myName, myEmail, { card: { last4: savedCard.last4, brand: savedCard.brand, exp_month: '', exp_year: '' } });
     }, 900);
   } else {
@@ -8847,7 +8900,14 @@ function _completeJoin(myName, myEmail, paymentMethod) {
       }
       if (ei >= 0) stored[ei] = league; else stored.push(league);
       saveLeagues(stored);
-      logEvent('Public_Joins', {session_user: myName, email: myEmail, pool_name: league.name, slate_id: id, entry_fee: league.fee}).catch(function(){});
+      fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ action: 'save_enrollment', data: {
+        uid: getUserId(), email: myEmail, username: myName,
+        leagueId: id, leagueName: league ? league.name : id,
+        fee: league ? league.fee : 0, week: league ? (league.week||getWN()) : getWN()
+      }})
+    }).catch(function(){});
     }
 
     closePayOverlay();
