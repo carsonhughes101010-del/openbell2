@@ -11778,7 +11778,7 @@ function renderBalanceHistory() {
   el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Loading…</div>';
   fetch('https://opbell-db.carsonhughes101010.workers.dev', {
     method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action: 'get_balance_history', data: { uid: uid } })
+    body: JSON.stringify({ action: 'get_balance_history', data: { uid: uid, email: sessionStorage.getItem('sd_useremail')||'' } })
   }).then(function(r){ return r.json(); })
   .then(function(res) {
     var txns = res.transactions || [];
