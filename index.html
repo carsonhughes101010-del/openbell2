@@ -1023,16 +1023,39 @@ select.fi { cursor: pointer; }
   border: 1px solid var(--border);
   border-radius: 8px;
   cursor: pointer;
-  transition: all .15s;
+  transition: all .18s;
   padding: 18px;
   box-shadow: var(--sh);
+  position: relative;
+  overflow: hidden;
 }
-.pub-card:hover { border-color: var(--border2); box-shadow: var(--sh-md); transform: translateY(-1px); }
+.pub-card:hover { border-color: var(--border2); box-shadow: var(--sh-md); transform: translateY(-2px); }
 .pub-card.featured { border-color: rgba(192,57,43,.25); }
 .pub-card-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
 .pub-card-name { font-weight: 700; font-size: 14px; line-height: 1.3; }
 .pub-card-meta { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
 .special-section-header { color:#7c3aed; }
+.pub-card.special {
+  background: linear-gradient(135deg, #1a0533 0%, #0f1a3d 100%);
+  border: 1px solid rgba(139,92,246,.4);
+  box-shadow: 0 0 20px rgba(139,92,246,.15), var(--sh);
+  color: #e2d9f3;
+}
+.pub-card.special:hover {
+  border-color: rgba(139,92,246,.7);
+  box-shadow: 0 0 32px rgba(139,92,246,.3), 0 8px 24px rgba(0,0,0,.3);
+  transform: translateY(-3px);
+}
+.pub-card.special::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle at 60% 40%, rgba(139,92,246,.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.pub-card.special .pub-card-name { color: #e2d9f3; }
+.pub-card.special .pub-card-meta { color: rgba(226,217,243,.5); }
 .featured-badge {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 8px;
@@ -2119,7 +2142,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
         <div class="sb-it" onclick="sbNav(this,'dash-picks');renderPicksHistory()">My Submissions</div>
         <div class="sb-it" onclick="sbNav(this,'dash-perf');renderDashPerf()">Performance</div>
         <div class="sb-it" onclick="sbNav(this,'dash-social');renderSocial()" style="display:flex;align-items:center;justify-content:space-between">
-          <span>Messages</span>
+          <span>Social</span>
           <span id="msg-badge" style="display:none;background:var(--neg);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;font-family:IBM Plex Mono,monospace">●</span>
         </div>
       </div>
@@ -2137,7 +2160,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
             <div style="font-size:10px;color:var(--muted);font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.06em">Available Balance</div>
             <div style="font-size:9px;color:var(--accent);font-family:IBM Plex Mono,monospace">History →</div>
           </div>
-          <div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:26px;color:var(--pos)" id="sb-wins">$0.00</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:26px;color:var(--pos)" id="sb-wins" onclick="openBalanceHistory()" style="cursor:pointer">$0.00</div>
         </div>
         <button class="btn" onclick="openDeposit()" style="width:100%;background:#00c087;color:#000;font-weight:700;font-size:12px;border:none;border-radius:8px;padding:9px;cursor:pointer;margin-bottom:6px">+ Deposit Cash</button>
         <button class="btn btn-outline btn-sm" style="width:100%;font-size:10px;padding:5px;color:var(--muted);margin-bottom:10px" onclick="openWithdraw()">↑ Withdraw</button>
@@ -4428,7 +4451,7 @@ function loadTVChart() {
   iframe.style.cssText = 'width:100%;height:500px;border:none;display:block';
   iframe.src = 'https://s.tradingview.com/widgetembed/?symbol=' + _chartSym +
     '&interval=' + interval + '&theme=' + theme +
-    '&style=1&locale=en&toolbar_bg=' + (isDark ? '%230d0d12' : '%23f7f7f8') +
+    '&style=3&locale=en&toolbar_bg=' + (isDark ? '%230d0d12' : '%23f7f7f8') +
     '&enable_publishing=false&hide_top_toolbar=0&save_image=false&hideideas=1';
   iframe.onload = function() { if (loading) loading.style.display = 'none'; };
   wrap.appendChild(iframe);
@@ -5003,6 +5026,11 @@ function saveDrafts(d) {
 // calcRet: equal-weight average of week returns (since Mon) when available, else daily pct
 function calcRet(pickSyms) {
   if (!pickSyms || pickSyms.length === 0) return null;
+  // Return 0 before Monday 9:30 AM ET
+  var _now = new Date();
+  var _etH = _now.getUTCHours() + (isDST(_now) ? -4 : -5);
+  var _etD = _now.getUTCDay();
+  if (_etD === 0 || (_etD === 1 && _etH < 9.5)) return 0;
   const weight = 1 / pickSyms.length;
   return pickSyms.reduce((sum, sym) => {
     const w = getWeekPct(sym);
@@ -6069,7 +6097,7 @@ function renderLeaderboard(leagueId) {
           : `<div class="lbret" style="color:var(--muted);font-size:14px">—</div>`;
     return `<div class="lbr ${isMe?'me':''}">
       <div class="lbrn ${hasRet ? rankClasses[i]||'' : ''}">${hasRet ? i+1 : '—'}</div>
-      <div><div class="lbu">${r.name}${isMe?'<span class="you-t">YOU</span>':''}</div><div class="lbm">Week ${league.week}</div></div>
+      <div><div class="lbu">${r.name}${isMe?'<span class="you-t">YOU</span>':''}${r.uid==='mr-market'?'<span style="font-size:9px;background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;padding:1px 6px;border-radius:4px;margin-left:4px;font-family:IBM Plex Mono,monospace;font-weight:700">SPY</span>':''}</div><div class="lbm">Week ${league.week}</div></div>
       <div class="lb-port">${tags}</div>
       ${retDisp}
       <div class="lbpy ${hasRet&&((i<3&&isTop3)||i===0)?'':'no'}">${payoutDisp}</div>
@@ -6831,19 +6859,20 @@ function getFeaturedSlates() {
     // ── NEW GAME MODES ──
     {id:weekId('pub_onepick'),    baseId:'pub_onepick',    name:'The One Pick',
      desc:'$5 entry. Pick ONE stock. Pure conviction — highest single return wins.',
-     fee:5,  maxPlayers:100, isPublic:true, isFeatured:true, organizer:'Openbell',
+     fee:5,  maxPlayers:100, isPublic:true, isFeatured:true, isSpecial:true, organizer:'Openbell',
      payoutStructure:'winner', maxPicks:1,
      participants:[], picks:{}, week:wn, created:new Date().toISOString(), code:'ONE-W'+wn},
     {id:weekId('pub_contrarian'), baseId:'pub_contrarian', name:'Contrarian Mode',
      desc:'$20 entry. The LOWEST portfolio return wins. Bet against the market.',
-     fee:20, maxPlayers:40,  isPublic:true, isFeatured:true, organizer:'Openbell',
+     fee:20, maxPlayers:40,  isPublic:true, isFeatured:true, isSpecial:true, organizer:'Openbell',
      payoutStructure:'winner', contrarian:true,
      participants:[], picks:{}, week:wn, created:new Date().toISOString(), code:'CONTRA-W'+wn},
     {id:weekId('pub_beater'),     baseId:'pub_beater',     name:'Beat the Market',
-     desc:'$15 entry. Outperform SPY this week. Everyone who beats the index splits the pot.',
-     fee:15, maxPlayers:60,  isPublic:true, isFeatured:true, organizer:'Openbell',
+     desc:'$15 entry. Outperform SPY this week. Beat Mr. Market (SPY tracker) to win. Everyone who beats the index splits the pot.',
+     fee:15, maxPlayers:60,  isPublic:true, isFeatured:true, isSpecial:true, organizer:'Openbell',
      payoutStructure:'beater',
-     participants:[], picks:{}, week:wn, created:new Date().toISOString(), code:'BEAT-W'+wn},
+     participants:[{name:'Mr. Market', uid:'mr-market', isMrMarket:true, isBot:false}],
+     picks:{'mr-market':['SPY']}, week:wn, created:new Date().toISOString(), code:'BEAT-W'+wn},
   ];
 
   // Overlay ONLY by exact ID match (no legacy fallbacks that cause duplicates)
@@ -6993,7 +7022,7 @@ function pubCard(l, myName, isFeat) {
       <div class="pcs"><strong style="color:var(--muted)">$${pay3}</strong>3rd · 15%</div>
     </div>` : ``;
 
-  return `<div class="pub-card ${isFeat?'featured':''}" onclick="openPublicSlate('${l.id}')">
+  return `<div class="pub-card ${l.isSpecial?'special featured':(isFeat?'featured':'')}" onclick="openPublicSlate('${l.id}')">
     <div class="pub-card-head">
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap">
@@ -8089,10 +8118,22 @@ function showPaymentModal(league, onConfirm) {
 function confirmBalanceJoin() {
   var btn = document.getElementById('bal-confirm-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Joining…'; }
-  // Deduct from balance and run the pending action
-  var newBal = Math.max(0, getBalance() - (_pendingLeagueFee || 0));
+  var _prevBal = getBalance();
+  var _fee = _pendingLeagueFee || 0;
+  var newBal = Math.max(0, _prevBal - _fee);
   localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
   updateBalanceDisplay();
+  var _uid2 = getUserId(); var _eml2 = sessionStorage.getItem('sd_useremail')||'';
+  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ action:'balance_tx', data:{
+      uid:_uid2, email:_eml2, type:'pool_entry',
+      amount:-parseFloat(_fee.toFixed(2)),
+      balance_before:parseFloat(_prevBal.toFixed(2)),
+      balance_after:parseFloat(newBal.toFixed(2)),
+      note:'Entry fee: '+(_pendingLeagueName||'Pool')
+    }})
+  }).catch(function(){});
   var overlay = document.getElementById('ov-balance-confirm');
   if (overlay) overlay.remove();
   if (typeof _pendingPaymentAction === 'function') {
@@ -8803,66 +8844,51 @@ function closePayOverlay() {
 
 function payAndJoin() {
   var nameInput = document.getElementById('poi-name-input');
-  var emailInput = document.getElementById('poi-email-input');
-  var myName  = (nameInput  ? nameInput.value.trim()  : '') || sessionStorage.getItem('sd_username') || '';
-  var myEmail = (emailInput ? emailInput.value.trim() : '') || sessionStorage.getItem('sd_useremail') || '';
+  var myName = (nameInput ? nameInput.value.trim() : '') || sessionStorage.getItem('sd_username') || '';
+  var myEmail = sessionStorage.getItem('sd_useremail') || '';
 
-  if (!myName) {
-    if (nameInput) nameInput.focus();
-    toast('Please enter your name');
-    return;
-  }
+  if (!myName) { if (nameInput) nameInput.focus(); toast('Enter your name'); return; }
 
   var btn = document.getElementById('poi-pay-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Processing…'; }
 
-  // Save identity
   sessionStorage.setItem('sd_username', myName);
-  sessionStorage.setItem('sd_useremail', myEmail);
-  sessionStorage.setItem('sd_uid', getUserId());
-  logNewUser(myName, myEmail);
   saveMyData({name: myName, email: myEmail, uid: getUserId()});
   updateNavUser();
 
-  // Stripe payment processing
-  var btn2 = document.getElementById('poi-pay-btn');
-  if (btn2) { btn2.disabled = true; btn2.textContent = 'Processing…'; }
+  var feeAmt = _pendingLeagueFee > 0 ? _pendingLeagueFee
+    : parseFloat(((document.getElementById('poi-fee')||{}).textContent||'0').replace('$',''))||0;
+  var prevBal = getBalance();
 
-  // Skip Stripe entirely for pay overlay — use saved card flow
-  // (Stripe element is only in the add-payment modal, not the join flow)
-
-  // Check if paying with balance
-  var useBalance = document.getElementById('poi-use-balance')?.checked;
-  var feeAmt = parseFloat((document.getElementById('poi-fee-btn')||{}).textContent||'0');
-  var userBal = parseFloat(localStorage.getItem(_uidKey('sd_balance'))||'0');
-
-  if (useBalance && userBal >= feeAmt) {
-    // Deduct from balance
-    setTimeout(function() {
-      var newBal = userBal - feeAmt;
-      localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
-      logEvent('BALANCE', {user_id: getUserId(), name: myName, type: 'debit', amount: -feeAmt, reason: 'Fund entry', bal_after: newBal, ts: new Date().toISOString()}).catch(function(){});
-      updateBalanceDisplay();
-      _completeJoin(myName, myEmail, null);
-    }, 600);
+  if (prevBal >= feeAmt && feeAmt > 0) {
+    var newBal = Math.max(0, prevBal - feeAmt);
+    localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
+    updateBalanceDisplay();
+    fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'balance_tx', data:{
+        uid: getUserId(), email: myEmail, type:'pool_entry',
+        amount: -parseFloat(feeAmt.toFixed(2)),
+        balance_before: parseFloat(prevBal.toFixed(2)),
+        balance_after: parseFloat(newBal.toFixed(2)),
+        note: 'Entry fee: ' + (_pendingLeagueName || _joinTargetId || 'Pool')
+      }})
+    }).catch(function(){});
+    setTimeout(function(){ _completeJoin(myName, myEmail, null); }, 300);
     return;
   }
 
-  // Card fallback
-  var savedCard = null;
-  try { savedCard = JSON.parse(localStorage.getItem('sd_payment') || 'null'); } catch(e) {}
-
-  if (savedCard && savedCard.last4) {
-    setTimeout(function() {
-      _completeJoin(myName, myEmail, { card: { last4: savedCard.last4, brand: savedCard.brand, exp_month: '', exp_year: '' } });
-    }, 900);
-  } else {
-    if (btn) { btn.disabled = false; btn.textContent = 'Pay $' + feeAmt + ' & Enter →'; }
-    closePayOverlay();
-    toast('Please add a payment method first');
-    setTimeout(openAddPayment, 400);
+  if (feeAmt === 0) {
+    _completeJoin(myName, myEmail, null);
+    return;
   }
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Pay $' + feeAmt + ' from Balance'; }
+  closePayOverlay();
+  toast('Insufficient balance — add funds first');
+  setTimeout(openDeposit, 400);
 }
+
 
 function _completeJoin(myName, myEmail, paymentMethod) {
   // Save card to sheet if we have payment info
@@ -11678,6 +11704,7 @@ function openPoolRules(leagueId) {
     : isContrarian ? 'Lowest return wins — 95% to 1st / Platform 5%'
     : 'Winner 95% / Platform 5%';
   var scoring = isContrarian ? 'Lowest average portfolio return wins.'
+    : isBeater ? 'Beat Mr. Market (SPY) this week. All players who outperform SPY split 95% of the pot. SPY price data sourced live from Google Finance.'
     : 'Highest average % return (Monday open → Friday close) wins.';
 
   var rulesHtml = '<div style="height:4px;background:var(--accent)"></div>' +
