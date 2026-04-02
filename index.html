@@ -2131,11 +2131,8 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
       <div class="sb-sec">
         <div class="sb-lbl">Balance</div>
         <!-- Balance display -->
-        <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:box-shadow .15s" onclick="openBalanceHistory()" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,192,135,.15)'" onmouseout="this.style.boxShadow=''">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-            <div style="font-size:10px;color:var(--muted);font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.06em">Available Balance</div>
-            <div style="font-size:9px;color:var(--accent);font-family:IBM Plex Mono,monospace">View History →</div>
-          </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;margin-bottom:8px">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.06em">Available</div>
           <div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:26px;color:var(--pos)" id="sb-wins">$0.00</div>
         </div>
         <button class="btn" onclick="openDeposit()" style="width:100%;background:#00c087;color:#000;font-weight:700;font-size:12px;border:none;border-radius:8px;padding:9px;cursor:pointer;margin-bottom:6px">+ Deposit Cash</button>
@@ -2430,22 +2427,24 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
         </div>
       </div>
 
-      <!-- Pool selector — prominent -->
-      <div id="draft-fund-banner" style="background:var(--ink);border-radius:8px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:20px">
-        <div style="flex:1">
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.4);margin-bottom:6px">Drafting For</div>
-          <div style="position:relative">
-            <select id="draft-fund-select-top" onchange="var _p=this.value.split('__');if(_p[0])switchDraftLeague(_p[0],_p[1]);updateDraftFundBanner()" style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;width:100%;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);color:#fff;cursor:pointer;padding:10px 36px 10px 14px;outline:none;appearance:none;-webkit-appearance:none;border-radius:8px;transition:border-color .15s" onmouseover="this.style.borderColor='rgba(0,192,135,.5)'" onmouseout="this.style.borderColor='rgba(255,255,255,.2)'">
-              <option value="" style="background:#141414;color:#fff">— Select a pool to draft for —</option>
-            </select>
-            <svg style="position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none" width="12" height="8" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="rgba(255,255,255,.5)" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-          </div>
-          <div id="draft-active-fund-label" style="font-family:Figtree,sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,.5);margin-top:8px;letter-spacing:-.01em;line-height:1.2">No pool selected — choose above to start drafting</div>
+      <!-- Pool selector -->
+      <div id="draft-fund-banner" style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:16px">
+        <div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--faint);margin-bottom:8px">Select Pool to Draft For</div>
+        <div style="position:relative;margin-bottom:10px">
+          <select id="draft-fund-select-top" onchange="var _p=this.value.split('__');if(_p[0]){switchDraftLeague(_p[0],_p[1]);updateDraftFundBanner();}" style="font-family:Figtree,sans-serif;font-size:15px;font-weight:700;width:100%;background:var(--surface2);border:1.5px solid var(--border);color:var(--ink);cursor:pointer;padding:11px 40px 11px 14px;outline:none;appearance:none;-webkit-appearance:none;border-radius:8px;transition:border-color .15s">
+            <option value="">— Select a pool —</option>
+          </select>
+          <svg style="position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;opacity:.4" width="12" height="8" viewBox="0 0 12 8"><path d="M1 1l5 5 5-5" stroke="var(--ink)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
         </div>
-        <div id="draft-fund-info" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(255,255,255,.5);text-align:right;flex-shrink:0;line-height:1.8"></div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.08em">Locks</div>
-          <div id="draft-sidebar-timer-top" style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:#f87171">—</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div id="draft-active-fund-label" style="font-size:12px;color:var(--muted)">No pool selected — choose above to start drafting</div>
+          <div style="display:flex;align-items:center;gap:14px;flex-shrink:0">
+            <div id="draft-fund-info" style="font-family:IBM Plex Mono,monospace;font-size:11px;color:var(--muted);text-align:right;line-height:1.8"></div>
+            <div style="text-align:right">
+              <div style="font-family:IBM Plex Mono,monospace;font-size:8px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em">Locks</div>
+              <div id="draft-sidebar-timer-top" style="font-family:IBM Plex Mono,monospace;font-size:14px;font-weight:700;color:var(--neg)">—</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2884,7 +2883,29 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 
 
 <!-- ══ PUBLIC FUND DETAIL ══ -->
-
+<div class="ov" id="ov-pub-detail">
+  <div class="modal" style="width:480px;padding:0;overflow:hidden">
+    <div style="padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:5px" id="pd-type">PUBLIC FUND</div>
+        <div style="font-family:'DM Serif Display',Georgia,serif;font-size:24px;font-weight:400" id="pd-name">Pool Name</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px" id="pd-desc"></div>
+      </div>
+      <button onclick="cm('pub-detail')" style="background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:4px;margin-left:12px;flex-shrink:0">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border)">
+      <div style="padding:14px 18px;border-right:1px solid var(--border)"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Entry</div><div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:20px" id="pd-fee">—</div></div>
+      <div style="padding:14px 18px;border-right:1px solid var(--border)"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Pool</div><div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:20px" id="pd-pool">—</div></div>
+      <div style="padding:14px 18px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Players</div><div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:20px" id="pd-spots">—</div></div>
+    </div>
+    <div style="padding:16px 22px;border-bottom:1px solid var(--border)" id="pd-payout-rows"></div>
+    <div style="padding:10px 22px;background:var(--surface2);border-bottom:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted)" id="pd-countdown"></div>
+    <div style="padding:14px 22px;display:flex;gap:8px">
+      <button class="btn btn-outline" style="flex:1" onclick="cm('pub-detail')">Cancel</button>
+      <button class="btn btn-primary" style="flex:2" onclick="cm('pub-detail');directJoin(_pdCurrentId||'')">Join — $<span id="pd-fee-inline">0</span> →</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══ AGE GATE — shows on first visit ══ -->
 <div id="ov-agegate" style="display:none;position:fixed;inset:0;background:rgba(10,10,15,.95);backdrop-filter:blur(12px);z-index:9000;align-items:center;justify-content:center;padding:20px">
@@ -3385,78 +3406,68 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 
 <!-- HOW IT WORKS MODAL -->
 <div class="ov" id="ov-how">
-  <div class="modal" style="width:580px;max-height:88vh;overflow-y:auto;padding:0;border-radius:14px">
+  <div class="modal" style="width:600px;max-height:90vh;overflow-y:auto;padding:0;border-radius:14px">
     <div style="height:4px;background:var(--accent)"></div>
-    <div style="padding:24px 28px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:5px">Openbell</div>
-        <div style="font-family:Figtree,sans-serif;font-weight:800;font-size:26px;letter-spacing:-.03em">How It Works</div>
-      </div>
-      <div onclick="cm('how')" style="cursor:pointer;font-size:18px;color:var(--muted);padding:4px 8px;border-radius:6px" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">✕</div>
+    <div style="padding:20px 26px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:5px">Openbell</div><div style="font-family:Figtree,sans-serif;font-weight:800;font-size:26px;letter-spacing:-.03em">How It Works</div></div>
+      <div onclick="cm('how')" style="cursor:pointer;font-size:18px;color:var(--muted);padding:4px 8px;border-radius:6px">&#x2715;</div>
     </div>
-    <div style="padding:24px 28px;display:flex;flex-direction:column;gap:20px">
-
-      <!-- Step 1 -->
-      <div style="display:flex;gap:16px;align-items:flex-start">
-        <div style="width:36px;height:36px;background:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:IBM Plex Mono,monospace;font-weight:700;font-size:15px;color:var(--bg);flex-shrink:0">1</div>
-        <div>
-          <div style="font-weight:700;font-size:15px;margin-bottom:4px">Deposit & Join a Pool</div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.65">Add cash to your Openbell balance, then join a public pool or create a private one. Entry fees start at $5. Your entry fee comes out of your balance.</div>
-        </div>
+    <div style="padding:22px 26px;display:flex;flex-direction:column;gap:22px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div style="background:var(--surface2);border-radius:9px;padding:14px;text-align:center"><div style="font-size:22px;margin-bottom:6px">&#x1F4B0;</div><div style="font-weight:700;font-size:13px;margin-bottom:3px">1. Deposit &amp; Join</div><div style="font-size:11px;color:var(--muted);line-height:1.5">Add funds, pick a pool. Entry fees start at $5.</div></div>
+        <div style="background:var(--surface2);border-radius:9px;padding:14px;text-align:center"><div style="font-size:22px;margin-bottom:6px">&#x1F4C8;</div><div style="font-weight:700;font-size:13px;margin-bottom:3px">2. Draft Stocks</div><div style="font-size:11px;color:var(--muted);line-height:1.5">Pick up to 5 stocks before Sunday 11:59 PM ET.</div></div>
+        <div style="background:var(--surface2);border-radius:9px;padding:14px;text-align:center"><div style="font-size:22px;margin-bottom:6px">&#x1F3C6;</div><div style="font-weight:700;font-size:13px;margin-bottom:3px">3. Win</div><div style="font-size:11px;color:var(--muted);line-height:1.5">Highest avg % return by Friday close wins.</div></div>
       </div>
-
       <div style="height:1px;background:var(--border)"></div>
-
-      <!-- Step 2 -->
-      <div style="display:flex;gap:16px;align-items:flex-start">
-        <div style="width:36px;height:36px;background:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:IBM Plex Mono,monospace;font-weight:700;font-size:15px;color:var(--bg);flex-shrink:0">2</div>
-        <div>
-          <div style="font-weight:700;font-size:15px;margin-bottom:4px">Draft 5 Stocks</div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.65">Pick any 5 stocks or ETFs before the pool locks Sunday at 11:59 PM ET. Each pick carries equal 20% weight — no multipliers, no luck.</div>
-        </div>
+      <div>
+        <div style="font-family:IBM Plex Mono,monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px">How Returns Are Calculated</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px">Your score is the <strong style="color:var(--ink)">simple average % return</strong> of all your picks, measured from Monday open to Friday close. Every pick carries equal weight.</div>
+        <div style="background:var(--surface2);border-radius:9px;padding:12px 14px;margin-bottom:10px"><div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Formula</div><div style="font-family:IBM Plex Mono,monospace;font-size:13px;background:var(--surface);padding:10px 12px;border-radius:6px;border:1px solid var(--border)">Score = (sum of weekly % returns) / number of picks</div></div>
+        <div style="background:var(--surface2);border-radius:9px;padding:12px 14px"><div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Example</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:8px"><div style="text-align:center;background:var(--surface);border-radius:6px;padding:7px 2px;border:1px solid var(--border)"><div style="font-family:IBM Plex Mono,monospace;font-size:10px;font-weight:700">AAPL</div><div style="font-size:10px;color:var(--pos)">+3.2%</div></div><div style="text-align:center;background:var(--surface);border-radius:6px;padding:7px 2px;border:1px solid var(--border)"><div style="font-family:IBM Plex Mono,monospace;font-size:10px;font-weight:700">NVDA</div><div style="font-size:10px;color:var(--pos)">+6.8%</div></div><div style="text-align:center;background:var(--surface);border-radius:6px;padding:7px 2px;border:1px solid var(--border)"><div style="font-family:IBM Plex Mono,monospace;font-size:10px;font-weight:700">TSLA</div><div style="font-size:10px;color:var(--neg)">-2.1%</div></div><div style="text-align:center;background:var(--surface);border-radius:6px;padding:7px 2px;border:1px solid var(--border)"><div style="font-family:IBM Plex Mono,monospace;font-size:10px;font-weight:700">META</div><div style="font-size:10px;color:var(--pos)">+1.5%</div></div><div style="text-align:center;background:var(--surface);border-radius:6px;padding:7px 2px;border:1px solid var(--border)"><div style="font-family:IBM Plex Mono,monospace;font-size:10px;font-weight:700">MSFT</div><div style="font-size:10px;color:var(--pos)">+0.9%</div></div></div><div style="font-size:12px;color:var(--muted)">(3.2 + 6.8 - 2.1 + 1.5 + 0.9) / 5 = <strong style="color:var(--pos)">+2.06%</strong></div></div>
       </div>
-
       <div style="height:1px;background:var(--border)"></div>
-
-      <!-- Step 3 -->
-      <div style="display:flex;gap:16px;align-items:flex-start">
-        <div style="width:36px;height:36px;background:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:IBM Plex Mono,monospace;font-weight:700;font-size:15px;color:var(--bg);flex-shrink:0">3</div>
-        <div>
-          <div style="font-weight:700;font-size:15px;margin-bottom:4px">Watch & Win</div>
-          <div style="font-size:13px;color:var(--muted);line-height:1.65">Live standings update throughout the week. At Friday 4:00 PM ET close, the player with the highest average portfolio return wins. Winnings are credited to your balance instantly.</div>
+      <div>
+        <div style="font-family:IBM Plex Mono,monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px">Price Data</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Start price:</strong> Monday official opening price (Yahoo Finance / Google Finance).</span></div>
+          <div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">End price:</strong> Friday official closing price at 4:00 PM ET.</span></div>
+          <div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Live updates:</strong> Standings refresh in real time during market hours (9:30 AM to 4:00 PM ET).</span></div>
+          <div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Eligible:</strong> Any NYSE or NASDAQ listed stock or ETF.</span></div>
         </div>
       </div>
-
       <div style="height:1px;background:var(--border)"></div>
-
-      <!-- Rules summary -->
-      <div style="background:var(--surface2);border-radius:10px;padding:16px 18px">
-        <div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);margin-bottom:12px">Key Rules</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span><span><strong>Equal weight:</strong> All 5 picks weighted 20% each. Return = simple average.</span></div>
-          <div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span><span><strong>Picks lock</strong> Sunday 11:59 PM ET. No changes after submission.</span></div>
-          <div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span><span><strong>Prices</strong> sourced from Yahoo Finance / Google Finance. Mon open to Fri close.</span></div>
-          <div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span><span><strong>Platform fee:</strong> 5% of the total pool. 95% goes to winners.</span></div>
-          <div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span><span><strong>Ties</strong> split the payout for their position equally.</span></div>
-          <div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span><span><strong>18+</strong> only. Not available in AZ, IA, LA, MT, or WA.</span></div>
+      <div>
+        <div style="font-family:IBM Plex Mono,monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px">Draft Rules</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Window:</strong> Opens after previous week closes. Deadline Sunday 11:59 PM ET.</span></div>
+          <div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Picks:</strong> 5 picks in standard pools. Special modes may differ.</span></div>
+          <div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Final:</strong> Picks lock on submission. No edits after deadline.</span></div>
+          <div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">No duplicates:</strong> Cannot pick the same ticker twice in one portfolio.</span></div>
         </div>
       </div>
-
-      <!-- Payout structures -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div style="background:var(--surface2);border-radius:9px;padding:14px 16px">
-          <div style="font-weight:700;font-size:13px;margin-bottom:6px">🥇 Top 3 Split</div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.7">1st — 60%<br>2nd — 20%<br>3rd — 15%<br>Platform — 5%</div>
+      <div style="height:1px;background:var(--border)"></div>
+      <div>
+        <div style="font-family:IBM Plex Mono,monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px">Payout Structures</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div style="background:var(--surface2);border-radius:9px;padding:12px 14px"><div style="font-weight:700;font-size:12px;margin-bottom:6px">Top 3 Split</div><div style="font-size:11px;color:var(--muted);line-height:1.9">1st 60% / 2nd 20% / 3rd 15% / Platform 5%</div></div>
+          <div style="background:var(--surface2);border-radius:9px;padding:12px 14px"><div style="font-weight:700;font-size:12px;margin-bottom:6px">Winner Takes All</div><div style="font-size:11px;color:var(--muted);line-height:1.9">1st place 95% / Platform 5%</div></div>
+          <div style="background:var(--surface2);border-radius:9px;padding:12px 14px"><div style="font-weight:700;font-size:12px;margin-bottom:6px">Contrarian Mode</div><div style="font-size:11px;color:var(--muted);line-height:1.9">Lowest avg return wins. Winner Takes All split.</div></div>
+          <div style="background:var(--surface2);border-radius:9px;padding:12px 14px"><div style="font-weight:700;font-size:12px;margin-bottom:6px">Beat the Market</div><div style="font-size:11px;color:var(--muted);line-height:1.9">Beat SPY this week. All winners split 95% of pot.</div></div>
         </div>
-        <div style="background:var(--surface2);border-radius:9px;padding:14px 16px">
-          <div style="font-weight:700;font-size:13px;margin-bottom:6px">🏆 Winner Takes All</div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.7">1st — 95%<br>Platform — 5%<br><br>&nbsp;</div>
+        <div style="background:rgba(0,192,135,.07);border:1px solid rgba(0,192,135,.2);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--muted)"><strong style="color:var(--accent)">Ties:</strong> Players tied for a position split that position's payout equally.</div>
+      </div>
+      <div style="height:1px;background:var(--border)"></div>
+      <div>
+        <div style="font-family:IBM Plex Mono,monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px">Fees &amp; Eligibility</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Platform fee:</strong> 5% of total prize pool. 95% paid to winners.</span></div>
+          <div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Age:</strong> Must be 18 or older to participate.</span></div>
+          <div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Restricted states:</strong> Not available in AZ, IA, LA, MT, or WA.</span></div>
+          <div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Winnings:</strong> Credited to your balance at Friday close. Withdrawable anytime.</span></div>
+          <div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Skill-based:</strong> Results depend entirely on stock-picking ability, not chance.</span></div>
         </div>
       </div>
-
-      <div style="text-align:center;padding-top:4px">
-        <button onclick="cm('how');om('tos')" style="font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline">Read full Terms of Service →</button>
-      </div>
+      <div style="text-align:center;padding-top:4px"><button onclick="cm('how');om('tos')" style="font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline">Read full Terms of Service</button></div>
     </div>
   </div>
 </div>
@@ -5462,23 +5473,14 @@ async function submitDraft() {
   localStorage.setItem(_dck, existing+1);
 
   // Log to Sheets + Formspree
-  // Save draft to Supabase
-  var _dUid = getUserId();
-  var _dEmail = myData.email||sessionStorage.getItem('sd_useremail')||'';
-  var _dName = myData.name||sessionStorage.getItem('sd_username')||'Anonymous';
-  var _dLg = [...getLeagues(),...getPublicLeagues()].find(function(l){return l.id===activeDraftLeagueId;});
-  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action: 'save_draft', data: {
-      uid: _dUid, email: _dEmail, username: _dName,
-      leagueId: activeDraftLeagueId||'free',
-      leagueName: _dLg ? _dLg.name : (activeDraftLeagueId||'Free Draft'),
-      week: _dLg ? (_dLg.week||getWN()) : getWN(),
-      picks: userPicks
-    }})
-  }).then(function(r){return r.json();})
-    .then(function(res){ console.log('[Openbell] Draft → Supabase:', res.success ? '✓' : res.error); })
-    .catch(function(e){ console.warn('[Openbell] Draft save error:', e); });
+  await logEvent('Drafts', {
+    session_user: sessionStorage.getItem('sd_username')||'Anonymous',
+    player: myData.name||'Anonymous',
+    email: myData.email||'—',
+    slate: activeDraftLeagueId||'free', user_id: getUserId(),
+    week: getWN(),
+    picks: userPicks.join(', ')
+  });
 
   // Resolve league name BEFORE using it
   const _lName = activeDraftLeagueId ? (getLeagues().find(l=>l.id===activeDraftLeagueId)||getPublicLeagues().find(l=>l.id===activeDraftLeagueId)||{name:activeDraftLeagueId}).name : 'Free Draft';
@@ -5632,15 +5634,7 @@ async function joinLeague() {
     sessionStorage.setItem('sd_useremail', jemail);
     updateNavUser();
     trackDraftSubmit && trackDraftSubmit(league ? league.name : 'unknown', league ? league.week : 0);
-    // Save enrollment to Supabase
-    fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ action: 'save_enrollment', data: {
-        uid: getUserId(), email: jemail, username: jname,
-        leagueId: league.id, leagueName: league.name,
-        fee: league.fee, week: league.week || getWN()
-      }})
-    }).catch(function(){});
+    await logEvent('Pool_Joins', {session_user:jname, player:jname, email:jemail, pool_name:league.name, access_code:league.code, entry_fee:league.fee});
     renderDashboard();
     toast(`✓ Paid & joined "${league.name}"! Now pick your 5 stocks.`);
     ['j-name','j-email','j-code'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -5717,7 +5711,7 @@ function renderDashboard() {
           : (_leaguePicks && _leaguePicks.length > 0 ? _leaguePicks : null);
         const hasDraft = !!(myPicks && myPicks.length > 0);
         const isFutureWeek = l.week > getWN(); // don't show returns for upcoming funds
-        const pool = getPlayerCount(l) * l.fee;
+        const pool = l.participants.length * l.fee;
         const payout = (pool * 0.95).toFixed(0);
         const isOrganizer = l.organizer === n;
 
@@ -5825,7 +5819,7 @@ function renderDashboard() {
             ${rankLabel ? `<div style="font-size:10px;font-weight:700;color:${rankColor}">${rankLabel}</div>` : ''}
           </div>
           <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted)">
-            <span>${getPlayerCount(l)}/${l.maxPlayers}</span>
+            <span>${l.participants.length}/${l.maxPlayers}</span>
             <span style="color:${(!isFutureWeek && myRet!==null)?(myRet>=0?'var(--green)':'var(--red)'):'var(--muted)'};font-weight:600">${isFutureWeek?'Draft open':myRet!==null?(myRet>=0?'+':'')+myRet.toFixed(2)+'%':'—'}</span>
           </div>
           ${weekChip ? `<div style="margin-top:2px">${weekChip}</div>` : ''}
@@ -6143,11 +6137,21 @@ function _goCore(view) {
     applyDraftCtx(); renderPickSlots(); renderDraftList(); renderDashboard();
     // Populate fund dropdown
     var _draftLeagues = [];
-    try { _draftLeagues = [...getLeagues(), ...getPublicLeagues()].filter(function(l){
+    try {
       var _n = sessionStorage.getItem('sd_username')||'';
       var _u = typeof getUserId==='function'?getUserId():'';
-      return l.participants && l.participants.find(function(p){return (!p.isBot&&!p.fake)&&((p.uid&&p.uid===_u)||(_n&&p.name===_n));});
-    }); } catch(e) {}
+      var _e = sessionStorage.getItem('sd_useremail')||'';
+      _draftLeagues = [...getLeagues(), ...getPublicLeagues()].filter(function(l){
+        if (!l.participants) return false;
+        return l.participants.find(function(p){
+          return (!p.isBot&&!p.fake)&&(
+            (p.uid && _u && p.uid===_u) ||
+            (_n && p.name && p.name.toLowerCase()===_n.toLowerCase()) ||
+            (_e && p.email && p.email.toLowerCase()===_e.toLowerCase())
+          );
+        });
+      });
+    } catch(e) {}
     var _lockEl = document.getElementById('draft-pick-lock');
     var _sel = document.getElementById('draft-fund-select-top');
     if (_draftLeagues.length === 0) {
@@ -6367,7 +6371,7 @@ function doSignup() {
   // Store locally so login works offline
   allUsers.push(userData);
   localStorage.setItem('sd_all_users', JSON.stringify(allUsers));
-  // Write to Supabase — await it so we know it worked
+  // Write to Supabase
   console.log('[Openbell] Saving to Supabase:', email);
   fetch('https://opbell-db.carsonhughes101010.workers.dev', {
     method: 'POST',
@@ -6377,54 +6381,24 @@ function doSignup() {
       data: { uid, email, firstName, lastName, passwordHash, phone, dob, state, age: userAge, isRestricted }
     })
   }).then(function(r) {
+    if (!r.ok) { console.warn('[Openbell] /db returned', r.status); return {}; }
     return r.json();
   }).then(function(res) {
-    if (res && res.success) {
-      console.log('[Openbell] User saved to Supabase ✓', uid);
-    } else {
-      console.warn('[Openbell] Supabase signup issue:', res && res.error ? res.error : JSON.stringify(res));
-    }
-  }).catch(function(err) {
-    console.warn('[Openbell] Supabase error:', err.message);
-  });
+    console.log('[Openbell] Supabase result:', JSON.stringify(res));
+  }).catch(function(err) { console.warn('[Openbell] Supabase error (non-blocking):', err.message); });
 
-  // Log sign-in
-  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action: 'sign_in_log', data: { uid: uid, email: email } })
-  }).catch(function(){});
-
-  // Complete signup
-  _setSession(userData);
-  if (btn) { btn.disabled = false; btn.textContent = 'Create Account →'; }
-  cm('signup');
-  updateNavUser();
-  renderDashboard();
-  go('dashboard');
-  toast('✓ Welcome to Openbell, ' + firstName + '!');
-}
-
-// Legacy stub so any old openLogin() calls still work
-function signIn()  { openLogin(); }
-
-// ════════════════════════════════════
-// SIGN OUT
-// ════════════════════════════════════
-function doSignOut() {
-  try { if (typeof window._googleSignOut === 'function') window._googleSignOut(); } catch(e){}
-  // Clear all session state
-  sessionStorage.clear();
-  ['sd_uid','sd_mydata'].forEach(function(k){ localStorage.removeItem(k); });
-  // Reset draft state
+  // User already saved to Supabase via /db signup action above
+  // Reset UI state
   userPicks = [];
   activeDraftLeagueId = null;
-  // Close any open modals
-  document.querySelectorAll('.ov').forEach(function(el){ el.style.display='none'; });
+  cm('account');
   updateNavUser();
   go('landing');
   toast('Signed out successfully');
 }
 
+// Legacy stub so any old openLogin() calls still work
+function signIn()  { openLogin(); }
 function signOut() { doSignOut(); }
 
 function updateNavUser() {
@@ -6808,10 +6782,6 @@ function setPubFilter(f, btn) {
 }
 
 function renderPublic() {
-  // Fetch live enrollment counts from Supabase, then render
-  if (!_enrollmentCountsLoaded) {
-    fetchEnrollmentCounts(function(){ renderPublic(); });
-  }
   try {
   // Update week header
   const wkEl = document.getElementById('pub-week-label');
@@ -6928,7 +6898,7 @@ function pubCard(l, myName, isFeat) {
       ? '<div style="text-align:center;padding:9px;background:var(--paper);border-radius:8px;font-size:12px;color:var(--muted)">This pool is full</div>'
       : isMine
         ? '<div style="text-align:center;padding:9px;background:var(--green-bg);border-radius:8px;font-size:12px;color:var(--green);font-weight:600">✓ Enrolled — picks due Sunday</div>'
-        : `<button class="btn btn-primary" style="width:100%;padding:10px" onclick="event.stopPropagation();directJoin('${l.id}')">Join — ${l.fee} →</button>`}
+        : `<button class="btn btn-primary" style="width:100%;padding:10px" onclick="event.stopPropagation();directJoin('${l.id}')">Join — $${l.fee} →</button>`}
   </div>`;
 }
 
@@ -6954,9 +6924,37 @@ function openPublicSlate(id) {
     return;
   }
 
-  // Go straight to directJoin — no intermediate popup
+  // Show detail popup
   _pdCurrentId = id;
-  directJoin(id);
+  const isTop3 = league.payoutStructure === 'top3';
+  const filled = league.participants?.length || 0;
+  const pool   = filled * league.fee;
+  const net    = pool * 0.95;
+  const pay1   = isTop3 ? (pool * 0.60).toFixed(0) : net.toFixed(0);
+  const pay2   = isTop3 ? (pool * 0.20).toFixed(0) : null;
+  const pay3   = isTop3 ? (pool * 0.15).toFixed(0) : null;
+
+  document.getElementById('pd-type').textContent      = league.isFeatured ? '★ FEATURED' : 'PUBLIC FUND';
+  setText('pd-name', league.name);
+  setText('pd-desc', league.desc || '');
+  setText('pd-fee', '$' + league.fee);
+  setText('pd-pool', '$' + pool);
+  setText('pd-spots', filled + '/' + league.maxPlayers);
+  setText('pd-fee-inline', league.fee);
+
+  const payRows = document.getElementById('pd-payout-rows');
+  if (isTop3) {
+    payRows.innerHTML =
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">' +
+        '<div style="background:var(--orange-bg);border-radius:8px;padding:10px;text-align:center"><div style="font-weight:700;font-size:11px;margin-bottom:4px">🥇 1st</div><div style="font-family:monospace;font-weight:700;font-size:16px;color:var(--orange)">$' + pay1 + '</div><div style="font-size:9px;color:var(--muted)">60%</div></div>' +
+        '<div style="background:var(--paper);border-radius:8px;padding:10px;text-align:center"><div style="font-weight:700;font-size:11px;margin-bottom:4px">🥈 2nd</div><div style="font-family:monospace;font-weight:700;font-size:16px">$' + pay2 + '</div><div style="font-size:9px;color:var(--muted)">20%</div></div>' +
+        '<div style="background:var(--paper);border-radius:8px;padding:10px;text-align:center"><div style="font-weight:700;font-size:11px;margin-bottom:4px">🥉 3rd</div><div style="font-family:monospace;font-weight:700;font-size:16px;color:var(--muted)">$' + pay3 + '</div><div style="font-size:9px;color:var(--muted)">15%</div></div>' +
+      '</div>';
+  } else {
+    payRows.innerHTML = '<div style="background:var(--orange-bg);border-radius:8px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700">🥇 Winner Takes All</span><span style="font-family:monospace;font-weight:700;font-size:18px;color:var(--orange)">$' + pay1 + '</span></div>';
+  }
+  updatePdCountdown();
+  om('pub-detail');
 }
 
 function updatePdCountdown() {
@@ -7995,23 +7993,10 @@ function showPaymentModal(league, onConfirm) {
 function confirmBalanceJoin() {
   var btn = document.getElementById('bal-confirm-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Joining…'; }
-  var prevBal = getBalance();
-  var fee = _pendingLeagueFee || 0;
-  var newBal = Math.max(0, prevBal - fee);
+  // Deduct from balance and run the pending action
+  var newBal = Math.max(0, getBalance() - (_pendingLeagueFee || 0));
   localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
   updateBalanceDisplay();
-  // Log deduction to Supabase
-  var uid = getUserId(); var email = sessionStorage.getItem('sd_useremail')||'';
-  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action: 'balance_tx', data: {
-      uid: uid, email: email, type: 'pool_entry',
-      amount: -parseFloat(fee.toFixed(2)),
-      balance_before: parseFloat(prevBal.toFixed(2)),
-      balance_after: parseFloat(newBal.toFixed(2)),
-      note: 'Entry fee: ' + (_pendingLeagueName||'Pool')
-    }})
-  }).catch(function(){});
   var overlay = document.getElementById('ov-balance-confirm');
   if (overlay) overlay.remove();
   if (typeof _pendingPaymentAction === 'function') {
@@ -8142,15 +8127,7 @@ function doJoinFundStripe() {
       stored.push(copy);
       saveLeagues(stored);
     }
-    // Save enrollment to Supabase
-    fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ action: 'save_enrollment', data: {
-        uid: getUserId(), email: myEmail, username: myName,
-        leagueId: league.id, leagueName: league.name,
-        fee: league.fee, week: league.week || getWN()
-      }})
-    }).catch(function(){});
+    logEvent('Pool_Joins', {player: myName, email: myEmail, pool_name: league.name, entry_fee: league.fee});
     renderDashboard();
     toast('✓ Joined ' + league.name + '! Now head to Draft Room.');
     setTimeout(function(){ activeDraftLeagueId = league.id; go('draft'); }, 1200);
@@ -8567,57 +8544,59 @@ function getOrCreatePayOverlay() {
   if (el) return el;
   el = document.createElement('div');
   el.id = 'pay-overlay-inline';
-  el.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:600;align-items:center;justify-content:center';
+  el.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(20,20,20,.7);backdrop-filter:blur(8px);z-index:999;align-items:center;justify-content:center';
   el.innerHTML = [
-    '<div style="background:var(--surface);border-radius:14px;width:420px;max-width:94vw;overflow:hidden;border:1px solid var(--border);animation:modalIn .22s cubic-bezier(.34,1.3,.64,1) both">',
-      '<div style="height:4px;background:var(--accent)"></div>',
+    '<div style="background:var(--white);border-radius:16px;width:420px;max-width:94vw;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.3)">',
+
       // Header
-      '<div style="padding:20px 24px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">',
+      '<div style="padding:22px 24px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start">',
         '<div>',
-          '<div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:4px">Confirm & Pay</div>',
-          '<div style="font-family:Figtree,sans-serif;font-weight:800;font-size:20px;letter-spacing:-.03em" id="poi-name">Pool Name</div>',
+          '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--orange);margin-bottom:5px">Confirm & Pay</div>',
+          '<div style="font-family:Figtree,sans-serif;font-weight:700;font-size:22px" id="poi-name">Pool</div>',
         '</div>',
-        '<button onclick="closePayOverlay()" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:6px">✕</button>',
+        '<button onclick="closePayOverlay()" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:6px" onmouseover="this.style.background=\'var(--paper)\'" onmouseout="this.style.background=\'none\'">✕</button>',
       '</div>',
-      // Fee row
-      '<div style="padding:16px 24px;border-bottom:1px solid var(--border)">',
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">',
-          '<div style="font-size:13px;color:var(--muted)">Entry Fee</div>',
-          '<div style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:24px;color:var(--ink)">$<span id="poi-fee">0</span></div>',
+
+      // Fee summary + balance option
+      '<div style="border-bottom:1px solid var(--border);padding:16px 24px">',
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">',
+          '<div style="font-size:13px;color:var(--muted)">Buy In</div>',
+          '<div style="font-family:Figtree,sans-serif;font-weight:700;font-size:28px;color:var(--orange)" id="poi-fee">$0</div>',
         '</div>',
-        // Balance display
-        '<div id="poi-balance-row" style="background:var(--surface2);border-radius:9px;padding:12px 14px">',
-          '<div style="display:flex;justify-content:space-between;align-items:center">',
-            '<div>',
-              '<div style="font-size:10px;color:var(--muted);margin-bottom:2px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.06em">Your Balance</div>',
-              '<div style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:18px;color:var(--pos)" id="poi-balance-avail">$0.00</div>',
-            '</div>',
-            '<div id="poi-balance-status" style="font-size:11px;font-weight:600"></div>',
-          '</div>',
-          '<div id="poi-after-row" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:11px;color:var(--muted)">',
-            '<span>Balance after</span>',
-            '<span id="poi-balance-after" style="font-family:IBM Plex Mono,monospace;font-weight:600;color:var(--ink)">$0.00</span>',
-          '</div>',
+        // Balance pay option row
+        '<div id="poi-balance-row" style="display:none;background:var(--paper);border-radius:8px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between">',
+          '<div style="font-size:12px;color:var(--muted)">Use balance: <strong id="poi-balance-avail" style="color:var(--green)">$0</strong> available</div>',
+          '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;font-weight:600">',
+            '<input type="checkbox" id="poi-use-balance" onchange="togglePoiPayMethod()" style="accent-color:var(--green)"> Pay with balance',
+          '</label>',
         '</div>',
       '</div>',
+
       // Name input
-      '<div style="padding:14px 24px;border-bottom:1px solid var(--border)">',
-        '<div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Your Name</div>',
-        '<input id="poi-name-input" class="fi" placeholder="Enter your name" style="width:100%;box-sizing:border-box">',
+      '<div style="padding:16px 24px;border-bottom:1px solid var(--border)">',
+        '<div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:7px">Your name</div>',
+        '<input id="poi-name-input" class="fi" placeholder="Enter your name" style="width:100%;box-sizing:border-box;font-size:13px" onkeydown="if(event.key===\'Enter\') payAndJoin()">',
+        '<input id="poi-email-input" class="fi" placeholder="Email (optional)" style="width:100%;box-sizing:border-box;font-size:13px;margin-top:8px">',
       '</div>',
-      '<div style="padding:10px 24px 0;display:flex;justify-content:center">',
-        '<button onclick="openPoolRules(_joinTargetId)" style="background:none;border:none;color:var(--accent);font-size:11px;cursor:pointer;text-decoration:underline;font-family:Figtree,sans-serif">View Pool Rules</button>',
+
+      // Card — populated dynamically with user's saved card
+      '<div style="padding:16px 24px;border-bottom:1px solid var(--border)" id="poi-card-section">',
+        '<div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:10px">Payment</div>',
+        '<div id="poi-card-display"></div>',
       '</div>',
+
       // CTA
-      '<div style="padding:10px 24px 14px;display:flex;gap:10px">',
+      '<div style="padding:16px 24px;display:flex;gap:10px">',
         '<button class="btn btn-outline" style="flex:1" onclick="closePayOverlay()">Cancel</button>',
-        '<button id="poi-pay-btn" style="flex:2;font-size:13px;font-weight:700;border:none;border-radius:8px;padding:11px;cursor:pointer;transition:all .15s" onclick="payAndJoin()">',
-          'Pay $<span id="poi-fee-btn">0</span> from Balance →',
+        '<button class="btn btn-primary" style="flex:2;font-size:14px" id="poi-pay-btn" onclick="payAndJoin()">',
+          'Pay $<span id="poi-fee-btn">0</span> & Enter →',
         '</button>',
       '</div>',
+
     '</div>'
   ].join('');
   document.body.appendChild(el);
+  // Close on backdrop click
   el.addEventListener('click', function(e) { if (e.target === el) closePayOverlay(); });
   return el;
 }
@@ -8664,11 +8643,9 @@ function directJoin(id) {
 
   // Show payment overlay
   _joinTargetId = id;
-  _pendingLeagueFee = league.fee || 0;
-  _pendingLeagueName = league.name || '';
   var ov = getOrCreatePayOverlay();
   var isTop3 = league.payoutStructure === 'top3';
-  var filled = getPlayerCount(league);
+  var filled = league.participants.length;
   var pool   = filled * league.fee;
   var net    = pool * 0.95;
   var pay1   = isTop3 ? (pool * 0.60).toFixed(0) : net.toFixed(0);
@@ -8691,26 +8668,16 @@ function directJoin(id) {
   var feeAmt  = feeEl ? parseFloat(feeEl.textContent.replace('$',''))||0 : 0;
   var balRow  = document.getElementById('poi-balance-row');
   var balAvail = document.getElementById('poi-balance-avail');
-  var balStatus = document.getElementById('poi-balance-status');
-  var balAfterEl = document.getElementById('poi-balance-after');
-  var payBtn = document.getElementById('poi-pay-btn');
-  var feeSpan = document.getElementById('poi-fee-btn');
-  if (feeSpan) feeSpan.textContent = feeAmt;
-  if (balAvail) balAvail.textContent = '$' + userBal.toFixed(2);
-  var canAfford = userBal >= feeAmt;
-  if (balAfterEl) balAfterEl.textContent = canAfford ? ('$' + Math.max(0, userBal - feeAmt).toFixed(2)) : '—';
-  if (balStatus) {
-    balStatus.textContent = canAfford ? '✓ Sufficient' : '✗ Insufficient';
-    balStatus.style.color = canAfford ? 'var(--pos)' : 'var(--neg)';
-  }
-  if (payBtn) {
-    if (canAfford) {
-      payBtn.textContent = 'Pay $' + feeAmt + ' from Balance →';
-      payBtn.style.background = '#00c087'; payBtn.style.color = '#000'; payBtn.disabled = false;
+  if (balRow) {
+    if (userBal > 0) {
+      balRow.style.display = 'flex';
+      if (balAvail) balAvail.textContent = '$' + userBal.toFixed(2);
+      // Auto-check if balance covers it
+      var useBalCb = document.getElementById('poi-use-balance');
+      if (useBalCb) useBalCb.checked = userBal >= feeAmt;
+      togglePoiPayMethod();
     } else {
-      payBtn.textContent = '+ Add Funds to Continue';
-      payBtn.style.background = 'var(--ink)'; payBtn.style.color = '#fff'; payBtn.disabled = false;
-      payBtn.onclick = function() { closePayOverlay(); openDeposit(); };
+      balRow.style.display = 'none';
     }
   }
   var cardDisp = document.getElementById('poi-card-display');
@@ -8797,7 +8764,7 @@ function payAndJoin() {
 
   // Check if paying with balance
   var useBalance = document.getElementById('poi-use-balance')?.checked;
-  var feeAmt = _pendingLeagueFee > 0 ? _pendingLeagueFee : parseFloat(((document.getElementById('poi-fee')||{}).textContent||'0').replace('$',''))||0;
+  var feeAmt = parseFloat((document.getElementById('poi-fee-btn')||{}).textContent||'0');
   var userBal = parseFloat(localStorage.getItem(_uidKey('sd_balance'))||'0');
 
   if (useBalance && userBal >= feeAmt) {
@@ -8805,54 +8772,23 @@ function payAndJoin() {
     setTimeout(function() {
       var newBal = userBal - feeAmt;
       localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
+      logEvent('BALANCE', {user_id: getUserId(), name: myName, type: 'debit', amount: -feeAmt, reason: 'Fund entry', bal_after: newBal, ts: new Date().toISOString()}).catch(function(){});
       updateBalanceDisplay();
-      // Log to Supabase balance_transactions
-      var uid = getUserId(); var email2 = sessionStorage.getItem('sd_useremail')||'';
-      var leagueName = '';
-      try { var lg2 = getPublicLeagues().find(function(l){return l.id===_joinTargetId;}); if(lg2) leagueName=lg2.name; } catch(e){}
-      fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-        method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ action: 'balance_tx', data: {
-          uid: uid, email: email2, type: 'pool_entry',
-          amount: -parseFloat(feeAmt.toFixed(2)),
-          balance_before: parseFloat(userBal.toFixed(2)),
-          balance_after: parseFloat(newBal.toFixed(2)),
-          note: 'Entry fee: ' + (leagueName || _joinTargetId || 'Pool')
-        }})
-      }).catch(function(){});
       _completeJoin(myName, myEmail, null);
     }, 600);
     return;
   }
 
-  // Card fallback — also log balance change if fee is being taken
+  // Card fallback
   var savedCard = null;
   try { savedCard = JSON.parse(localStorage.getItem('sd_payment') || 'null'); } catch(e) {}
 
   if (savedCard && savedCard.last4) {
     setTimeout(function() {
-      // Log pool entry to Supabase even for card payments
-      var uid3 = getUserId(); var email3 = sessionStorage.getItem('sd_useremail')||'';
-      var prevBal3 = parseFloat(localStorage.getItem(_uidKey('sd_balance'))||'0');
-      var leagueName3 = '';
-      try { var lg3 = getPublicLeagues().find(function(l){return l.id===_joinTargetId;}); if(lg3) leagueName3=lg3.name; } catch(e){}
-      var newBal3 = Math.max(0, prevBal3 - (feeAmt||0));
-      localStorage.setItem(_uidKey('sd_balance'), newBal3.toFixed(2));
-      updateBalanceDisplay();
-      fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-        method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ action: 'balance_tx', data: {
-          uid: uid3, email: email3, type: 'pool_entry_card',
-          amount: -parseFloat((feeAmt||0).toFixed(2)),
-          balance_before: parseFloat(prevBal3.toFixed(2)),
-          balance_after: parseFloat(newBal3.toFixed(2)),
-          note: 'Entry fee: ' + (leagueName3 || _joinTargetId || 'Pool')
-        }})
-      }).catch(function(){});
       _completeJoin(myName, myEmail, { card: { last4: savedCard.last4, brand: savedCard.brand, exp_month: '', exp_year: '' } });
     }, 900);
   } else {
-    if (btn) { btn.disabled = false; btn.innerHTML = 'Pay $' + feeAmt + ' from Balance &rarr;'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Pay $' + feeAmt + ' & Enter →'; }
     closePayOverlay();
     toast('Please add a payment method first');
     setTimeout(openAddPayment, 400);
@@ -8887,19 +8823,10 @@ function _completeJoin(myName, myEmail, paymentMethod) {
       }
       if (ei >= 0) stored[ei] = league; else stored.push(league);
       saveLeagues(stored);
-      fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ action: 'save_enrollment', data: {
-        uid: getUserId(), email: myEmail, username: myName,
-        leagueId: id, leagueName: league ? league.name : id,
-        fee: league ? league.fee : 0, week: league ? (league.week||getWN()) : getWN()
-      }})
-    }).catch(function(){});
+      logEvent('Public_Joins', {session_user: myName, email: myEmail, pool_name: league.name, slate_id: id, entry_fee: league.fee}).catch(function(){});
     }
 
     closePayOverlay();
-    var _payBtn = document.getElementById('poi-pay-btn');
-    if (_payBtn) { _payBtn.disabled = false; _payBtn.innerHTML = 'Pay $' + (_pendingLeagueFee||'') + ' from Balance &rarr;'; }
     renderPublic();
     renderDashboard();
     toast('✓ Joined! Now pick your 5 stocks.');
@@ -9177,63 +9104,76 @@ function sendChatMsg() {
 // PICKS HISTORY — rich breakdown
 // ══════════════════════════════════════════════════════════════════
 function renderPicksHistory() {
-  var el = document.getElementById('picks-history');
+  const el = document.getElementById('picks-history');
   if (!el) return;
-  var drafts = getDrafts();
-  var allL = [...getLeagues(), ...getPublicLeagues()];
-  var entries = Object.entries(drafts);
+  const drafts = getDrafts();
+  const allL = [...getLeagues(), ...getPublicLeagues()];
+  const entries = Object.entries(drafts);
   if (!entries.length) {
-    el.innerHTML = '<div class="card" style="padding:40px;text-align:center;color:var(--muted)"><div style="font-size:28px;margin-bottom:12px">🎟</div><div style="font-weight:600;margin-bottom:6px">No submissions yet</div><div style="font-size:12px">Join a pool and submit picks to see them here.</div></div>';
+    el.innerHTML = '<div class="card" style="padding:40px;text-align:center;color:var(--muted)"><div style="font-size:28px;margin-bottom:12px">🎟</div><div style="font-weight:600;margin-bottom:6px">No submissions yet</div><div style="font-size:12px">Join a pool and submit your picks to see them here.</div></div>';
     return;
   }
-  var html = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">';
-  entries.slice().reverse().forEach(function(entry) {
-    var key = entry[0], picks = entry[1];
-    var parts = key.split('_'); var wn = parts[parts.length-1];
-    var leagueId = parts.slice(0,-1).join('_');
-    var league = allL.find(function(l){return l.id===leagueId;});
-    var ret = calcRet(picks); var pos = ret!=null&&ret>=0;
-    var betas = (Array.isArray(picks)?picks:[]).map(function(s){return LD[s]&&LD[s].beta!=null?LD[s].beta:null;}).filter(function(b){return b!=null;});
-    var avgBeta = betas.length?(betas.reduce(function(a,b){return a+b;},0)/betas.length).toFixed(2):'—';
-    var retStr = ret!=null?((pos?'+':'')+ret.toFixed(2)+'%'):'Pending';
-    var retClr = ret!=null?(pos?'var(--pos)':'var(--neg)'):'var(--muted)';
-    var stripeClr = ret!=null?(pos?'#00c087':'#e63946'):'#888';
-    var dateStr='Week '+wn;
-    try{var d=weekDatesFromWN(parseInt(wn));if(d&&d.mon)dateStr=d.mon+(d.fri?' - '+d.fri:'');}catch(e){}
-    var pickRows='';
-    (Array.isArray(picks)?picks:[]).forEach(function(sym,i){
-      var d2=LD[sym]||FALLBACK[sym]||{};
-      var wp=d2.weekPct!=null?d2.weekPct:(d2.pct!=null?d2.pct:null);
-      var wPos=wp!=null&&wp>=0;
-      pickRows+='<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed rgba(0,0,0,.07)">';
-      pickRows+='<span style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700">'+sym+'</span>';
-      pickRows+='<span style="font-family:IBM Plex Mono,monospace;font-size:10px;color:'+(wp!=null?(wPos?'var(--pos)':'var(--neg)'):'var(--faint)')+'">'+( wp!=null?((wPos?'+':'')+wp.toFixed(2)+'%'):'—')+'</span>';
-      pickRows+='</div>';
-    });
-    html+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05)">';
-    html+='<div style="height:5px;background:'+stripeClr+'"></div>';
-    html+='<div style="padding:9px 13px;border-bottom:2px dashed var(--border);background:var(--surface2)">';
-    html+='<div style="font-weight:700;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(league?league.name:'Pool')+'</div>';
-    html+='<div style="font-family:IBM Plex Mono,monospace;font-size:9px;color:var(--muted)">'+dateStr+'</div>';
-    html+='</div>';
-    html+='<div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border)">';
-    html+='<div style="padding:7px 13px;border-right:1px solid var(--border)">';
-    html+='<div style="font-family:IBM Plex Mono,monospace;font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);margin-bottom:2px">Return</div>';
-    html+='<div style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:14px;color:'+retClr+'">'+retStr+'</div>';
-    html+='</div>';
-    html+='<div style="padding:7px 13px">';
-    html+='<div style="font-family:IBM Plex Mono,monospace;font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);margin-bottom:2px">Avg Beta</div>';
-    html+='<div style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:14px">'+avgBeta+'</div>';
-    html+='</div>';
-    html+='</div>';
-    html+='<div style="padding:7px 13px">'+pickRows+'</div>';
-    html+='<div style="padding:4px 13px;background:var(--surface2);border-top:1px solid var(--border)">';
-    html+='<div style="font-family:IBM Plex Mono,monospace;font-size:8px;color:var(--faint)">'+picks.length+' picks · Wk '+wn+'</div>';
-    html+='</div>';
-    html+='</div>';
-  });
-  html+='</div>';
-  el.innerHTML=html;
+
+  const cards = entries.slice().reverse().map(([key, picks]) => {
+    const parts = key.split('_');
+    const wn = parts[parts.length - 1];
+    const leagueId = parts.slice(0, -1).join('_');
+    const league = allL.find(l => l.id === leagueId);
+    const ret = calcRet(picks);
+    const pos = ret != null && ret >= 0;
+    const betas = (Array.isArray(picks)?picks:[]).map(s=>LD[s]?.beta).filter(b=>b!=null);
+    const avgBeta = betas.length ? (betas.reduce((a,b)=>a+b,0)/betas.length).toFixed(2) : '—';
+    const retStr = ret != null ? (pos?'+':'') + ret.toFixed(2) + '%' : '—';
+    const retClr = ret != null ? (pos ? 'var(--pos)' : 'var(--neg)') : 'var(--muted)';
+
+    // Date range
+    let dateStr = 'Week ' + wn;
+    try { const d = weekDatesFromWN(parseInt(wn)); if(d&&d.mon) dateStr = d.mon + (d.fri?' – '+d.fri:''); } catch(e){}
+
+    const pickRows = (Array.isArray(picks)?picks:[]).map((sym,i) => {
+      const d = LD[sym]||FALLBACK[sym]||{};
+      const wp = d.weekPct??d.pct??null;
+      const wPos = wp!=null&&wp>=0;
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0">
+        <div style="display:flex;align-items:center;gap:5px">
+          <span style="font-family:IBM Plex Mono,monospace;font-size:9px;color:var(--faint);width:10px">${i+1}</span>
+          <span style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:700;letter-spacing:.02em">${sym}</span>
+        </div>
+        <span style="font-family:IBM Plex Mono,monospace;font-size:10px;font-weight:600;color:${wp!=null?(wPos?'var(--pos)':'var(--neg)'):'var(--faint)'}">${wp!=null?(wPos?'+':'')+wp.toFixed(2)+'%':'—'}</span>
+      </div>`;
+    }).join('');
+
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--sh);position:relative">
+      <!-- Ticket top stripe -->
+      <div style="height:4px;background:${ret!=null?(pos?'var(--pos)':'var(--neg)'):'var(--border2)'}"></div>
+      <!-- Header -->
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border)">
+        <div style="font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px">${league?.name||'Pool'}</div>
+        <div style="font-family:IBM Plex Mono,monospace;font-size:9px;color:var(--muted)">${dateStr}</div>
+      </div>
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border)">
+        <div style="padding:8px 14px;border-right:1px solid var(--border)">
+          <div style="font-family:IBM Plex Mono,monospace;font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);margin-bottom:3px">Return</div>
+          <div style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:15px;color:${retClr}">${retStr}</div>
+        </div>
+        <div style="padding:8px 14px">
+          <div style="font-family:IBM Plex Mono,monospace;font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);margin-bottom:3px">Avg β</div>
+          <div style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:15px;color:var(--ink)">${avgBeta}</div>
+        </div>
+      </div>
+      <!-- Ticket perforation line -->
+      <div style="height:1px;background:repeating-linear-gradient(90deg,var(--border) 0,var(--border) 6px,transparent 6px,transparent 12px);margin:0"></div>
+      <!-- Picks -->
+      <div style="padding:8px 14px">${pickRows}</div>
+      <!-- Bottom stub -->
+      <div style="padding:6px 14px;background:var(--surface2);border-top:1px solid var(--border)">
+        <div style="font-family:IBM Plex Mono,monospace;font-size:8px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em">Wk ${wn} · ${picks.length} picks locked</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">${cards}</div>`;
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -9770,7 +9710,7 @@ function _applyFirebaseUser(user, isNew) {
       }
     }, 800);
 
-    // Always try Supabase — 409 means already exists, that's fine
+    // Save basic info to Supabase (password will be updated when they set it)
     fetch('https://opbell-db.carsonhughes101010.workers.dev', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -9783,13 +9723,10 @@ function _applyFirebaseUser(user, isNew) {
         }
       })
     }).then(function(r){ return r.json(); })
-    .then(function(res){
-      if (res.success) console.log('[Openbell] Google user in Supabase ✓');
-      else if (res.error !== 'Email already registered') console.warn('[Openbell] Supabase:', res.error);
-    })
-    .catch(function(e){ console.warn('[Openbell] Supabase error:', e); });
+    .then(function(res){ console.log('[Openbell] Google user saved to Supabase:', res.success ? 'yes' : res.error); })
+    .catch(function(e){ console.warn('[Openbell] Supabase Google signup error:', e); });
 
-    // Always log sign-in
+    // Also log the sign-in
     fetch('https://opbell-db.carsonhughes101010.workers.dev', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -9808,8 +9745,6 @@ function _applyFirebaseUser(user, isNew) {
   localStorage.setItem('sd_uid', uid);
   sessionStorage.setItem('sd_uid', uid);
   sessionStorage.setItem('sd_username',  (firstName + ' ' + lastName).trim());
-  // Check if profile needs completing
-  setTimeout(function(){ promptGoogleProfileIfNeeded(uid, email); }, 1200);
   sessionStorage.setItem('sd_useremail', email);
   saveMyData({ name: (firstName + ' ' + lastName).trim(), email: email, uid: uid,
                firstName: firstName, lastName: lastName });
@@ -10724,10 +10659,10 @@ function togglePoiPayMethod() {
   var useBalance = document.getElementById('poi-use-balance')?.checked;
   var cardSection = document.getElementById('poi-card-section');
   var btn = document.getElementById('poi-pay-btn');
-  // Use _pendingLeagueFee as source of truth, fallback to DOM
-  var fee = _pendingLeagueFee > 0 ? _pendingLeagueFee : parseFloat((document.getElementById('poi-fee-btn')||{}).textContent||'0')||'?';
+  var feeBtn = document.getElementById('poi-fee-btn');
+  var fee = feeBtn ? feeBtn.textContent : '?';
   if (cardSection) cardSection.style.display = useBalance ? 'none' : 'block';
-  if (btn) btn.innerHTML = useBalance ? 'Pay $' + fee + ' from Balance &rarr;' : 'Pay $' + fee + ' & Enter &rarr;';
+  if (btn) btn.textContent = useBalance ? 'Pay $' + fee + ' from Balance →' : 'Pay $' + fee + ' & Enter →';
 }
 
 
@@ -11190,70 +11125,40 @@ function searchPlayers(q) {
   q = (q || '').trim().toLowerCase();
   if (!q) { el.innerHTML = ''; return; }
 
-  // Show loading state
-  el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:6px 0">Searching…</div>';
+  var players = getAllKnownPlayers().filter(function(p) {
+    return p.name.toLowerCase().includes(q);
+  }).slice(0, 6);
 
-  // Search Supabase users table
-  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-    method: 'POST', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ action: 'search_users', data: { q: q } })
-  }).then(function(r) { return r.json(); })
-  .then(function(res) {
-    var users = res.users || [];
-    // Also merge local known players
-    var local = getAllKnownPlayers().filter(function(p) {
-      return p.name.toLowerCase().includes(q);
-    });
-    // Dedupe by email/name
-    var seen = new Set(users.map(function(u){ return u.email; }));
-    local.forEach(function(p) {
-      if (!seen.has(p.email||'')) {
-        users.push({first_name: p.name.split(' ')[0]||p.name, last_name: p.name.split(' ').slice(1).join(' ')||'', email: p.email||'', uid: p.uid||''});
-        seen.add(p.email||p.name);
-      }
-    });
-    users = users.slice(0, 8);
-    if (!users.length) {
-      el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:6px 0">No players found matching "' + q + '"</div>';
-      return;
-    }
-    var soc = _getSocial();
-    var myFriends = (soc.friends||[]).map(function(f){ return (f.name||'').toLowerCase(); });
-    el.innerHTML = users.map(function(u) {
-      var name = ((u.first_name||'') + ' ' + (u.last_name||'')).trim() || u.email || 'Unknown';
-      var isFriend = myFriends.includes(name.toLowerCase());
-      var addBtn = isFriend
-        ? '<span style="font-size:10px;color:var(--pos)">✓ Friends</span>'
-        : '<button data-name="' + name + '" onclick="sendFriendRequest(this.dataset.name);this.textContent=String.fromCharCode(10003);this.disabled=true" style="background:var(--ink);color:var(--bg);border:none;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:600">+ Add</button>';
-      return '<div style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px" class="ns-row">' +
-        '<div style="width:26px;height:26px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:700;font-size:11px;flex-shrink:0">' + (name[0]||'?').toUpperCase() + '</div>' +
-        '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px">' + name + '</div><div style="font-size:10px;color:var(--muted)">' + (u.email||'') + '</div></div>' +
-        '<div style="display:flex;gap:4px">' + addBtn + '</div>' +
-      '</div>';
-    }).join('');
-  })
-  .catch(function() {
-    // Fall back to local search
-    var players = getAllKnownPlayers().filter(function(p) {
-      return p.name.toLowerCase().includes(q);
-    }).slice(0, 6);
-    if (!players.length) {
-      el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:6px 0">No players found</div>';
-      return;
-    }
-    var soc = _getSocial();
-    var myFriends = (soc.friends||[]).map(function(f){ return (f.name||'').toLowerCase(); });
-    el.innerHTML = players.map(function(p) {
-      var isFriend = myFriends.includes(p.name.toLowerCase());
-      var addBtn = isFriend ? '<span style="font-size:10px;color:var(--pos)">✓</span>'
-        : '<button data-name="' + p.name + '" onclick="sendFriendRequest(this.dataset.name);this.textContent=String.fromCharCode(10003);this.disabled=true" style="background:var(--ink);color:var(--bg);border:none;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:600">+ Add</button>';
-      return '<div style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px">' +
-        '<div style="width:26px;height:26px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:700;font-size:11px">' + p.name[0].toUpperCase() + '</div>' +
-        '<div style="flex:1"><div style="font-weight:600;font-size:12px">' + p.name + '</div></div>' +
-        addBtn +
-      '</div>';
-    }).join('');
-  });
+  if (!players.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:6px 0">No players found matching "' + q + '"</div>';
+    return;
+  }
+
+  var soc = _getSocial();
+  var myFriends = (soc.friends || []).map(function(f){return (f.name||'').toLowerCase();});
+  var pending = (soc.requests || []).filter(function(r){return r.dir==='out';}).map(function(r){return (r.name||'').toLowerCase();});
+
+  el.innerHTML = players.map(function(p) {
+    var isFriend = myFriends.includes(p.name.toLowerCase());
+    var isPending = pending.includes(p.name.toLowerCase());
+    var initials = p.name[0].toUpperCase();
+    var addBtn = isFriend
+      ? '<span style="font-size:10px;color:var(--pos);font-weight:600">✓ Friends</span>'
+      : isPending
+        ? '<span style="font-size:10px;color:var(--muted)">Pending</span>'
+        : '<button data-name="' + p.name + '" onclick="sendFriendRequest(this.dataset.name);_refreshSearch()" style="background:var(--ink);color:var(--bg);border:none;border-radius:5px;padding:3px 10px;cursor:pointer;font-size:11px;font-weight:600">+ Add</button>';
+
+    return '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)">' +
+      '<div style="width:30px;height:30px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:700;font-size:12px;flex-shrink:0">' + initials + '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-weight:600;font-size:12px">' + p.name + '</div>' +
+        '<div style="font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + p.league + '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:5px;flex-shrink:0">' + addBtn +
+        '<button data-name="' + p.name + '" onclick="sendChallenge(this.dataset.name)" style="background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:3px 8px;cursor:pointer;font-size:11px;font-weight:600">⚔</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
 }
 
 // ── Friend Requests ──
@@ -11577,27 +11482,15 @@ async function confirmDeposit() {
 }
 
 function creditBalance(amt) {
-  var prevBal = getBalance();
-  var newBal = prevBal + parseFloat(amt);
+  var newBal = getBalance() + parseFloat(amt);
   localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
   updateBalanceDisplay();
   cm('deposit');
+  // Reset button for next use
   var btn = document.getElementById('deposit-confirm-btn');
   if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
   toast('✓ $' + parseFloat(amt).toFixed(2) + ' added to your balance!');
   renderDashboard();
-  // Log to Supabase
-  var uid = getUserId(); var email = sessionStorage.getItem('sd_useremail')||'';
-  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action: 'balance_tx', data: {
-      uid: uid, email: email, type: 'deposit',
-      amount: parseFloat(parseFloat(amt).toFixed(2)),
-      balance_before: parseFloat(prevBal.toFixed(2)),
-      balance_after: parseFloat(newBal.toFixed(2)),
-      note: 'Stripe deposit'
-    }})
-  }).catch(function(){});
 }
 
 function updateBalanceDisplay() {
@@ -11702,167 +11595,6 @@ function skipGooglePassword() {
   }
   cm('google-pw');
   toast('Signed in with Google ✓');
-}
-
-// ── Google Profile Completion ──
-function promptGoogleProfileIfNeeded(uid, email) {
-  var allU = JSON.parse(localStorage.getItem('sd_all_users') || '[]');
-  var u = allU.find(function(x){ return x.email === email; });
-  if (!u || (u.phone && u.state && u.dob)) return; // already complete
-  // Set max DOB date
-  var maxDob = new Date(); maxDob.setFullYear(maxDob.getFullYear() - 18);
-  var dobEl = document.getElementById('gp-dob');
-  if (dobEl) dobEl.max = maxDob.toISOString().split('T')[0];
-  setTimeout(function(){ om('google-profile'); }, 800);
-}
-
-function saveGoogleProfile() {
-  var phone = (document.getElementById('gp-phone')?.value||'').trim();
-  var dob   = (document.getElementById('gp-dob')?.value||'').trim();
-  var state = (document.getElementById('gp-state')?.value||'').trim();
-  var errEl = document.getElementById('gp-error');
-  if (!phone || !dob || !state) {
-    if (errEl) { errEl.textContent = 'Please fill in all fields'; errEl.style.display='block'; }
-    return;
-  }
-  var age = Math.floor((new Date() - new Date(dob)) / (365.25 * 24 * 3600 * 1000));
-  if (age < 18) {
-    if (errEl) { errEl.textContent = 'You must be 18 or older'; errEl.style.display='block'; }
-    return;
-  }
-  var email = sessionStorage.getItem('sd_useremail') || '';
-  var uid = getUserId();
-  // Update localStorage
-  var allU = JSON.parse(localStorage.getItem('sd_all_users') || '[]');
-  var idx = allU.findIndex(function(x){ return x.email === email; });
-  if (idx >= 0) {
-    allU[idx].phone = phone;
-    allU[idx].dob = dob;
-    allU[idx].state = state;
-    allU[idx].age = age;
-    localStorage.setItem('sd_all_users', JSON.stringify(allU));
-  }
-  // Update Supabase — upsert by uid
-  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action: 'update_profile', data: { uid: uid, phone: phone, dob: dob, state: state, age: age }})
-  }).catch(function(){});
-  cm('google-profile');
-  toast('✓ Profile saved!');
-}
-
-function openBalanceHistory() {
-  var bal = getBalance();
-  var balEl = document.getElementById('bh-balance');
-  if (balEl) balEl.textContent = '$' + bal.toFixed(2);
-  om('balance-history');
-  renderBalanceHistory();
-}
-
-function renderBalanceHistory() {
-  var el = document.getElementById('bh-list');
-  if (!el) return;
-  var uid = getUserId();
-  if (!uid) {
-    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:12px">Sign in to see your history</div>';
-    return;
-  }
-  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Loading…</div>';
-  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action: 'get_balance_history', data: { uid: uid, email: sessionStorage.getItem('sd_useremail')||'' } })
-  }).then(function(r){ return r.json(); })
-  .then(function(res) {
-    var txns = res.transactions || [];
-    if (!txns.length) {
-      el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:12px">No transactions yet</div>';
-      return;
-    }
-    el.innerHTML = txns.map(function(t) {
-      var pos = t.amount >= 0;
-      var icon = t.type === 'deposit' ? '↓' : t.type === 'withdrawal' ? '↑' : '→';
-      var label = t.note || t.type || 'Transaction';
-      var date = new Date(t.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">' +
-        '<div style="width:32px;height:32px;border-radius:50%;background:' + (pos?'var(--accent-bg)':'var(--red-bg)') + ';display:flex;align-items:center;justify-content:center;font-weight:700;color:' + (pos?'var(--pos)':'var(--neg)') + ';flex-shrink:0">' + icon + '</div>' +
-        '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + label + '</div><div style="font-size:10px;color:var(--muted)">' + date + '</div></div>' +
-        '<div style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:14px;color:' + (pos?'var(--pos)':'var(--neg)') + '">' + (pos?'+':'') + '$' + Math.abs(t.amount).toFixed(2) + '</div>' +
-        '<div style="font-family:IBM Plex Mono,monospace;font-size:10px;color:var(--muted);text-align:right">$' + (t.balance_after||0).toFixed(2) + '</div>' +
-      '</div>';
-    }).join('');
-  })
-  .catch(function() {
-    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:12px">Could not load history</div>';
-  });
-}
-
-// ── Shared enrollment counts from Supabase ──
-var _enrollmentCounts = {}; // { leagueId: count }
-var _enrollmentCountsLoaded = false;
-
-function fetchEnrollmentCounts(callback) {
-  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action: 'get_enrollment_counts' })
-  }).then(function(r){ return r.json(); })
-  .then(function(res) {
-    if (res && res.counts) {
-      _enrollmentCounts = res.counts;
-      _enrollmentCountsLoaded = true;
-      if (callback) callback();
-    }
-  }).catch(function(){});
-}
-
-function getPlayerCount(league) {
-  var local = (league.participants||[]).length;
-  var remote = _enrollmentCounts[league.id] || 0;
-  return Math.max(local, remote);
-}
-
-function openPoolRules(leagueId) {
-  var all = [...getPublicLeagues(), ...getLeagues()];
-  var league = all.find(function(l){ return l.id === leagueId; });
-  if (!league) { om('how'); return; }
-  // Build pool-specific rules
-  var isTop3 = league.payoutStructure === 'top3';
-  var isWinner = league.payoutStructure === 'winner';
-  var isBeater = league.payoutStructure === 'beater';
-  var isContrarian = league.contrarian;
-  var maxPicks = league.maxPicks || 5;
-  var rulesHtml = '<div style="padding:18px 22px">' +
-    '<div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:6px">Pool Rules</div>' +
-    '<div style="font-family:Figtree,sans-serif;font-weight:800;font-size:20px;margin-bottom:14px">' + league.name + '</div>' +
-    '<div style="display:flex;flex-direction:column;gap:8px">' +
-      '<div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700">→</span><span><strong>Entry:</strong> $' + league.fee + ' per player, max ' + league.maxPlayers + ' players</span></div>' +
-      '<div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700">→</span><span><strong>Draft:</strong> Pick ' + maxPicks + ' stock' + (maxPicks > 1 ? 's' : '') + '. Equal weight, no multipliers.</span></div>' +
-      '<div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700">→</span><span><strong>Scoring:</strong> ' + (isContrarian ? 'Lowest portfolio return wins.' : 'Highest average % return Monday open → Friday close wins.') + '</span></div>' +
-      '<div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700">→</span><span><strong>Payout:</strong> ' + (isTop3 ? '1st 60% · 2nd 20% · 3rd 15% · Platform 5%' : isBeater ? 'Everyone who beats SPY splits the pot (95%)' : 'Winner 95% · Platform 5%') + '</span></div>' +
-      '<div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700">→</span><span><strong>Lock:</strong> Sunday 11:59 PM ET. No changes after submission.</span></div>' +
-      '<div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700">→</span><span><strong>Ties</strong> split the payout equally for their position.</span></div>' +
-    '</div>' +
-    '<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);text-align:center">' +
-      '<button onclick="closePoolRules()" style="background:#00c087;color:#000;font-weight:700;border:none;border-radius:8px;padding:10px 28px;cursor:pointer;font-size:13px">Got it</button>' +
-    '</div>' +
-  '</div>';
-  // Create a quick overlay
-  var ov = document.getElementById('ov-pool-rules');
-  if (!ov) {
-    ov = document.createElement('div');
-    ov.id = 'ov-pool-rules';
-    ov.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:700;align-items:center;justify-content:center';
-    ov.innerHTML = '<div style="background:var(--surface);border-radius:14px;width:400px;max-width:94vw;border:1px solid var(--border);overflow:hidden"><div style="height:4px;background:var(--accent)"></div><div id="pool-rules-body"></div></div>';
-    ov.addEventListener('click', function(e){ if(e.target===ov) closePoolRules(); });
-    document.body.appendChild(ov);
-  }
-  var body = document.getElementById('pool-rules-body');
-  if (body) body.innerHTML = rulesHtml;
-  ov.style.display = 'flex';
-}
-
-function closePoolRules() {
-  var ov = document.getElementById('ov-pool-rules');
-  if (ov) ov.style.display = 'none';
 }
 </script>
 
@@ -12011,27 +11743,15 @@ async function confirmDeposit() {
 }
 
 function creditBalance(amt) {
-  var prevBal = getBalance();
-  var newBal = prevBal + parseFloat(amt);
+  var newBal = getBalance() + parseFloat(amt);
   localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
   updateBalanceDisplay();
   cm('deposit');
+  // Reset button for next use
   var btn = document.getElementById('deposit-confirm-btn');
   if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
   toast('✓ $' + parseFloat(amt).toFixed(2) + ' added to your balance!');
   renderDashboard();
-  // Log to Supabase
-  var uid = getUserId(); var email = sessionStorage.getItem('sd_useremail')||'';
-  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action: 'balance_tx', data: {
-      uid: uid, email: email, type: 'deposit',
-      amount: parseFloat(parseFloat(amt).toFixed(2)),
-      balance_before: parseFloat(prevBal.toFixed(2)),
-      balance_after: parseFloat(newBal.toFixed(2)),
-      note: 'Stripe deposit'
-    }})
-  }).catch(function(){});
 }
 
 function updateBalanceDisplay() {
@@ -12121,62 +11841,5 @@ function updateBalanceDisplay() {
   </div>
 </div>
 
-
-<!-- ══ COMPLETE GOOGLE PROFILE MODAL ══ -->
-<div class="ov" id="ov-google-profile">
-  <div class="modal" style="width:420px;padding:0;overflow:hidden;border-radius:14px">
-    <div style="height:4px;background:var(--accent)"></div>
-    <div style="padding:20px 24px 14px;border-bottom:1px solid var(--border)">
-      <div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:5px">One More Step</div>
-      <div style="font-family:Figtree,sans-serif;font-weight:800;font-size:22px;letter-spacing:-.03em">Complete Your Profile</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px">Required to join paid pools and comply with regulations.</div>
-    </div>
-    <div style="padding:16px 24px;display:flex;flex-direction:column;gap:10px">
-      <div>
-        <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Phone Number</div>
-        <input class="fi" id="gp-phone" type="tel" placeholder="+1 (555) 000-0000" style="width:100%;box-sizing:border-box">
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div>
-          <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Date of Birth</div>
-          <input class="fi" id="gp-dob" type="date" style="width:100%;box-sizing:border-box">
-        </div>
-        <div>
-          <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">State</div>
-          <select class="fi" id="gp-state" style="width:100%;box-sizing:border-box">
-            <option value="">Select state…</option>
-            <option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option>
-          </select>
-        </div>
-      </div>
-      <div id="gp-error" style="display:none;color:var(--neg);font-size:11px"></div>
-    </div>
-    <div style="padding:0 24px 20px;display:flex;gap:10px">
-      <button class="btn btn-outline" style="flex:1" onclick="cm('google-profile')">Skip for now</button>
-      <button class="btn" style="flex:2;background:#00c087;color:#000;font-weight:700;border:none;border-radius:8px;padding:11px;cursor:pointer;font-size:13px" onclick="saveGoogleProfile()">Save Profile →</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ BALANCE HISTORY MODAL ══ -->
-<div class="ov" id="ov-balance-history">
-  <div class="modal" style="width:480px;padding:0;overflow:hidden;border-radius:14px;max-height:88vh;display:flex;flex-direction:column">
-    <div style="height:4px;background:var(--accent)"></div>
-    <div style="padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
-      <div>
-        <div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:4px">Wallet</div>
-        <div style="font-family:Figtree,sans-serif;font-weight:800;font-size:22px;letter-spacing:-.03em">Balance History</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:10px;color:var(--muted);margin-bottom:2px">Current Balance</div>
-        <div id="bh-balance" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:22px;color:var(--pos)">$0.00</div>
-      </div>
-      <div onclick="cm('balance-history')" style="cursor:pointer;font-size:18px;color:var(--muted);padding:4px 8px;border-radius:6px;margin-left:12px" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">✕</div>
-    </div>
-    <div id="bh-list" style="overflow-y:auto;padding:10px 22px 20px;flex:1">
-      <div style="text-align:center;padding:32px;color:var(--muted);font-size:13px">Loading…</div>
-    </div>
-  </div>
-</div>
 </body>
 </html>
