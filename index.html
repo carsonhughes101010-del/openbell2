@@ -2131,8 +2131,11 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
       <div class="sb-sec">
         <div class="sb-lbl">Balance</div>
         <!-- Balance display -->
-        <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;margin-bottom:8px">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:4px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.06em">Available</div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:box-shadow .15s" onclick="openBalanceHistory()" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,192,135,.15)'" onmouseout="this.style.boxShadow=''">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div style="font-size:10px;color:var(--muted);font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.06em">Available Balance</div>
+            <div style="font-size:9px;color:var(--accent);font-family:IBM Plex Mono,monospace">History →</div>
+          </div>
           <div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:26px;color:var(--pos)" id="sb-wins">$0.00</div>
         </div>
         <button class="btn" onclick="openDeposit()" style="width:100%;background:#00c087;color:#000;font-weight:700;font-size:12px;border:none;border-radius:8px;padding:9px;cursor:pointer;margin-bottom:6px">+ Deposit Cash</button>
@@ -5824,7 +5827,7 @@ function renderDashboard() {
             ${rankLabel ? `<div style="font-size:10px;font-weight:700;color:${rankColor}">${rankLabel}</div>` : ''}
           </div>
           <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted)">
-            <span>${l.participants.length}/${l.maxPlayers}</span>
+            <span>${getPlayerCount(l)}/${l.maxPlayers}</span>
             <span style="color:${(!isFutureWeek && myRet!==null)?(myRet>=0?'var(--green)':'var(--red)'):'var(--muted)'};font-weight:600">${isFutureWeek?'Draft open':myRet!==null?(myRet>=0?'+':'')+myRet.toFixed(2)+'%':'—'}</span>
           </div>
           ${weekChip ? `<div style="margin-top:2px">${weekChip}</div>` : ''}
@@ -6890,6 +6893,10 @@ function setPubFilter(f, btn) {
 }
 
 function renderPublic() {
+  // Fetch live enrollment counts then render
+  if (!_enrollmentCountsLoaded) {
+    fetchEnrollmentCounts(function(){ renderPublic(); });
+  }
   try {
   // Update week header
   const wkEl = document.getElementById('pub-week-label');
@@ -6907,7 +6914,7 @@ function renderPublic() {
 
   const filtered = all.filter(l=>{
     if (q && !l.name.toLowerCase().includes(q) && !(l.desc||'').toLowerCase().includes(q)) return false;
-    if (pubFilter==='open') return l.participants.length < l.maxPlayers;
+    if (pubFilter==='open') return getPlayerCount(l) < l.maxPlayers;
     if (pubFilter==='large') return l.maxPlayers >= 25;
     if (pubFilter==='small') return l.maxPlayers <= 10;
     if (pubFilter==='mine') return l.organizer===myName || l.participants?.find(p=>p.name===myName);
@@ -11696,6 +11703,79 @@ function closePoolRules() {
   var ov = document.getElementById('ov-pool-rules');
   if (ov) ov.style.display = 'none';
 }
+
+// ── Shared enrollment counts from Supabase ──
+var _enrollmentCounts = {};
+var _enrollmentCountsLoaded = false;
+
+function fetchEnrollmentCounts(callback) {
+  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action: 'get_enrollment_counts' })
+  }).then(function(r){ return r.json(); })
+  .then(function(res) {
+    if (res && res.counts) {
+      _enrollmentCounts = res.counts;
+      _enrollmentCountsLoaded = true;
+      if (typeof callback === 'function') callback();
+    }
+  }).catch(function(){});
+}
+
+function getPlayerCount(league) {
+  var local = (league.participants||[]).filter(function(p){ return !p.isBot && !p.fake; }).length;
+  var remote = _enrollmentCounts[league.id] || 0;
+  return Math.max(local, remote);
+}
+
+function openBalanceHistory() {
+  var bal = getBalance();
+  var balEl = document.getElementById('bh-balance');
+  if (balEl) balEl.textContent = '$' + bal.toFixed(2);
+  om('balance-history');
+  renderBalanceHistory();
+}
+
+function renderBalanceHistory() {
+  var el = document.getElementById('bh-list');
+  if (!el) return;
+  var uid = getUserId();
+  var email = sessionStorage.getItem('sd_useremail') || '';
+  if (!uid && !email) {
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:12px">Sign in to see your history</div>';
+    return;
+  }
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Loading…</div>';
+  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action: 'get_balance_history', data: { uid: uid, email: email } })
+  }).then(function(r){ return r.json(); })
+  .then(function(res) {
+    var txns = res.transactions || [];
+    if (!txns.length) {
+      el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:12px">No transactions yet</div>';
+      return;
+    }
+    el.innerHTML = txns.map(function(t) {
+      var pos = t.amount >= 0;
+      var icon = t.type === 'deposit' ? '&#x2193;' : t.type === 'withdrawal' ? '&#x2191;' : '&#x2192;';
+      var label = t.note || t.type || 'Transaction';
+      var date = new Date(t.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      var amtStr = (pos?'+':'-') + '$' + Math.abs(t.amount||0).toFixed(2);
+      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">' +
+        '<div style="width:32px;height:32px;border-radius:50%;background:var(--surface2);border:1.5px solid '+(pos?'var(--accent)':'var(--neg)')+';display:flex;align-items:center;justify-content:center;font-weight:700;color:'+(pos?'var(--pos)':'var(--neg)')+';flex-shrink:0;font-size:14px">' + icon + '</div>' +
+        '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + label + '</div><div style="font-size:10px;color:var(--muted)">' + date + '</div></div>' +
+        '<div style="text-align:right;flex-shrink:0">' +
+          '<div style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:14px;color:'+(pos?'var(--pos)':'var(--neg)')+'">'+amtStr+'</div>' +
+          '<div style="font-family:IBM Plex Mono,monospace;font-size:10px;color:var(--muted)">bal: $'+(t.balance_after||0).toFixed(2)+'</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  })
+  .catch(function() {
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:12px">Could not load history</div>';
+  });
+}
 </script>
 
   <script type="module">
@@ -11941,5 +12021,26 @@ function updateBalanceDisplay() {
   </div>
 </div>
 
+
+<!-- ══ BALANCE HISTORY MODAL ══ -->
+<div class="ov" id="ov-balance-history">
+  <div class="modal" style="width:480px;padding:0;overflow:hidden;border-radius:14px;max-height:88vh;display:flex;flex-direction:column">
+    <div style="height:4px;background:var(--accent);flex-shrink:0"></div>
+    <div style="padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+      <div>
+        <div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:4px">Wallet</div>
+        <div style="font-family:Figtree,sans-serif;font-weight:800;font-size:22px;letter-spacing:-.03em">Balance History</div>
+      </div>
+      <div style="text-align:right;margin-right:12px">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:2px">Current Balance</div>
+        <div id="bh-balance" style="font-family:IBM Plex Mono,monospace;font-weight:700;font-size:22px;color:var(--pos)">$0.00</div>
+      </div>
+      <div onclick="cm('balance-history')" style="cursor:pointer;font-size:18px;color:var(--muted);padding:4px 8px;border-radius:6px" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">&#x2715;</div>
+    </div>
+    <div id="bh-list" style="overflow-y:auto;padding:10px 22px 20px;flex:1">
+      <div style="text-align:center;padding:32px;color:var(--muted);font-size:13px">Loading…</div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
