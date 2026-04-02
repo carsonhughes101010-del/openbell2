@@ -6334,6 +6334,81 @@ function _calcAge(dob) {
 }
 
 
+
+async function doLogin() {
+  var email    = (document.getElementById('li-email')?.value||'').trim().toLowerCase();
+  var password = (document.getElementById('li-password')?.value||'').trim();
+  var errEl    = document.getElementById('li-error');
+  var btn      = document.getElementById('li-btn');
+  var showErr  = function(msg){ if(errEl){errEl.textContent=msg;errEl.style.display='block';} };
+  if(errEl) errEl.style.display='none';
+  if(!email || !email.includes('@')){ showErr('Please enter a valid email address'); return; }
+  if(!password){ showErr('Please enter your password'); return; }
+  if(btn){ btn.disabled=true; btn.textContent='Signing in…'; }
+
+  // Check local cache first for offline support
+  var allUsers = JSON.parse(localStorage.getItem('sd_all_users')||'[]');
+  var localUser = allUsers.find(function(u){ return u.email && u.email.toLowerCase()===email; });
+
+  // Always try Supabase
+  try {
+    var res = await fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'login', data:{ email:email } })
+    }).then(function(r){ return r.json(); });
+
+    if(res && res.success && res.user) {
+      var u = res.user;
+      var userData = {
+        uid: u.uid, firstName: u.first_name||'', lastName: u.last_name||'',
+        email: u.email, phone: u.phone||'', dob: u.dob||'',
+        state: u.state||'', age: u.age||0, isRestricted: u.is_restricted||false
+      };
+      // Verify password hash
+      var hash = _hashPassword(password);
+      if(u.password_hash && u.password_hash !== 'google-oauth' && u.password_hash !== hash) {
+        showErr('Incorrect password');
+        if(btn){ btn.disabled=false; btn.textContent='Log In →'; }
+        return;
+      }
+      _setSession(userData);
+      if(btn){ btn.disabled=false; btn.textContent='Log In →'; }
+      cm('login');
+      updateNavUser();
+      renderDashboard();
+      go('dashboard');
+      toast('Welcome back, ' + (u.first_name||'') + '!');
+      // Log sign-in
+      fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'sign_in_log', data:{ uid:u.uid, email:email } })
+      }).catch(function(){});
+      return;
+    }
+  } catch(e) { console.warn('[Openbell] Login fetch error:', e); }
+
+  // Fallback to local
+  if(localUser) {
+    var hash = _hashPassword(password);
+    if(localUser.passwordHash && localUser.passwordHash !== hash) {
+      showErr('Incorrect password');
+      if(btn){ btn.disabled=false; btn.textContent='Log In →'; }
+      return;
+    }
+    _setSession(localUser);
+    if(btn){ btn.disabled=false; btn.textContent='Log In →'; }
+    cm('login');
+    updateNavUser();
+    renderDashboard();
+    go('dashboard');
+    toast('Welcome back, ' + (localUser.firstName||'') + '!');
+    return;
+  }
+
+  showErr('No account found with that email. Sign up instead?');
+  if(btn){ btn.disabled=false; btn.textContent='Log In →'; }
+}
+
 function _hashPassword(pw) {
   var h = 0;
   for (var i = 0; i < pw.length; i++) { h = Math.imul(31, h) + pw.charCodeAt(i) | 0; }
