@@ -4485,37 +4485,38 @@ function navSearchPlayers(q) {
   var dd = document.getElementById('nav-search-dropdown');
   if (!dd) return;
   q = (q||'').trim().toLowerCase();
-  if (!q) { dd.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--muted)">Type to search…</div>'; return; }
-  var players = [];
-  var seen = new Set();
-  var myName = (getMyData().name||sessionStorage.getItem('sd_username')||'').toLowerCase();
-  try {
-    [...getLeagues(),...getPublicLeagues()].forEach(function(l){
-      (l.participants||[]).forEach(function(p){
-        var n=(p.name||'').trim();
-        if(n&&n.toLowerCase()!==myName&&!p.isBot&&!seen.has(n.toLowerCase())){
-          seen.add(n.toLowerCase()); players.push({name:n,league:l.name||''});
-        }
-      });
-    });
-  } catch(e){}
-  var matches = players.filter(function(p){return p.name.toLowerCase().includes(q);}).slice(0,6);
-  if (!matches.length) { dd.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--muted)">No players found</div>'; return; }
-  var soc = typeof _getSocial==='function' ? _getSocial() : {friends:[]};
-  var myF = (soc.friends||[]).map(function(f){return (f.name||'').toLowerCase();});
-  dd.innerHTML = matches.map(function(p) {
-    var isFriend = myF.includes(p.name.toLowerCase());
-    var addBtn = isFriend
-      ? '<span style="font-size:10px;color:var(--pos)">✓</span>'
-      : '<button data-name="' + p.name + '" onclick="sendFriendRequest(this.dataset.name);this.textContent=String.fromCharCode(10003);this.disabled=true" style="background:var(--ink);color:var(--bg);border:none;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:600">+ Add</button>';
-    var chalBtn = '<button data-name="' + p.name + '" onclick="sendChallenge(this.dataset.name)" style="background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:600">⚔</button>';
-    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px" class="ns-row">' +
-      '<div style="width:26px;height:26px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:700;font-size:11px;flex-shrink:0">' + p.name[0].toUpperCase() + '</div>' +
-      '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + p.name + '</div><div style="font-size:10px;color:var(--muted)">' + p.league + '</div></div>' +
-      '<div style="display:flex;gap:4px">' + addBtn + chalBtn + '</div>' +
-    '</div>';
-  }).join('');
+  if (!q) { dd.style.display='none'; return; }
   dd.style.display = 'block';
+  dd.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--muted)">Searching…</div>';
+  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action: 'search_users', data: { q: q } })
+  }).then(function(r){ return r.json(); })
+  .then(function(res) {
+    var users = Array.isArray(res.users) ? res.users : [];
+    if (!users.length) {
+      dd.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--muted)">No players found</div>';
+      return;
+    }
+    var soc = typeof _getSocial==='function' ? _getSocial() : {friends:[]};
+    var myF = (soc.friends||[]).map(function(f){return (f.name||'').toLowerCase();});
+    dd.innerHTML = users.map(function(u) {
+      var name = ((u.first_name||'')+' '+(u.last_name||'')).trim() || u.email || 'Unknown';
+      var isFriend = myF.includes(name.toLowerCase());
+      var addBtn = isFriend
+        ? '<span style="font-size:10px;color:var(--pos)">✓</span>'
+        : '<button data-name="'+name+'" onclick="sendFriendRequest(this.dataset.name);this.textContent=String.fromCharCode(10003);this.disabled=true" style="background:var(--ink);color:var(--bg);border:none;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:600">+ Add</button>';
+      return '<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px" class="ns-row">' +
+        '<div style="width:26px;height:26px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:700;font-size:11px;flex-shrink:0">' + (name[0]||'?').toUpperCase() + '</div>' +
+        '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+name+'</div>' +
+        '<div style="font-size:10px;color:var(--muted)">'+( u.email||'')+'</div></div>' +
+        '<div style="display:flex;gap:4px">'+addBtn+'</div>' +
+      '</div>';
+    }).join('');
+  })
+  .catch(function() {
+    dd.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--muted)">Search failed</div>';
+  });
 }
 </script><script>
 // ══════════════════════════════════════════════════
@@ -5361,7 +5362,7 @@ function switchDraftLeague(id, weekOverride) {
       _bannerLabel.textContent = league.name + ' — Week ' + league.week;
       _bannerLabel.style.color = 'rgba(255,255,255,.95)';
     }
-    setText('draft-league-sub', league.participants.length+'/'+league.maxPlayers+' participants · $'+league.fee+' entry');
+    setText('draft-league-sub', getPlayerCount(league)+'/'+league.maxPlayers+' participants · $'+league.fee+' entry');
     const drafts = getDrafts();
     const dKey = `${id}_${league.week || getWN()}`;
     userPicks = drafts[dKey] ? [...drafts[dKey]] : [];
@@ -5590,7 +5591,7 @@ function previewJoin(el) {
   if (league) {
     preview.style.display='flex';
     setText('j-prev-title', league.name);
-    setText('j-prev-body', league.participants.length+'/'+league.maxPlayers+' participants · $'+league.fee+' entry · Organizer: '+league.organizer);
+    setText('j-prev-body', getPlayerCount(league)+'/'+league.maxPlayers+' participants · $'+league.fee+' entry · Organizer: '+league.organizer);
   } else {
     // Only show "not found" once they've typed something that looks like a complete code
     const looksComplete = code.includes('-') && code.length >= 7;
@@ -5965,7 +5966,7 @@ function renderLeaderboard(leagueId) {
   if (!league) return;
 
   // Update sidebar details
-  const pool = league.participants.length * league.fee;
+  const pool = getPlayerCount(league) * league.fee;
   const netPool = pool * 0.95;
   const fee5 = (pool * 0.05).toFixed(0);
   const isTop3 = league.payoutStructure === 'top3';
@@ -5978,7 +5979,7 @@ function renderLeaderboard(leagueId) {
   const weekStatus = wd ? (wd.isCurrentWeek ? 'Live' : wd.isPast ? 'Completed' : 'Upcoming') : 'Active';
   const weekRange  = wd ? `${wd.mon} – ${wd.fri}` : '';
   setText('lb-week-label', 'Week '+league.week+(weekRange?' · '+weekRange:'')+' · '+weekStatus);
-  setText('lb-d-players', league.participants.length);
+  setText('lb-d-players', getPlayerCount(league));
   setText('lb-d-fee', '$'+league.fee);
   setText('lb-d-pool', '$'+pool);
   setText('lb-d-win', '$'+pay1);
@@ -8721,7 +8722,7 @@ function directJoin(id) {
   _joinTargetId = id;
   var ov = getOrCreatePayOverlay();
   var isTop3 = league.payoutStructure === 'top3';
-  var filled = league.participants.length;
+  var filled = getPlayerCount(league);
   var pool   = filled * league.fee;
   var net    = pool * 0.95;
   var pay1   = isTop3 ? (pool * 0.60).toFixed(0) : net.toFixed(0);
@@ -11747,6 +11748,7 @@ function renderBalanceHistory() {
     return;
   }
   el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Loading…</div>';
+  console.log('[Openbell] Fetching balance history for uid:', uid, 'email:', email);
   fetch('https://opbell-db.carsonhughes101010.workers.dev', {
     method: 'POST', headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ action: 'get_balance_history', data: { uid: uid, email: email } })
