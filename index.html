@@ -5719,7 +5719,7 @@ function renderDashboard() {
           : (_leaguePicks && _leaguePicks.length > 0 ? _leaguePicks : null);
         const hasDraft = !!(myPicks && myPicks.length > 0);
         const isFutureWeek = l.week > getWN(); // don't show returns for upcoming funds
-        const pool = l.participants.length * l.fee;
+        const pool = getPlayerCount(l) * l.fee;
         const payout = (pool * 0.95).toFixed(0);
         const isOrganizer = l.organizer === n;
 
@@ -6244,7 +6244,7 @@ function go(view) {
 
 function sbNav(el, panel) {
   document.querySelectorAll('.sb-it').forEach(i=>i.classList.remove('on')); if(el) el.classList.add('on');
-  var panels = ['dash-main','dash-picks','dash-perf'];
+  var panels = ['dash-main','dash-picks','dash-perf','dash-social'];
   panels.forEach(function(p){ var e=document.getElementById(p); if(e) e.style.display = p===panel?'block':'none'; });
 }
 function renderDashPerf() {
@@ -6893,10 +6893,11 @@ function setPubFilter(f, btn) {
 }
 
 function renderPublic() {
-  // Fetch live enrollment counts then render
-  if (!_enrollmentCountsLoaded) {
-    fetchEnrollmentCounts(function(){ renderPublic(); });
-  }
+  // Always fetch fresh counts, then re-render with updated data
+  fetchEnrollmentCounts(function(){ _renderPublicInner(); });
+  _renderPublicInner(); // render immediately with cached data too
+}
+function _renderPublicInner() {
   try {
   // Update week header
   const wkEl = document.getElementById('pub-week-label');
@@ -6925,8 +6926,8 @@ function renderPublic() {
   const rest = filtered.filter(l=>!l.isFeatured);
 
   // Stats bar
-  const totalPlayers = all.reduce((s,l)=>s+l.participants.length,0);
-  const totalPrize = all.reduce((s,l)=>s+(l.participants.length*l.fee),0);
+  const totalPlayers = all.reduce((s,l)=>s+getPlayerCount(l),0);
+  const totalPrize = all.reduce((s,l)=>s+(getPlayerCount(l)*l.fee),0);
   const elN = id=>document.getElementById(id);
   if (elN('pub-stat-active')) elN('pub-stat-active').textContent = all.length;
   if (elN('pub-stat-players')) elN('pub-stat-players').textContent = totalPlayers;
@@ -6954,7 +6955,7 @@ function renderPublic() {
 }
 
 function pubCard(l, myName, isFeat) {
-  const filled  = l.participants.length;
+  const filled  = getPlayerCount(l);
   const cap     = l.maxPlayers;
   const full    = filled >= cap;
   const pool    = filled * l.fee;
@@ -10079,7 +10080,7 @@ function updateDraftFundBanner() {
   var league = all.find(l => l.id === activeDraftLeagueId);
   var labelEl = document.getElementById('draft-active-fund-label');
   if (league) {
-    if (info) info.innerHTML = '$' + league.fee + ' entry · ' + league.participants.length + '/' + league.maxPlayers + ' players';
+    if (info) info.innerHTML = '$' + league.fee + ' entry · ' + getPlayerCount(league) + '/' + league.maxPlayers + ' players';
     if (labelEl) {
       var gameTag = league.maxPicks === 1 ? ' <span style="font-size:10px;font-family:IBM Plex Mono,monospace;background:#7c3aed;color:#fff;padding:2px 7px;border-radius:4px;vertical-align:middle">1-PICK</span>' :
         league.contrarian ? ' <span style="font-size:10px;font-family:IBM Plex Mono,monospace;background:#dc2626;color:#fff;padding:2px 7px;border-radius:4px;vertical-align:middle">CONTRARIAN</span>' :
