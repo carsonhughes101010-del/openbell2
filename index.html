@@ -5243,9 +5243,13 @@ function renderDraftList() {
 function renderPickSlots() {
   const el = document.getElementById('pickSlots'); if (!el) return;
   const n = userPicks.length;
+  // Get maxPicks from active league
+  var _activeLgPS = null;
+  try { _activeLgPS = [...getLeagues(),...getPublicLeagues()].find(function(l){return l.id===activeDraftLeagueId;}); } catch(e){}
+  var maxP = (_activeLgPS && _activeLgPS.maxPicks) ? _activeLgPS.maxPicks : 5;
 
   // Render each pick slot — clean, spacious
-  el.innerHTML = Array.from({length:5}, (_, i) => {
+  el.innerHTML = Array.from({length:maxP}, (_, i) => {
     const sym = userPicks[i];
     if (sym) {
       const d = getSD(sym);
@@ -5270,9 +5274,9 @@ function renderPickSlots() {
     </div>`;
   }).join('');
 
-  const lbl = document.getElementById('pickCLabel'); if (lbl) lbl.textContent = `${n} / 5`;
-  const ctr = document.getElementById('pickCtr'); if (ctr) ctr.textContent = `${n} of 5 selected`;
-  const btn = document.getElementById('subBtn'); if (btn) btn.disabled = n < 5;
+  const lbl = document.getElementById('pickCLabel'); if (lbl) lbl.textContent = `${n} / ${maxP}`;
+  const ctr = document.getElementById('pickCtr'); if (ctr) ctr.textContent = `${n} of ${maxP} selected`;
+  const btn = document.getElementById('subBtn'); if (btn) btn.disabled = n < maxP;
   renderDraftSidebar();
 
   // Average Beta footer: ((b1+b2+b3+b4+b5) * 0.2) / 5
@@ -6184,18 +6188,21 @@ function _goCore(view) {
           var draftKey = l.id + '_' + l.week;
           return _drafts[draftKey] && _drafts[draftKey].length > 0;
         });
+        // Dedup by id
+        var _seen = new Set();
+        var _deduped = _noPicks.filter(function(l){ if(_seen.has(l.id)) return false; _seen.add(l.id); return true; });
         _sel.innerHTML = '<option value="">— Select a pool —</option>' +
-          (_noPicks.length ? '<optgroup label="Draft pending">' + _noPicks.map(function(l){
+          _deduped.map(function(l){
             return '<option value="'+l.id+'__'+l.week+'">'+l.name+' — Wk '+l.week+'</option>';
-          }).join('') + '</optgroup>' : '') +
-          (_hasPicks.length ? '<optgroup label="Already submitted">' + _hasPicks.map(function(l){
-            return '<option value="'+l.id+'__'+l.week+'" disabled style="color:var(--muted)">&#x2713; '+l.name+' (submitted)</option>';
-          }).join('') + '</optgroup>' : '');
+          }).join('');
         // Auto-select if only one pending pool
-        if (_noPicks.length === 1) {
-          _sel.value = _noPicks[0].id + '__' + _noPicks[0].week;
-          switchDraftLeague(_noPicks[0].id, _noPicks[0].week);
+        if (_deduped.length === 1) {
+          _sel.value = _deduped[0].id + '__' + _deduped[0].week;
+          switchDraftLeague(_deduped[0].id, _deduped[0].week);
         }
+        // Add note below dropdown
+        var _noteEl = document.getElementById('draft-active-fund-label');
+        if (_noteEl && _deduped.length === 0) _noteEl.textContent = 'No active pools — join one first.';
       }
     }
   }
@@ -8711,7 +8718,7 @@ function directJoin(id) {
   var pay1   = isTop3 ? (pool * 0.60).toFixed(0) : net.toFixed(0);
 
   var _pn = document.getElementById('poi-name');        if (_pn) _pn.textContent = league.name;
-  var _pf = document.getElementById('poi-fee');         if (_pf) _pf.textContent = '$' + league.fee;
+  var _pf = document.getElementById('poi-fee');         if (_pf) _pf.textContent = league.fee;
   var _pb = document.getElementById('poi-fee-btn');     if (_pb) _pb.textContent = league.fee;
   var _pp = document.getElementById('poi-pool');        if (_pp) _pp.textContent = '$' + pool;
   var _pr = document.getElementById('poi-prize');       if (_pr) _pr.textContent = '$' + pay1;
@@ -8721,49 +8728,34 @@ function directJoin(id) {
 
   ov.style.display = 'flex';
 
-  // Show user's saved card in overlay
-  // Show balance row if user has enough balance
-  var userBal = parseFloat(localStorage.getItem(_uidKey('sd_balance'))||'0');
-  var feeEl   = document.getElementById('poi-fee');
-  var feeAmt  = feeEl ? parseFloat(feeEl.textContent.replace('$',''))||0 : 0;
-  var balRow  = document.getElementById('poi-balance-row');
-  var balAvail = document.getElementById('poi-balance-avail');
-  if (balRow) {
-    if (userBal > 0) {
-      balRow.style.display = 'flex';
-      if (balAvail) balAvail.textContent = '$' + userBal.toFixed(2);
-      // Auto-check if balance covers it
-      var useBalCb = document.getElementById('poi-use-balance');
-      if (useBalCb) useBalCb.checked = userBal >= feeAmt;
-      togglePoiPayMethod();
+  // Populate new balance-only overlay
+  var userBal = getBalance();
+  var feeAmt  = league.fee || 0;
+  var canAffordNew = userBal >= feeAmt;
+
+  var balAvailEl = document.getElementById('poi-balance-avail');
+  if (balAvailEl) balAvailEl.textContent = '$' + userBal.toFixed(2);
+  var balStatusEl = document.getElementById('poi-balance-status');
+  if (balStatusEl) {
+    balStatusEl.textContent = canAffordNew ? '✓ Sufficient' : '✗ Insufficient';
+    balStatusEl.style.color = canAffordNew ? 'var(--pos)' : 'var(--neg)';
+  }
+  var balAfterEl = document.getElementById('poi-balance-after');
+  if (balAfterEl) balAfterEl.textContent = canAffordNew ? '$' + (userBal - feeAmt).toFixed(2) : '—';
+
+  var payBtn = document.getElementById('poi-pay-btn');
+  if (payBtn) {
+    if (canAffordNew) {
+      payBtn.textContent = 'Pay $' + feeAmt + ' from Balance';
+      payBtn.style.background = '#00c087'; payBtn.style.color = '#000'; payBtn.disabled = false;
+      payBtn.onclick = function(){ payAndJoin(); };
     } else {
-      balRow.style.display = 'none';
+      payBtn.textContent = '+ Add Funds to Continue';
+      payBtn.style.background = 'var(--ink)'; payBtn.style.color = '#fff'; payBtn.disabled = false;
+      payBtn.onclick = function(){ closePayOverlay(); openDeposit(); };
     }
   }
-  var cardDisp = document.getElementById('poi-card-display');
-  if (cardDisp) {
-    var savedCard = null;
-    try { savedCard = JSON.parse(localStorage.getItem('sd_payment') || 'null'); } catch(e) {}
-    if (savedCard && savedCard.last4) {
-      cardDisp.innerHTML = [
-        '<div style="border:1.5px solid var(--border);border-radius:9px;padding:13px 14px;display:flex;align-items:center;gap:12px;background:var(--paper)">',
-          '<svg width="34" height="24" viewBox="0 0 34 24" fill="none"><rect width="34" height="24" rx="4" fill="#1434CB"/><rect x="12" y="7" width="10" height="10" rx="5" fill="#F9A000" opacity=".8"/><rect x="8" y="7" width="10" height="10" rx="5" fill="#EB001B" opacity=".8"/></svg>',
-          '<div style="flex:1">',
-            '<div style="font-family:monospace;font-size:13px;font-weight:700;letter-spacing:2px">' + '•••• •••• •••• ' + savedCard.last4 + '</div>',
-            '<div style="font-size:10px;color:var(--muted);margin-top:2px">' + (savedCard.brand||'Card').toUpperCase() + ' · Expires ' + savedCard.exp + '</div>',
-          '</div>',
-          '<span style="font-size:8px;font-weight:700;background:var(--green-bg);color:var(--green);padding:2px 7px;border-radius:100px">Default</span>',
-        '</div>'
-      ].join('');
-    } else {
-      cardDisp.innerHTML = [
-        '<div style="border:1.5px dashed var(--border);border-radius:9px;padding:13px 14px;text-align:center;cursor:pointer;background:var(--paper)" onclick="closePayOverlay();openAddPayment()">',
-          '<div style="font-size:12px;color:var(--muted)">No card on file</div>',
-          '<div style="font-size:11px;color:var(--orange);margin-top:4px;font-weight:600">+ Add a payment method →</div>',
-        '</div>'
-      ].join('');
-    }
-  }
+  // Balance-only — no card section needed
 
   // Mount Stripe card element
   try {
@@ -11649,6 +11641,59 @@ function skipGooglePassword() {
   }
   cm('google-pw');
   toast('Signed in with Google ✓');
+}
+
+function openPoolRules(leagueId) {
+  var all = [...getPublicLeagues(), ...getLeagues()];
+  var league = all.find(function(l){ return l.id === leagueId; });
+  if (!league) { om('how'); return; }
+  var isTop3 = league.payoutStructure === 'top3';
+  var isBeater = league.payoutStructure === 'beater';
+  var isContrarian = !!league.contrarian;
+  var maxPicks = league.maxPicks || 5;
+  var fee = league.fee || 0;
+  var payout = isTop3 ? '1st 60% / 2nd 20% / 3rd 15% / Platform 5%'
+    : isBeater ? 'Everyone who beats SPY splits 95% of pot'
+    : isContrarian ? 'Lowest return wins — 95% to 1st / Platform 5%'
+    : 'Winner 95% / Platform 5%';
+  var scoring = isContrarian ? 'Lowest average portfolio return wins.'
+    : 'Highest average % return (Monday open → Friday close) wins.';
+
+  var rulesHtml = '<div style="height:4px;background:var(--accent)"></div>' +
+    '<div style="padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">' +
+      '<div><div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:4px">Pool Rules</div>' +
+      '<div style="font-family:Figtree,sans-serif;font-weight:800;font-size:20px">' + league.name + '</div></div>' +
+      '<div onclick="closePoolRules()" style="cursor:pointer;font-size:18px;color:var(--muted);padding:4px 8px;border-radius:6px">&#x2715;</div>' +
+    '</div>' +
+    '<div style="padding:16px 22px;display:flex;flex-direction:column;gap:9px">' +
+      '<div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Entry:</strong> $' + fee + ' per player · Max ' + league.maxPlayers + ' players</span></div>' +
+      '<div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Picks:</strong> Choose ' + maxPicks + ' stock' + (maxPicks > 1 ? 's' : '') + '. Equal weight, no multipliers.</span></div>' +
+      '<div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Scoring:</strong> ' + scoring + '</span></div>' +
+      '<div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Payout:</strong> ' + payout + '</span></div>' +
+      '<div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Lock:</strong> Sunday 11:59 PM ET. No changes after submission.</span></div>' +
+      '<div style="display:flex;gap:10px;font-size:12px;color:var(--muted)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">&#x2192;</span><span><strong style="color:var(--ink)">Platform fee:</strong> 5% of prize pool. 95% goes to winners.</span></div>' +
+    '</div>' +
+    '<div style="padding:0 22px 16px;text-align:center">' +
+      '<button onclick="closePoolRules()" style="background:#00c087;color:#000;font-weight:700;border:none;border-radius:8px;padding:9px 28px;cursor:pointer;font-size:13px">Got it</button>' +
+    '</div>';
+
+  var ov = document.getElementById('ov-pool-rules');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'ov-pool-rules';
+    ov.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:700;align-items:center;justify-content:center';
+    ov.innerHTML = '<div style="background:var(--surface);border-radius:14px;width:400px;max-width:94vw;border:1px solid var(--border);overflow:hidden"><div id="pool-rules-body"></div></div>';
+    ov.addEventListener('click', function(e){ if(e.target===ov) closePoolRules(); });
+    document.body.appendChild(ov);
+  }
+  var body = document.getElementById('pool-rules-body');
+  if (body) body.innerHTML = rulesHtml;
+  ov.style.display = 'flex';
+}
+
+function closePoolRules() {
+  var ov = document.getElementById('ov-pool-rules');
+  if (ov) ov.style.display = 'none';
 }
 </script>
 
