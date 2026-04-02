@@ -5739,7 +5739,7 @@ function renderDashboard() {
           : (_leaguePicks && _leaguePicks.length > 0 ? _leaguePicks : null);
         const hasDraft = !!(myPicks && myPicks.length > 0);
         const isFutureWeek = l.week > getWN(); // don't show returns for upcoming funds
-        const pool = l.participants.length * l.fee;
+        const pool = getPlayerCount(l) * l.fee;
         const payout = (pool * 0.95).toFixed(0);
         const isOrganizer = l.organizer === n;
 
@@ -5847,7 +5847,7 @@ function renderDashboard() {
             ${rankLabel ? `<div style="font-size:10px;font-weight:700;color:${rankColor}">${rankLabel}</div>` : ''}
           </div>
           <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted)">
-            <span>${l.participants.length}/${l.maxPlayers}</span>
+            <span>${getPlayerCount(l)}/${l.maxPlayers}</span>
             <span style="color:${(!isFutureWeek && myRet!==null)?(myRet>=0?'var(--green)':'var(--red)'):'var(--muted)'};font-weight:600">${isFutureWeek?'Draft open':myRet!==null?(myRet>=0?'+':'')+myRet.toFixed(2)+'%':'—'}</span>
           </div>
           ${weekChip ? `<div style="margin-top:2px">${weekChip}</div>` : ''}
@@ -6389,7 +6389,7 @@ function doSignup() {
   // Store locally so login works offline
   allUsers.push(userData);
   localStorage.setItem('sd_all_users', JSON.stringify(allUsers));
-  // Write to Supabase
+  // Write to Supabase — await it so we know it worked
   console.log('[Openbell] Saving to Supabase:', email);
   fetch('https://opbell-db.carsonhughes101010.workers.dev', {
     method: 'POST',
@@ -6399,15 +6399,22 @@ function doSignup() {
       data: { uid, email, firstName, lastName, passwordHash, phone, dob, state, age: userAge, isRestricted }
     })
   }).then(function(r) {
-    if (!r.ok) { console.warn('[Openbell] /db returned', r.status); return {}; }
     return r.json();
   }).then(function(res) {
     if (res && res.success) {
-      console.log('[Openbell] User saved to Supabase ✓');
-    } else if (res && res.error) {
-      console.warn('[Openbell] Supabase signup error:', res.error);
+      console.log('[Openbell] User saved to Supabase ✓', uid);
+    } else {
+      console.warn('[Openbell] Supabase signup issue:', res && res.error ? res.error : JSON.stringify(res));
     }
-  }).catch(function(err) { console.warn('[Openbell] Supabase error:', err.message); });
+  }).catch(function(err) {
+    console.warn('[Openbell] Supabase error:', err.message);
+  });
+
+  // Log sign-in
+  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action: 'sign_in_log', data: { uid: uid, email: email } })
+  }).catch(function(){});
 
   // Complete signup
   _setSession(userData);
@@ -6417,11 +6424,6 @@ function doSignup() {
   renderDashboard();
   go('dashboard');
   toast('✓ Welcome to Openbell, ' + firstName + '!');
-  // Log sign-in
-  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action: 'sign_in_log', data: { uid: uid, email: email } })
-  }).catch(function(){});
 }
 
 // Legacy stub so any old openLogin() calls still work
@@ -6828,6 +6830,10 @@ function setPubFilter(f, btn) {
 }
 
 function renderPublic() {
+  // Fetch live enrollment counts from Supabase, then render
+  if (!_enrollmentCountsLoaded) {
+    fetchEnrollmentCounts(function(){ renderPublic(); });
+  }
   try {
   // Update week header
   const wkEl = document.getElementById('pub-week-label');
@@ -8709,7 +8715,7 @@ function directJoin(id) {
   _pendingLeagueName = league.name || '';
   var ov = getOrCreatePayOverlay();
   var isTop3 = league.payoutStructure === 'top3';
-  var filled = league.participants.length;
+  var filled = getPlayerCount(league);
   var pool   = filled * league.fee;
   var net    = pool * 0.95;
   var pay1   = isTop3 ? (pool * 0.60).toFixed(0) : net.toFixed(0);
@@ -11802,6 +11808,30 @@ function renderBalanceHistory() {
   .catch(function() {
     el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:12px">Could not load history</div>';
   });
+}
+
+// ── Shared enrollment counts from Supabase ──
+var _enrollmentCounts = {}; // { leagueId: count }
+var _enrollmentCountsLoaded = false;
+
+function fetchEnrollmentCounts(callback) {
+  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action: 'get_enrollment_counts' })
+  }).then(function(r){ return r.json(); })
+  .then(function(res) {
+    if (res && res.counts) {
+      _enrollmentCounts = res.counts;
+      _enrollmentCountsLoaded = true;
+      if (callback) callback();
+    }
+  }).catch(function(){});
+}
+
+function getPlayerCount(league) {
+  var local = (league.participants||[]).length;
+  var remote = _enrollmentCounts[league.id] || 0;
+  return Math.max(local, remote);
 }
 </script>
 
