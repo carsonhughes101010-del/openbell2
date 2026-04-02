@@ -1032,6 +1032,7 @@ select.fi { cursor: pointer; }
 .pub-card-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
 .pub-card-name { font-weight: 700; font-size: 14px; line-height: 1.3; }
 .pub-card-meta { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+.special-section-header { color:#7c3aed; }
 .featured-badge {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 8px;
@@ -2547,6 +2548,12 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
       <button class="pub-filter" id="pf-small" onclick="setPubFilter('small',this)">Small (≤10)</button>
       <button class="pub-filter" id="pf-mine" onclick="setPubFilter('mine',this)">My Public Pools</button>
       <button class="btn btn-primary btn-sm" onclick="om('create-public')" style="margin-left:auto">+ Create Public Pool</button>
+    </div>
+
+    <!-- SPECIAL MODES -->
+    <div id="pub-special-section" style="display:none">
+      <div class="pub-section-title" style="color:#7c3aed">&#x2736; Special Modes</div>
+      <div class="pub-grid" id="pub-special"></div>
     </div>
 
     <!-- FEATURED -->
@@ -6990,7 +6997,7 @@ function pubCard(l, myName, isFeat) {
     <div class="pub-card-head">
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap">
-          ${isFeat ? '<span class="featured-badge">Featured</span>' : ''}
+          ${l.isSpecial ? '<span class="featured-badge" style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff">&#x2736; Special</span>' : (isFeat ? '<span class="featured-badge">Featured</span>' : '')}
           ${isMine ? '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:8px;background:var(--green-bg);color:var(--green);padding:2px 7px;border-radius:100px;font-weight:700">✓ Joined</span>' : ''}
         </div>
         <div class="pub-card-name">${l.name} <span style="font-weight:400;color:var(--muted)">— Week ${l.week}</span></div>
@@ -10083,11 +10090,13 @@ function updateDraftFundBanner() {
   if (league) {
     if (info) info.innerHTML = '$' + league.fee + ' entry · ' + getPlayerCount(league) + '/' + league.maxPlayers + ' players';
     if (labelEl) {
+      var _wd = weekDatesFromWN(league.week);
+      var _dateStr = _wd ? (' <span style="color:rgba(255,255,255,.35);font-size:11px;font-family:IBM Plex Mono,monospace">' + _wd.mon + ' – ' + _wd.fri + '</span>') : '';
       var gameTag = league.maxPicks === 1 ? ' <span style="font-size:10px;font-family:IBM Plex Mono,monospace;background:#7c3aed;color:#fff;padding:2px 7px;border-radius:4px;vertical-align:middle">1-PICK</span>' :
         league.contrarian ? ' <span style="font-size:10px;font-family:IBM Plex Mono,monospace;background:#dc2626;color:#fff;padding:2px 7px;border-radius:4px;vertical-align:middle">CONTRARIAN</span>' :
         league.payoutStructure === 'beater' ? ' <span style="font-size:10px;font-family:IBM Plex Mono,monospace;background:#0284c7;color:#fff;padding:2px 7px;border-radius:4px;vertical-align:middle">BEAT INDEX</span>' :
         (league.id && league.id.includes('pub_etf')) ? ' <span style="font-size:10px;font-family:IBM Plex Mono,monospace;background:#059669;color:#fff;padding:2px 7px;border-radius:4px;vertical-align:middle">ETF ONLY</span>' : '';
-      labelEl.innerHTML = '<span style="color:#fff;font-weight:700;font-size:16px;font-family:Figtree,sans-serif">' + league.name + '</span>' + gameTag + ' <span style="color:rgba(255,255,255,.4);font-size:12px">· Week ' + league.week + '</span>';
+      labelEl.innerHTML = '<span style="color:#fff;font-weight:700;font-size:16px;font-family:Figtree,sans-serif">' + league.name + '</span>' + gameTag + ' <span style="color:rgba(255,255,255,.4);font-size:12px">· Week ' + league.week + '</span>' + _dateStr;
     }
   } else {
     if (labelEl) labelEl.textContent = 'No pool selected — choose above to start drafting';
@@ -11220,9 +11229,11 @@ function searchPlayers(q) {
 // ── Friend Requests ──
 function sendFriendRequest(name) {
   if (!name) return;
+  var myName = sessionStorage.getItem('sd_username') || getMyData().name || '';
+  if (name.toLowerCase() === myName.toLowerCase()) { toast("That's you!"); return; }
   var soc = _getSocial();
   if ((soc.friends||[]).find(function(f){return f.name===name;})) { toast(name + ' is already a friend'); return; }
-  if ((soc.requests||[]).find(function(r){return r.name===name&&r.dir==='out';})) { toast('Request already sent'); return; }
+  if ((soc.requests||[]).find(function(r){return r.name===name&&r.dir==='out';})) { toast('Request already sent to ' + name); return; }
   if (!soc.requests) soc.requests = [];
   soc.requests.push({name: name, dir: 'out', ts: Date.now()});
   // Simulate incoming (demo — in production this would be server-side)
@@ -11778,6 +11789,20 @@ function renderBalanceHistory() {
   .catch(function() {
     el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:12px">Could not load history</div>';
   });
+}
+
+// ── Fetch league enrollments from Supabase (for leaderboard) ──
+function fetchLeagueEnrollments(leagueId, callback) {
+  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action: 'get_league_enrollments', data: { leagueId: leagueId } })
+  }).then(function(r){ return r.json(); })
+  .then(function(res) {
+    if (res && Array.isArray(res.enrollments)) {
+      localStorage.setItem('sd_supa_enrollments_' + leagueId, JSON.stringify(res.enrollments));
+      if (typeof callback === 'function') callback(res.enrollments);
+    }
+  }).catch(function(){});
 }
 </script>
 
