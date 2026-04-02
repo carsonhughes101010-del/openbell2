@@ -3267,83 +3267,84 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 
 <!-- ══ SIGNUP MODAL ══ -->
 <div class="ov" id="ov-signup">
-  <div class="modal" style="width:460px;padding:0;overflow:hidden">
-    <div style="padding:28px 28px 20px;border-bottom:1px solid var(--border)">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div style="font-family:monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--orange);margin-bottom:5px">Create account</div>
-          <div style="font-family:Figtree,sans-serif;font-weight:900;font-size:28px;line-height:1;letter-spacing:-.03em">Sign Up</div>
-        </div>
-        <div onclick="cm('signup')" style="cursor:pointer;font-size:18px;color:var(--muted);padding:4px 8px;border-radius:6px" onmouseover="this.style.background='var(--paper)'" onmouseout="this.style.background='transparent'">✕</div>
+  <div class="modal" style="width:460px;padding:0;overflow:hidden;border-radius:14px;max-height:92vh;display:flex;flex-direction:column">
+    <div style="height:4px;background:var(--accent);flex-shrink:0"></div>
+    <!-- Header -->
+    <div style="padding:20px 24px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+      <div>
+        <div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:5px">Openbell</div>
+        <div style="font-family:Figtree,sans-serif;font-weight:800;font-size:24px;letter-spacing:-.03em">Create Account</div>
       </div>
+      <div onclick="cm('signup')" style="cursor:pointer;font-size:18px;color:var(--muted);padding:4px 8px;border-radius:6px" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">&#x2715;</div>
     </div>
-    <div style="padding:16px 28px 0">
-      <button onclick="loginWithGoogle()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink);transition:border-color .15s" onmouseover="this.style.borderColor='var(--accent,#00c087)'" onmouseout="this.style.borderColor='var(--border)'">
+    <!-- Google -->
+    <div style="padding:14px 24px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <button onclick="loginWithGoogle()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink);font-family:Figtree,sans-serif;transition:border-color .15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
         Continue with Google
       </button>
-      <div style="display:flex;align-items:center;gap:10px;margin:14px 0 0">
+      <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
         <div style="flex:1;height:1px;background:var(--border)"></div>
-        <span style="font-size:11px;color:var(--muted)">or</span>
+        <span style="font-size:11px;color:var(--muted);font-family:IBM Plex Mono,monospace">or</span>
         <div style="flex:1;height:1px;background:var(--border)"></div>
       </div>
     </div>
-    <div style="padding:12px 28px;display:flex;flex-direction:column;gap:12px;max-height:60vh;overflow-y:auto">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <!-- Form -->
+    <div style="padding:14px 24px;display:flex;flex-direction:column;gap:11px;overflow-y:auto;flex:1">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div>
-          <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">First name</div>
+          <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">First name</div>
           <input class="fi" id="su-first" type="text" placeholder="Jake" style="width:100%;box-sizing:border-box">
         </div>
         <div>
-          <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Last name</div>
+          <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Last name</div>
           <input class="fi" id="su-last" type="text" placeholder="Morrison" style="width:100%;box-sizing:border-box">
         </div>
       </div>
       <div>
-        <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Email address</div>
-        <input class="fi" id="su-email" type="email" placeholder="jake@university.edu" style="width:100%;box-sizing:border-box">
+        <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Email address</div>
+        <input class="fi" id="su-email" type="email" placeholder="jake@email.com" style="width:100%;box-sizing:border-box">
       </div>
-            <div>
-        <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Password</div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Password</div>
         <input class="fi" id="su-password" type="password" placeholder="At least 8 characters" style="width:100%;box-sizing:border-box" autocomplete="new-password">
       </div>
       <div>
-        <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Phone number</div>
-        <input class="fi" id="su-phone" type="tel" placeholder="+1 (555) 000-0000" style="width:100%;box-sizing:border-box"
-          oninput="this.value=this.value.replace(/[^0-9+()\-\s]/g,'')">
+        <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Phone number</div>
+        <input class="fi" id="su-phone" type="tel" placeholder="+1 (555) 000-0000" style="width:100%;box-sizing:border-box" oninput="this.value=this.value.replace(/[^0-9+()\-\s]/g,'')">
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div>
-          <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Date of birth</div>
-          <input class="fi" id="su-dob" type="date" style="width:100%;box-sizing:border-box" max="">
+          <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Date of birth</div>
+          <input class="fi" id="su-dob" type="date" style="width:100%;box-sizing:border-box">
         </div>
         <div>
-          <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">State</div>
+          <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">State</div>
           <select class="fi" id="su-state" style="width:100%;box-sizing:border-box" onchange="checkStateRestriction(this.value)">
-            <option value="">Select state…</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona" data-restricted=true>Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa" data-restricted=true>Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana" data-restricted=true>Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana" data-restricted=true>Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington" data-restricted=true>Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option>
+            <option value="">Select state…</option><option>Alabama</option><option>Alaska</option><option data-restricted="true">Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option data-restricted="true">Iowa</option><option>Kansas</option><option>Kentucky</option><option data-restricted="true">Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option><option data-restricted="true">Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option data-restricted="true">Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option>
           </select>
         </div>
       </div>
-      <div id="su-state-warning" style="display:none;background:#fffbeb;border:1px solid rgba(217,119,6,.3);border-radius:8px;padding:10px 14px;font-size:11px;color:#92400e;line-height:1.6">
-        ⚠️ <strong>Paid competitions are currently unavailable in your state.</strong> You can still browse public pools and practice drafting, but you cannot enter paid competitions from this location.
+      <div id="su-state-warning" style="display:none;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);border-radius:8px;padding:9px 12px;font-size:11px;color:#92400e;line-height:1.5">
+        ⚠ Paid competitions are not available in your state. You can still practice drafting for free.
       </div>
-      <div id="su-error" style="display:none;background:var(--red-bg);color:var(--red);border-radius:8px;padding:10px 14px;font-size:12px"></div>
-      <div style="background:var(--paper);border-radius:8px;padding:12px 14px">
-        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
-          <input type="checkbox" id="su-terms" style="margin-top:2px;accent-color:var(--orange);flex-shrink:0">
-          <span style="font-size:11px;color:var(--muted);line-height:1.65">I am 18 years of age or older, and I agree to Openbell's <span style="color:var(--orange);font-weight:600">Terms of Service</span> and <span style="color:var(--orange);font-weight:600">Privacy Policy</span>. I understand this is a skill-based competition, not gambling.</span>
-        </label>
-      </div>
+      <div id="su-error" style="display:none;background:var(--red-bg);color:var(--neg);border:1px solid var(--red-bd);border-radius:8px;padding:9px 12px;font-size:12px"></div>
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;background:var(--surface2);border-radius:8px;padding:10px 12px">
+        <input type="checkbox" id="su-terms" style="margin-top:2px;accent-color:var(--accent);flex-shrink:0">
+        <span style="font-size:11px;color:var(--muted);line-height:1.6">I am 18+ and agree to Openbell's <span onclick="om('tos')" style="color:var(--accent);font-weight:600;cursor:pointer">Terms of Service</span> and <span onclick="om('tos')" style="color:var(--accent);font-weight:600;cursor:pointer">Privacy Policy</span>. I understand this is a skill-based competition, not gambling.</span>
+      </label>
     </div>
-    <div style="padding:0 28px 14px;display:flex;gap:10px">
+    <!-- Actions -->
+    <div style="padding:12px 24px 10px;display:flex;gap:10px;border-top:1px solid var(--border);flex-shrink:0">
       <button class="btn btn-outline" style="flex:1" onclick="cm('signup')">Cancel</button>
-      <button class="btn btn-primary" style="flex:2" id="su-btn" onclick="doSignup()">Create Account →</button>
+      <button class="btn" id="su-btn" onclick="doSignup()" style="flex:2;background:#00c087;color:#000;font-weight:700;border:none;border-radius:8px;padding:11px;cursor:pointer;font-size:14px">Create Account →</button>
     </div>
-    <div style="padding:0 28px 22px;text-align:center;font-size:12px;color:var(--muted)">
-      Already have an account? <span style="color:var(--accent,#00c087);font-weight:600;cursor:pointer" onclick="cm('signup');openLogin()">Log in</span>
+    <div style="padding:0 24px 14px;text-align:center;font-size:12px;color:var(--muted);flex-shrink:0">
+      Already have an account? <span style="color:var(--accent);font-weight:600;cursor:pointer" onclick="cm('signup');openLogin()">Log in</span>
     </div>
   </div>
 </div>
+
 
 <!-- ══ ACCOUNT MODAL (logged-in view) ══ -->
 <div class="ov" id="ov-account">
@@ -6481,14 +6482,14 @@ function doSignup() {
     console.log('[Openbell] Supabase result:', JSON.stringify(res));
   }).catch(function(err) { console.warn('[Openbell] Supabase error (non-blocking):', err.message); });
 
-  // User already saved to Supabase via /db signup action above
-  // Reset UI state
-  userPicks = [];
-  activeDraftLeagueId = null;
-  cm('account');
+  // Set session and go to dashboard
+  _setSession(userData);
+  if (btn) { btn.disabled = false; btn.textContent = 'Create Account →'; }
+  cm('signup');
   updateNavUser();
-  go('landing');
-  toast('Signed out successfully');
+  renderDashboard();
+  go('dashboard');
+  toast('Welcome to Openbell, ' + firstName + '!');
 }
 
 // Legacy stub so any old openLogin() calls still work
