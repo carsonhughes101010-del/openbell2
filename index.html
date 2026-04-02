@@ -2884,29 +2884,7 @@ body.dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(0,
 
 
 <!-- ══ PUBLIC FUND DETAIL ══ -->
-<div class="ov" id="ov-pub-detail">
-  <div class="modal" style="width:480px;padding:0;overflow:hidden">
-    <div style="padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start">
-      <div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:5px" id="pd-type">PUBLIC FUND</div>
-        <div style="font-family:'DM Serif Display',Georgia,serif;font-size:24px;font-weight:400" id="pd-name">Pool Name</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:3px" id="pd-desc"></div>
-      </div>
-      <button onclick="cm('pub-detail')" style="background:none;border:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:4px;margin-left:12px;flex-shrink:0">✕</button>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border)">
-      <div style="padding:14px 18px;border-right:1px solid var(--border)"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Entry</div><div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:20px" id="pd-fee">—</div></div>
-      <div style="padding:14px 18px;border-right:1px solid var(--border)"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Pool</div><div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:20px" id="pd-pool">—</div></div>
-      <div style="padding:14px 18px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Players</div><div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:20px" id="pd-spots">—</div></div>
-    </div>
-    <div style="padding:16px 22px;border-bottom:1px solid var(--border)" id="pd-payout-rows"></div>
-    <div style="padding:10px 22px;background:var(--surface2);border-bottom:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted)" id="pd-countdown"></div>
-    <div style="padding:14px 22px;display:flex;gap:8px">
-      <button class="btn btn-outline" style="flex:1" onclick="cm('pub-detail')">Cancel</button>
-      <button class="btn btn-primary" style="flex:2" onclick="cm('pub-detail');directJoin(_pdCurrentId||'')">Join — $<span id="pd-fee-inline">0</span> →</button>
-    </div>
-  </div>
-</div>
+
 
 <!-- ══ AGE GATE — shows on first visit ══ -->
 <div id="ov-agegate" style="display:none;position:fixed;inset:0;background:rgba(10,10,15,.95);backdrop-filter:blur(12px);z-index:9000;align-items:center;justify-content:center;padding:20px">
@@ -6950,7 +6928,7 @@ function pubCard(l, myName, isFeat) {
       ? '<div style="text-align:center;padding:9px;background:var(--paper);border-radius:8px;font-size:12px;color:var(--muted)">This pool is full</div>'
       : isMine
         ? '<div style="text-align:center;padding:9px;background:var(--green-bg);border-radius:8px;font-size:12px;color:var(--green);font-weight:600">✓ Enrolled — picks due Sunday</div>'
-        : `<button class="btn btn-primary" style="width:100%;padding:10px" onclick="event.stopPropagation();directJoin('${l.id}')">Join — $${l.fee} →</button>`}
+        : `<button class="btn btn-primary" style="width:100%;padding:10px" onclick="event.stopPropagation();directJoin('${l.id}')">Join — ${l.fee} →</button>`}
   </div>`;
 }
 
@@ -6976,37 +6954,9 @@ function openPublicSlate(id) {
     return;
   }
 
-  // Show detail popup
+  // Go straight to directJoin — no intermediate popup
   _pdCurrentId = id;
-  const isTop3 = league.payoutStructure === 'top3';
-  const filled = league.participants?.length || 0;
-  const pool   = filled * league.fee;
-  const net    = pool * 0.95;
-  const pay1   = isTop3 ? (pool * 0.60).toFixed(0) : net.toFixed(0);
-  const pay2   = isTop3 ? (pool * 0.20).toFixed(0) : null;
-  const pay3   = isTop3 ? (pool * 0.15).toFixed(0) : null;
-
-  document.getElementById('pd-type').textContent      = league.isFeatured ? '★ FEATURED' : 'PUBLIC FUND';
-  setText('pd-name', league.name);
-  setText('pd-desc', league.desc || '');
-  setText('pd-fee', '$' + league.fee);
-  setText('pd-pool', '$' + pool);
-  setText('pd-spots', filled + '/' + league.maxPlayers);
-  setText('pd-fee-inline', league.fee);
-
-  const payRows = document.getElementById('pd-payout-rows');
-  if (isTop3) {
-    payRows.innerHTML =
-      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">' +
-        '<div style="background:var(--orange-bg);border-radius:8px;padding:10px;text-align:center"><div style="font-weight:700;font-size:11px;margin-bottom:4px">🥇 1st</div><div style="font-family:monospace;font-weight:700;font-size:16px;color:var(--orange)">$' + pay1 + '</div><div style="font-size:9px;color:var(--muted)">60%</div></div>' +
-        '<div style="background:var(--paper);border-radius:8px;padding:10px;text-align:center"><div style="font-weight:700;font-size:11px;margin-bottom:4px">🥈 2nd</div><div style="font-family:monospace;font-weight:700;font-size:16px">$' + pay2 + '</div><div style="font-size:9px;color:var(--muted)">20%</div></div>' +
-        '<div style="background:var(--paper);border-radius:8px;padding:10px;text-align:center"><div style="font-weight:700;font-size:11px;margin-bottom:4px">🥉 3rd</div><div style="font-family:monospace;font-weight:700;font-size:16px;color:var(--muted)">$' + pay3 + '</div><div style="font-size:9px;color:var(--muted)">15%</div></div>' +
-      '</div>';
-  } else {
-    payRows.innerHTML = '<div style="background:var(--orange-bg);border-radius:8px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700">🥇 Winner Takes All</span><span style="font-family:monospace;font-weight:700;font-size:18px;color:var(--orange)">$' + pay1 + '</span></div>';
-  }
-  updatePdCountdown();
-  om('pub-detail');
+  directJoin(id);
 }
 
 function updatePdCountdown() {
@@ -8655,8 +8605,11 @@ function getOrCreatePayOverlay() {
         '<div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Your Name</div>',
         '<input id="poi-name-input" class="fi" placeholder="Enter your name" style="width:100%;box-sizing:border-box">',
       '</div>',
+      '<div style="padding:10px 24px 0;display:flex;justify-content:center">',
+        '<button onclick="openPoolRules(_joinTargetId)" style="background:none;border:none;color:var(--accent);font-size:11px;cursor:pointer;text-decoration:underline;font-family:Figtree,sans-serif">View Pool Rules</button>',
+      '</div>',
       // CTA
-      '<div style="padding:14px 24px;display:flex;gap:10px">',
+      '<div style="padding:10px 24px 14px;display:flex;gap:10px">',
         '<button class="btn btn-outline" style="flex:1" onclick="closePayOverlay()">Cancel</button>',
         '<button id="poi-pay-btn" style="flex:2;font-size:13px;font-weight:700;border:none;border-radius:8px;padding:11px;cursor:pointer;transition:all .15s" onclick="payAndJoin()">',
           'Pay $<span id="poi-fee-btn">0</span> from Balance →',
@@ -8883,14 +8836,17 @@ function payAndJoin() {
       var prevBal3 = parseFloat(localStorage.getItem(_uidKey('sd_balance'))||'0');
       var leagueName3 = '';
       try { var lg3 = getPublicLeagues().find(function(l){return l.id===_joinTargetId;}); if(lg3) leagueName3=lg3.name; } catch(e){}
+      var newBal3 = Math.max(0, prevBal3 - (feeAmt||0));
+      localStorage.setItem(_uidKey('sd_balance'), newBal3.toFixed(2));
+      updateBalanceDisplay();
       fetch('https://opbell-db.carsonhughes101010.workers.dev', {
         method: 'POST', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ action: 'balance_tx', data: {
           uid: uid3, email: email3, type: 'pool_entry_card',
           amount: -parseFloat((feeAmt||0).toFixed(2)),
-          balance_before: prevBal3,
-          balance_after: prevBal3,
-          note: 'Card payment for: ' + (leagueName3 || _joinTargetId || 'Pool')
+          balance_before: parseFloat(prevBal3.toFixed(2)),
+          balance_after: parseFloat(newBal3.toFixed(2)),
+          note: 'Entry fee: ' + (leagueName3 || _joinTargetId || 'Pool')
         }})
       }).catch(function(){});
       _completeJoin(myName, myEmail, { card: { last4: savedCard.last4, brand: savedCard.brand, exp_month: '', exp_year: '' } });
@@ -11234,40 +11190,70 @@ function searchPlayers(q) {
   q = (q || '').trim().toLowerCase();
   if (!q) { el.innerHTML = ''; return; }
 
-  var players = getAllKnownPlayers().filter(function(p) {
-    return p.name.toLowerCase().includes(q);
-  }).slice(0, 6);
+  // Show loading state
+  el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:6px 0">Searching…</div>';
 
-  if (!players.length) {
-    el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:6px 0">No players found matching "' + q + '"</div>';
-    return;
-  }
-
-  var soc = _getSocial();
-  var myFriends = (soc.friends || []).map(function(f){return (f.name||'').toLowerCase();});
-  var pending = (soc.requests || []).filter(function(r){return r.dir==='out';}).map(function(r){return (r.name||'').toLowerCase();});
-
-  el.innerHTML = players.map(function(p) {
-    var isFriend = myFriends.includes(p.name.toLowerCase());
-    var isPending = pending.includes(p.name.toLowerCase());
-    var initials = p.name[0].toUpperCase();
-    var addBtn = isFriend
-      ? '<span style="font-size:10px;color:var(--pos);font-weight:600">✓ Friends</span>'
-      : isPending
-        ? '<span style="font-size:10px;color:var(--muted)">Pending</span>'
-        : '<button data-name="' + p.name + '" onclick="sendFriendRequest(this.dataset.name);_refreshSearch()" style="background:var(--ink);color:var(--bg);border:none;border-radius:5px;padding:3px 10px;cursor:pointer;font-size:11px;font-weight:600">+ Add</button>';
-
-    return '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)">' +
-      '<div style="width:30px;height:30px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:700;font-size:12px;flex-shrink:0">' + initials + '</div>' +
-      '<div style="flex:1;min-width:0">' +
-        '<div style="font-weight:600;font-size:12px">' + p.name + '</div>' +
-        '<div style="font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + p.league + '</div>' +
-      '</div>' +
-      '<div style="display:flex;gap:5px;flex-shrink:0">' + addBtn +
-        '<button data-name="' + p.name + '" onclick="sendChallenge(this.dataset.name)" style="background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:5px;padding:3px 8px;cursor:pointer;font-size:11px;font-weight:600">⚔</button>' +
-      '</div>' +
-    '</div>';
-  }).join('');
+  // Search Supabase users table
+  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ action: 'search_users', data: { q: q } })
+  }).then(function(r) { return r.json(); })
+  .then(function(res) {
+    var users = res.users || [];
+    // Also merge local known players
+    var local = getAllKnownPlayers().filter(function(p) {
+      return p.name.toLowerCase().includes(q);
+    });
+    // Dedupe by email/name
+    var seen = new Set(users.map(function(u){ return u.email; }));
+    local.forEach(function(p) {
+      if (!seen.has(p.email||'')) {
+        users.push({first_name: p.name.split(' ')[0]||p.name, last_name: p.name.split(' ').slice(1).join(' ')||'', email: p.email||'', uid: p.uid||''});
+        seen.add(p.email||p.name);
+      }
+    });
+    users = users.slice(0, 8);
+    if (!users.length) {
+      el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:6px 0">No players found matching "' + q + '"</div>';
+      return;
+    }
+    var soc = _getSocial();
+    var myFriends = (soc.friends||[]).map(function(f){ return (f.name||'').toLowerCase(); });
+    el.innerHTML = users.map(function(u) {
+      var name = ((u.first_name||'') + ' ' + (u.last_name||'')).trim() || u.email || 'Unknown';
+      var isFriend = myFriends.includes(name.toLowerCase());
+      var addBtn = isFriend
+        ? '<span style="font-size:10px;color:var(--pos)">✓ Friends</span>'
+        : '<button data-name="' + name + '" onclick="sendFriendRequest(this.dataset.name);this.textContent=String.fromCharCode(10003);this.disabled=true" style="background:var(--ink);color:var(--bg);border:none;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:600">+ Add</button>';
+      return '<div style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px" class="ns-row">' +
+        '<div style="width:26px;height:26px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:700;font-size:11px;flex-shrink:0">' + (name[0]||'?').toUpperCase() + '</div>' +
+        '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px">' + name + '</div><div style="font-size:10px;color:var(--muted)">' + (u.email||'') + '</div></div>' +
+        '<div style="display:flex;gap:4px">' + addBtn + '</div>' +
+      '</div>';
+    }).join('');
+  })
+  .catch(function() {
+    // Fall back to local search
+    var players = getAllKnownPlayers().filter(function(p) {
+      return p.name.toLowerCase().includes(q);
+    }).slice(0, 6);
+    if (!players.length) {
+      el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:6px 0">No players found</div>';
+      return;
+    }
+    var soc = _getSocial();
+    var myFriends = (soc.friends||[]).map(function(f){ return (f.name||'').toLowerCase(); });
+    el.innerHTML = players.map(function(p) {
+      var isFriend = myFriends.includes(p.name.toLowerCase());
+      var addBtn = isFriend ? '<span style="font-size:10px;color:var(--pos)">✓</span>'
+        : '<button data-name="' + p.name + '" onclick="sendFriendRequest(this.dataset.name);this.textContent=String.fromCharCode(10003);this.disabled=true" style="background:var(--ink);color:var(--bg);border:none;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:600">+ Add</button>';
+      return '<div style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px">' +
+        '<div style="width:26px;height:26px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:700;font-size:11px">' + p.name[0].toUpperCase() + '</div>' +
+        '<div style="flex:1"><div style="font-weight:600;font-size:12px">' + p.name + '</div></div>' +
+        addBtn +
+      '</div>';
+    }).join('');
+  });
 }
 
 // ── Friend Requests ──
@@ -11832,6 +11818,51 @@ function getPlayerCount(league) {
   var local = (league.participants||[]).length;
   var remote = _enrollmentCounts[league.id] || 0;
   return Math.max(local, remote);
+}
+
+function openPoolRules(leagueId) {
+  var all = [...getPublicLeagues(), ...getLeagues()];
+  var league = all.find(function(l){ return l.id === leagueId; });
+  if (!league) { om('how'); return; }
+  // Build pool-specific rules
+  var isTop3 = league.payoutStructure === 'top3';
+  var isWinner = league.payoutStructure === 'winner';
+  var isBeater = league.payoutStructure === 'beater';
+  var isContrarian = league.contrarian;
+  var maxPicks = league.maxPicks || 5;
+  var rulesHtml = '<div style="padding:18px 22px">' +
+    '<div style="font-family:IBM Plex Mono,monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:6px">Pool Rules</div>' +
+    '<div style="font-family:Figtree,sans-serif;font-weight:800;font-size:20px;margin-bottom:14px">' + league.name + '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:8px">' +
+      '<div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700">→</span><span><strong>Entry:</strong> $' + league.fee + ' per player, max ' + league.maxPlayers + ' players</span></div>' +
+      '<div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700">→</span><span><strong>Draft:</strong> Pick ' + maxPicks + ' stock' + (maxPicks > 1 ? 's' : '') + '. Equal weight, no multipliers.</span></div>' +
+      '<div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700">→</span><span><strong>Scoring:</strong> ' + (isContrarian ? 'Lowest portfolio return wins.' : 'Highest average % return Monday open → Friday close wins.') + '</span></div>' +
+      '<div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700">→</span><span><strong>Payout:</strong> ' + (isTop3 ? '1st 60% · 2nd 20% · 3rd 15% · Platform 5%' : isBeater ? 'Everyone who beats SPY splits the pot (95%)' : 'Winner 95% · Platform 5%') + '</span></div>' +
+      '<div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700">→</span><span><strong>Lock:</strong> Sunday 11:59 PM ET. No changes after submission.</span></div>' +
+      '<div style="display:flex;gap:10px;font-size:12px"><span style="color:var(--accent);font-weight:700">→</span><span><strong>Ties</strong> split the payout equally for their position.</span></div>' +
+    '</div>' +
+    '<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);text-align:center">' +
+      '<button onclick="closePoolRules()" style="background:#00c087;color:#000;font-weight:700;border:none;border-radius:8px;padding:10px 28px;cursor:pointer;font-size:13px">Got it</button>' +
+    '</div>' +
+  '</div>';
+  // Create a quick overlay
+  var ov = document.getElementById('ov-pool-rules');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'ov-pool-rules';
+    ov.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:700;align-items:center;justify-content:center';
+    ov.innerHTML = '<div style="background:var(--surface);border-radius:14px;width:400px;max-width:94vw;border:1px solid var(--border);overflow:hidden"><div style="height:4px;background:var(--accent)"></div><div id="pool-rules-body"></div></div>';
+    ov.addEventListener('click', function(e){ if(e.target===ov) closePoolRules(); });
+    document.body.appendChild(ov);
+  }
+  var body = document.getElementById('pool-rules-body');
+  if (body) body.innerHTML = rulesHtml;
+  ov.style.display = 'flex';
+}
+
+function closePoolRules() {
+  var ov = document.getElementById('ov-pool-rules');
+  if (ov) ov.style.display = 'none';
 }
 </script>
 
