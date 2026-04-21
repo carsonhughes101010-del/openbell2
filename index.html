@@ -5322,8 +5322,8 @@ function navSearchPlayers(q) {
         : '<button data-name="'+name+'" onclick="sendFriendRequest(this.dataset.name);this.textContent=String.fromCharCode(10003);this.disabled=true" style="background:var(--ink);color:var(--bg);border:none;border-radius:4px;padding:2px 7px;cursor:pointer;font-size:10px;font-weight:600">+ Add</button>';
       return '<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px" class="ns-row">' +
         '<div style="width:26px;height:26px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:700;font-size:11px;flex-shrink:0">' + (name[0]||'?').toUpperCase() + '</div>' +
-        '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+name+'</div>' +
-        '<div style="font-size:10px;color:var(--muted)">'+( u.email||'')+'</div></div>' +
+        '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+_escHtml(name)+'</div>' +
+        '<div style="font-size:10px;color:var(--muted)">'+_escHtml(u.email||'')+'</div></div>' +
         '<div style="display:flex;gap:4px">'+addBtn+'</div>' +
       '</div>';
     }).join('');
@@ -7271,12 +7271,14 @@ function _calcAge(dob) {
 
 
 const DB = 'https://opbell-db.carsonhughes101010.workers.dev';
+// Must match CLIENT_KEY env var set in Cloudflare Workers dashboard.
+const CLIENT_KEY = 'ob-client-2025';
 
 async function _dbPost(action, data) {
   const r = await fetch(DB, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ action, data: data || {} })
+    body: JSON.stringify({ action, secret: CLIENT_KEY, data: data || {} })
   });
   return r.json();
 }
@@ -7294,26 +7296,12 @@ async function doLogin() {
 
   // Always try Supabase first
   try {
-    var res = await _dbPost('login', { email });
+    var hashV2 = await _hashPassword(password);
+    var hashV1 = _hashPasswordLegacy(password);
+    // Server does the hash comparison — we send both hashes for v1/v2 migration support
+    var res = await _dbPost('login', { email, passwordHash: hashV2, legacyHash: hashV1 });
     if(res && res.success && res.user) {
       var u = res.user;
-      // Verify password — support v2 (SHA-256) and v1 (legacy polynomial) for migration
-      var hashV2 = await _hashPassword(password);
-      var hashV1 = _hashPasswordLegacy(password);
-      var storedHash = u.password_hash || '';
-      var hashVersion = u.hash_version || 1;
-      var hashOk = storedHash === 'google-oauth' ||
-                   storedHash === hashV2 ||
-                   (hashVersion === 1 && storedHash === hashV1);
-      if(!hashOk) {
-        showErr('Incorrect password');
-        if(btn){ btn.disabled=false; btn.textContent='Log In →'; }
-        return;
-      }
-      // If user had v1 hash, silently upgrade to v2
-      if(hashVersion === 1 && storedHash === hashV1) {
-        _dbPost('change_password', { uid: u.uid, passwordHash: hashV2, hashVersion: 2 }).catch(()=>{});
-      }
       var userData = {
         uid: u.uid, firstName: u.first_name||'', lastName: u.last_name||'',
         email: u.email, phone: u.phone||'', dob: u.dob||'',
@@ -7332,34 +7320,31 @@ async function doLogin() {
       return;
     }
     if(res && res.error) {
-      console.warn('[Openbell] Login error from server:', res.error);
-    }
-  } catch(e) { console.warn('[Openbell] Login fetch error:', e.message); }
-
-  // Offline fallback — check local cache
-  var allUsers = JSON.parse(localStorage.getItem('sd_all_users')||'[]');
-  var localUser = allUsers.find(function(u){ return u.email && u.email.toLowerCase()===email; });
-  if(localUser) {
-    var hashV2 = await _hashPassword(password);
-    var hashV1 = _hashPasswordLegacy(password);
-    var storedHash = localUser.passwordHash || '';
-    var hashOk = !storedHash || storedHash === hashV2 || storedHash === hashV1;
-    if(!hashOk) {
-      showErr('Incorrect password');
+      // Server explicitly rejected — show message, don't fall through to offline cache
+      showErr(res.error === 'Incorrect password' ? 'Incorrect password' : 'No account found with that email.');
       if(btn){ btn.disabled=false; btn.textContent='Log In →'; }
       return;
     }
-    _setSession(localUser);
-    if(btn){ btn.disabled=false; btn.textContent='Log In →'; }
-    cm('login');
-    updateNavUser();
-    renderDashboard();
-    go('dashboard');
-    toast('Welcome back (offline), ' + (localUser.firstName||'') + '!');
-    return;
+  } catch(e) {
+    // Network error — try offline fallback
+    var allUsers = JSON.parse(localStorage.getItem('sd_all_users')||'[]');
+    var localUser = allUsers.find(function(u){ return u.email && u.email.toLowerCase()===email; });
+    if(localUser) {
+      var hashV2b = await _hashPassword(password);
+      var hashV1b = _hashPasswordLegacy(password);
+      var storedHash = localUser.passwordHash || '';
+      var hashOk = !storedHash || storedHash === hashV2b || storedHash === hashV1b;
+      if(!hashOk) { showErr('Incorrect password'); if(btn){ btn.disabled=false; btn.textContent='Log In →'; } return; }
+      _setSession(localUser);
+      if(btn){ btn.disabled=false; btn.textContent='Log In →'; }
+      cm('login'); updateNavUser(); renderDashboard(); go('dashboard');
+      toast('Welcome back (offline), ' + (localUser.firstName||'') + '!');
+      return;
+    }
+    console.warn('[Openbell] Login fetch error:', e.message);
   }
 
-  showErr('No account found with that email. Try signing up instead.');
+  showErr('Unable to log in. Check your connection and try again.');
   if(btn){ btn.disabled=false; btn.textContent='Log In →'; }
 }
 
