@@ -27,7 +27,22 @@
  *   );
  *   ALTER TABLE password_resets ENABLE ROW LEVEL SECURITY;
  *   CREATE POLICY allow_all ON password_resets FOR ALL USING (true) WITH CHECK (true);
+ *
+ *   -- Unique constraint for draft upsert (required for save_draft action)
+ *   ALTER TABLE drafts
+ *     ADD CONSTRAINT drafts_uid_league_week_unique
+ *     UNIQUE (uid, league_id, week);
+ *
+ * Required Cloudflare Worker env vars:
+ *   CLIENT_KEY  — sent by frontend on all write actions (set in Workers dashboard)
+ *   ADMIN_KEY   — required for pay_winner only, never in frontend JS
+ *   SUPABASE_URL, SUPABASE_KEY, RESEND_API_KEY — as before
  */
+
+// Module-level cache for platform stats (survives across requests in same worker instance)
+let _statsCache = null;
+let _statsCacheAt = 0;
+const STATS_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export async function onRequest(context) {
   const cors = {
@@ -94,14 +109,39 @@ export async function onRequest(context) {
     return new Response(JSON.stringify({ error: msg }), { status, headers: cors });
   }
 
+  async function _getBalance(uid) {
+    const rows = await sbGet('balance_transactions?uid=eq.' + encodeURIComponent(uid) + '&select=amount');
+    const sum = Array.isArray(rows) ? rows.reduce((s, r) => s + (parseFloat(r.amount) || 0), 0) : 0;
+    return Math.max(0, parseFloat(sum.toFixed(2)));
+  }
+
   // ── Parse request ────────────────────────────────────────────────
-  let action, data;
+  let action, data, requestSecret;
   try {
     const body = await context.request.json();
     action = body.action;
     data = body.data || {};
+    requestSecret = body.secret || '';
   } catch (e) {
     return err('Invalid JSON: ' + e.message);
+  }
+
+  // ── Auth gate ────────────────────────────────────────────────────
+  // ADMIN_KEY: required for pay_winner (cron-only, never sent from browser)
+  // CLIENT_KEY: required for all user write operations (sent by frontend)
+  // Read-only actions (get_*, login, request_reset, verify_reset) are public.
+  const { CLIENT_KEY, ADMIN_KEY } = context.env;
+  const ADMIN_ACTIONS = new Set(['pay_winner']);
+  const WRITE_ACTIONS = new Set([
+    'signup', 'change_password', 'update_profile',
+    'save_draft', 'save_enrollment',
+    'balance_tx', 'send_chat', 'sign_in_log',
+    'consume_reset',
+  ]);
+  if (ADMIN_ACTIONS.has(action)) {
+    if (!ADMIN_KEY || requestSecret !== ADMIN_KEY) return err('Unauthorized', 401);
+  } else if (WRITE_ACTIONS.has(action) && CLIENT_KEY) {
+    if (requestSecret !== CLIENT_KEY) return err('Unauthorized', 401);
   }
 
   try {
@@ -132,16 +172,33 @@ export async function onRequest(context) {
     }
 
     // ════════════════════════════════════════════════
-    // AUTH — login (returns user row; hash check is client-side)
+    // AUTH — login (server-side hash comparison; hash never returned to client)
     // ════════════════════════════════════════════════
     if (action === 'login') {
+      if (!data.email) return err('Missing email');
       const rows = await sbGet(
         'users?email=eq.' + encodeURIComponent(data.email.toLowerCase()) + '&select=*'
       );
-      if (!Array.isArray(rows) || rows.length === 0) {
-        return err('No account found', 404);
+      if (!Array.isArray(rows) || rows.length === 0) return err('No account found', 404);
+      const u = rows[0];
+      const storedHash = u.password_hash || '';
+      // Google OAuth users skip hash check; password users must supply hash
+      if (storedHash !== 'google-oauth') {
+        if (!data.passwordHash) return err('Missing password', 400);
+        const v2Match = storedHash === data.passwordHash;
+        const v1Match = u.hash_version === 1 && data.legacyHash && storedHash === data.legacyHash;
+        if (!v2Match && !v1Match) return err('Incorrect password', 401);
+        // Silently upgrade v1 → v2 on successful login
+        if (v1Match && !v2Match) {
+          await sbPatch('users?uid=eq.' + encodeURIComponent(u.uid), {
+            password_hash: data.passwordHash,
+            hash_version: 2
+          });
+        }
       }
-      return ok({ user: rows[0] });
+      // Never return the password hash to the client
+      const { password_hash, ...safeUser } = u;
+      return ok({ user: safeUser });
     }
 
     // ════════════════════════════════════════════════
@@ -190,14 +247,11 @@ export async function onRequest(context) {
               <h2 style="font-size:20px;font-weight:700;margin-bottom:12px">Reset your password, ${firstName}.</h2>
               <p style="color:#555;line-height:1.7;margin-bottom:24px">Use this 6-digit code to reset your password. It expires in 1 hour.</p>
               <div style="font-family:monospace;font-size:36px;font-weight:700;letter-spacing:8px;color:#000;background:#f5f5f5;padding:20px;border-radius:8px;text-align:center;margin-bottom:24px">${token.slice(0,6).toUpperCase()}</div>
-              <p style="color:#999;font-size:12px">Full token (if needed): <code>${token}</code></p>
               <p style="color:#999;font-size:12px;margin-top:16px">If you didn't request this, ignore this email — your account is safe.</p>
             </div>`
           })
         }).catch(() => {}); // don't fail the request if email fails
       }
-      // Return the full token for the frontend to use — do NOT return to client
-      // (frontend uses email + the code they receive to call verify_reset)
       return ok({ sent: true });
     }
 
@@ -302,14 +356,7 @@ export async function onRequest(context) {
     // ════════════════════════════════════════════════
     if (action === 'get_balance') {
       if (!data.uid) return err('Missing uid');
-      const rows = await sbGet(
-        'balance_transactions?uid=eq.' + encodeURIComponent(data.uid) +
-        '&select=amount&order=created_at.asc'
-      );
-      const balance = Array.isArray(rows)
-        ? rows.reduce((s, r) => s + (parseFloat(r.amount) || 0), 0)
-        : 0;
-      return ok({ balance: Math.max(0, parseFloat(balance.toFixed(2))) });
+      return ok({ balance: await _getBalance(data.uid) });
     }
 
     // ════════════════════════════════════════════════
@@ -317,7 +364,7 @@ export async function onRequest(context) {
     // ════════════════════════════════════════════════
     if (action === 'balance_tx') {
       if (!data.uid || data.amount === undefined) return err('Missing fields');
-      const row = await sbPost('balance_transactions', {
+      await sbPost('balance_transactions', {
         uid:         data.uid,
         email:       data.email || '',
         username:    data.username || '',
@@ -327,15 +374,8 @@ export async function onRequest(context) {
         pool_id:     data.poolId || null,
         pool_name:   data.poolName || null,
         created_at:  new Date().toISOString()
-      });
-      // Return new running balance
-      const allRows = await sbGet(
-        'balance_transactions?uid=eq.' + encodeURIComponent(data.uid) + '&select=amount'
-      );
-      const balance = Array.isArray(allRows)
-        ? allRows.reduce((s, r) => s + (parseFloat(r.amount) || 0), 0)
-        : 0;
-      return ok({ balance: Math.max(0, parseFloat(balance.toFixed(2))) });
+      }, 'return=minimal');
+      return ok({ balance: await _getBalance(data.uid) });
     }
 
     // ════════════════════════════════════════════════
@@ -355,25 +395,21 @@ export async function onRequest(context) {
 
     // ════════════════════════════════════════════════
     // DRAFT — save picks
+    // Requires unique constraint: ALTER TABLE drafts ADD CONSTRAINT
+    //   drafts_uid_league_week_unique UNIQUE (uid, league_id, week);
     // ════════════════════════════════════════════════
     if (action === 'save_draft') {
       if (!data.uid || !data.leagueId || !data.picks) return err('Missing fields');
-      // Upsert: delete existing then insert (Supabase upsert on composite key)
-      await sbDelete(
-        'drafts?uid=eq.' + encodeURIComponent(data.uid) +
-        '&league_id=eq.' + encodeURIComponent(data.leagueId) +
-        '&week=eq.' + encodeURIComponent(data.week)
-      );
       await sbPost('drafts', {
-        uid:         data.uid,
-        email:       data.email || '',
-        username:    data.username || '',
-        league_id:   data.leagueId,
-        league_name: data.leagueName || '',
-        week:        data.week || 0,
-        picks:       data.picks,
+        uid:          data.uid,
+        email:        data.email || '',
+        username:     data.username || '',
+        league_id:    data.leagueId,
+        league_name:  data.leagueName || '',
+        week:         data.week || 0,
+        picks:        data.picks,
         submitted_at: new Date().toISOString()
-      });
+      }, 'resolution=merge-duplicates');
       return ok({});
     }
 
@@ -459,13 +495,15 @@ export async function onRequest(context) {
     if (action === 'get_enrollment_counts') {
       const leagueIds = data.leagueIds || [];
       if (!leagueIds.length) return ok({ counts: {} });
+      // Single query via in() filter instead of N sequential queries
+      const ids = leagueIds.slice(0, 20).map(id => encodeURIComponent(id)).join(',');
+      const rows = await sbGet('enrollments?league_id=in.(' + ids + ')&select=league_id,uid');
       const counts = {};
-      // Batch: fetch all enrollments for given league_ids
-      for (const id of leagueIds.slice(0, 20)) {
-        const rows = await sbGet(
-          'enrollments?league_id=eq.' + encodeURIComponent(id) + '&select=uid'
-        );
-        counts[id] = Array.isArray(rows) ? rows.length : 0;
+      for (const id of leagueIds.slice(0, 20)) counts[id] = 0;
+      if (Array.isArray(rows)) {
+        for (const r of rows) {
+          if (counts[r.league_id] !== undefined) counts[r.league_id]++;
+        }
       }
       return ok({ counts });
     }
@@ -534,7 +572,6 @@ export async function onRequest(context) {
       if (!data.uid || !data.amount || !data.poolId || !data.poolName) return err('Missing fields');
       const amount = parseFloat(data.amount);
       if (amount <= 0) return err('Amount must be positive');
-      // Write winnings transaction
       await sbPost('balance_transactions', {
         uid:         data.uid,
         email:       data.email || '',
@@ -545,13 +582,8 @@ export async function onRequest(context) {
         pool_id:     data.poolId,
         pool_name:   data.poolName,
         created_at:  new Date().toISOString()
-      });
-      // Return new balance
-      const allRows = await sbGet('balance_transactions?uid=eq.' + encodeURIComponent(data.uid) + '&select=amount');
-      const balance = Array.isArray(allRows)
-        ? allRows.reduce((s, r) => s + (parseFloat(r.amount) || 0), 0)
-        : amount;
-      return ok({ balance: Math.max(0, parseFloat(balance.toFixed(2))) });
+      }, 'return=minimal');
+      return ok({ balance: await _getBalance(data.uid) });
     }
 
     // ════════════════════════════════════════════════
@@ -593,13 +625,17 @@ export async function onRequest(context) {
     // PLATFORM STATS — aggregate totals for hero section
     // ════════════════════════════════════════════════
     if (action === 'get_platform_stats') {
-      // Count total distinct users ever enrolled
+      if (_statsCache && Date.now() - _statsCacheAt < STATS_TTL_MS) {
+        return ok(_statsCache);
+      }
       const allEnrollments = await sbGet('enrollments?select=uid,league_id,fee');
       const enrollArr = Array.isArray(allEnrollments) ? allEnrollments : [];
       const uniqueUsers = new Set(enrollArr.map(e => e.uid)).size;
       const uniquePools = new Set(enrollArr.map(e => e.league_id)).size;
       const totalVolume = enrollArr.reduce((s, e) => s + (parseFloat(e.fee) || 0), 0);
-      return ok({ users: uniqueUsers, pools: uniquePools, volume: Math.round(totalVolume) });
+      _statsCache = { users: uniqueUsers, pools: uniquePools, volume: Math.round(totalVolume) };
+      _statsCacheAt = Date.now();
+      return ok(_statsCache);
     }
 
     // ════════════════════════════════════════════════
