@@ -2669,6 +2669,94 @@ body.dark select.fi option { background: var(--surface2) !important; color: var(
 /* ── PRICE FLASH (keep for data value) ── */
 @keyframes flashPos { 0%{background:rgba(0,168,118,.14)} 100%{background:transparent} }
 @keyframes flashNeg { 0%{background:rgba(220,38,38,.1)} 100%{background:transparent} }
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS — mobile-first additions
+   Breakpoints: 768px (tablet), 480px (mobile)
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  /* Navigation */
+  nav { padding: 0 16px; }
+  .nav-r { gap: 6px; }
+  .nav-r > button.btn-ghost { display: none; } /* hide ghost nav links */
+  #nav-player-search-wrap { display: none; }   /* hide player search */
+
+  /* Hero */
+  .hero { flex-direction: column; padding: 40px 20px 32px; gap: 32px; }
+  .hero h1 { font-size: clamp(36px, 8vw, 56px); }
+  .widget { max-width: 100%; width: 100%; }
+  .hero-stats { gap: 16px; }
+  .hst-n { font-size: 22px; }
+
+  /* Dashboard app layout */
+  .app { flex-direction: column; }
+  .sb { width: 100%; max-height: none; border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .sb-prof { padding: 12px 16px 8px; }
+  .sb-sec { padding: 0 12px; }
+
+  /* Prices grid: 2 columns on tablet */
+  .pg { grid-template-columns: repeat(2, 1fr); }
+
+  /* Pool cards: single column */
+  .lg { grid-template-columns: 1fr; }
+
+  /* Public pools: adjust padding */
+  .pub-main { padding: 20px 16px; }
+  .pub-body { padding: 16px; }
+
+  /* How It Works steps: stack vertically */
+  .steps { flex-direction: column; gap: 20px; }
+  .step { border-left: 3px solid var(--accent); padding-left: 16px; }
+
+  /* Sections */
+  .section { padding: 48px 20px; }
+  .cta-sec { flex-direction: column; padding: 48px 20px; gap: 32px; }
+  .form-card { width: 100%; }
+
+  /* Modals: full width on tablet */
+  .modal { width: 94vw !important; max-width: 94vw !important; }
+
+  /* Market breadth bar */
+  #market-breadth-bar { padding: 4px 16px; }
+}
+
+@media (max-width: 480px) {
+  /* Navigation: minimal on mobile */
+  nav { padding: 0 12px; height: 52px; }
+  .logo { font-size: 14px; gap: 6px; }
+  #nav-auth-btns { gap: 4px; }
+  #nav-auth-btns button { padding: 5px 10px; font-size: 11px; }
+  #nav-btn-dashboard, #nav-btn-public, #nav-btn-draft,
+  #nav-btn-resources, #nav-btn-rules { display: none; }
+  #mob-menu-btn { display: flex !important; }
+  #nav-auth-btns { display: none !important; }  /* drawer has auth buttons */
+
+  /* Hero: tighter */
+  .hero { padding: 28px 16px 24px; }
+  .hero h1 { font-size: clamp(28px, 9vw, 40px); line-height: 1.1; }
+  .hero-sub { font-size: 13px; }
+  .hero-cta { flex-direction: column; gap: 8px; }
+  .hero-cta .btn-lg { width: 100%; text-align: center; }
+  .hero-stats { grid-template-columns: repeat(2, 1fr); display: grid; gap: 10px; }
+  .hst { padding: 10px; }
+
+  /* Prices: single column on small mobile */
+  .pg { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .pc { padding: 10px; }
+
+  /* Balance sidebar section: compact */
+  #sb-wins { font-size: 20px; }
+
+  /* Draft page */
+  .draft-cols { flex-direction: column; }
+
+  /* Deposit modal: full-screen feel */
+  .ov > div { width: 100vw !important; max-width: 100vw !important; border-radius: 16px 16px 0 0; position: fixed; bottom: 0; left: 0; right: 0; }
+
+  /* Leaderboard */
+  #lb-podium { gap: 6px; }
+}
 </style>
 </head>
 <body>
@@ -2708,8 +2796,30 @@ body.dark select.fi option { background: var(--surface2) !important; color: var(
       <div id="nav-av" style="width:22px;height:22px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Figtree,sans-serif;font-weight:700;font-size:13px;color:#fff">?</div>
       <span id="nav-name" style="font-size:12px;font-weight:600;color:var(--ink)">Account</span>
     </div>
+    <!-- Hamburger — mobile only -->
+    <button id="mob-menu-btn" onclick="toggleMobileMenu()" aria-label="Open navigation menu" style="display:none;background:none;border:1px solid var(--border);border-radius:6px;padding:6px 8px;cursor:pointer;flex-direction:column;gap:4px;align-items:center;justify-content:center">
+      <span style="display:block;width:16px;height:1.5px;background:var(--ink);border-radius:2px"></span>
+      <span style="display:block;width:16px;height:1.5px;background:var(--ink);border-radius:2px"></span>
+      <span style="display:block;width:16px;height:1.5px;background:var(--ink);border-radius:2px"></span>
+    </button>
   </div>
 </nav>
+
+<!-- Mobile nav drawer -->
+<div id="mob-nav-drawer" style="display:none;position:fixed;top:52px;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--border);z-index:149;padding:12px 16px;box-shadow:0 8px 24px rgba(0,0,0,.1)">
+  <div style="display:flex;flex-direction:column;gap:2px">
+    <button class="btn btn-ghost" style="text-align:left;justify-content:flex-start;padding:10px 12px;font-size:14px" onclick="go('dashboard');toggleMobileMenu()">Dashboard</button>
+    <button class="btn btn-ghost" style="text-align:left;justify-content:flex-start;padding:10px 12px;font-size:14px" onclick="go('public');toggleMobileMenu()">Public Pools</button>
+    <button class="btn btn-ghost" style="text-align:left;justify-content:flex-start;padding:10px 12px;font-size:14px" onclick="go('draft');toggleMobileMenu()">Draft</button>
+    <button class="btn btn-ghost" style="text-align:left;justify-content:flex-start;padding:10px 12px;font-size:14px" onclick="go('resources');toggleMobileMenu()">Resources</button>
+    <button class="btn btn-ghost" style="text-align:left;justify-content:flex-start;padding:10px 12px;font-size:14px" onclick="om('how');toggleMobileMenu()">Rules</button>
+    <div style="border-top:1px solid var(--border);margin:8px 0;padding-top:8px;display:flex;gap:8px">
+      <button class="btn btn-outline" style="flex:1;font-size:13px" onclick="openLogin();toggleMobileMenu()">Log In</button>
+      <button class="btn btn-primary" style="flex:1;font-size:13px" onclick="openSignup();toggleMobileMenu()">Sign Up</button>
+    </div>
+  </div>
+</div>
+
 <div id="market-breadth-bar" style="background:#111;border-bottom:1px solid rgba(255,255,255,.05);padding:4px 32px;display:flex;gap:24px;align-items:center;overflow:hidden"><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.2);flex-shrink:0">LIVE</span><div id="breadth-tickers" style="display:flex;gap:20px;flex:1;overflow:hidden"></div><span id="breadth-time" style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:rgba(255,255,255,.2);flex-shrink:0"></span></div>
 
 
@@ -2724,10 +2834,10 @@ body.dark select.fi option { background: var(--surface2) !important; color: var(
         <button class="btn btn-outline btn-lg" onclick="om('join')">Join with a Code</button>
       </div>
       <div class="hero-stats">
-        <div class="hst"><div class="hst-n" id="stat-funds">9</div><div class="hst-l">Game modes</div></div>
-        <div class="hst"><div class="hst-n">$5</div><div class="hst-l">Min. entry</div></div>
+        <div class="hst"><div class="hst-n" id="stat-active-pools" style="animation:pulse 1.5s ease-in-out infinite">·</div><div class="hst-l">Active pools</div></div>
+        <div class="hst"><div class="hst-n" id="stat-total-players" style="animation:pulse 1.5s ease-in-out infinite">·</div><div class="hst-l">Total players</div></div>
+        <div class="hst"><div class="hst-n" id="stat-total-volume" style="animation:pulse 1.5s ease-in-out infinite">·</div><div class="hst-l">Volume played</div></div>
         <div class="hst"><div class="hst-n">5%</div><div class="hst-l">Only fee ever</div></div>
-        <div class="hst"><div class="hst-n">Fri</div><div class="hst-l">Results drop</div></div>
       </div>
     </div>
     <div class="widget">
@@ -2860,23 +2970,6 @@ body.dark select.fi option { background: var(--surface2) !important; color: var(
         </div>
       </div>
 
-      <!-- PRICES -->
-      <div class="pp">
-        <div class="pp-h">
-          <div><span class="pp-t">Market Prices</span><span class="pp-st" id="priceStatus">Loading…</span></div>
-          <button class="btn btn-outline btn-sm" onclick="fetchPrices()">↻ Refresh</button>
-        </div>
-        <div class="pg" id="pricesGrid">
-          <div class="pc shim"><div class="pc-s">—</div><div class="pc-p">Loading</div><div class="pc-c">—</div></div>
-          <div class="pc shim"><div class="pc-s">—</div><div class="pc-p">Loading</div><div class="pc-c">—</div></div>
-          <div class="pc shim"><div class="pc-s">—</div><div class="pc-p">Loading</div><div class="pc-c">—</div></div>
-          <div class="pc shim"><div class="pc-s">—</div><div class="pc-p">Loading</div><div class="pc-c">—</div></div>
-        </div>
-        <div style="margin-top:8px;padding:6px 2px;font-size:9px;color:var(--muted);line-height:1.5;border-top:1px solid var(--border)">
-          Quotes are not sourced from all markets and may be delayed up to 20 minutes. Information is provided 'as is' and solely for informational purposes, not for trading purposes or advice.
-        </div>
-      </div>
-
       <div id="dash-main">
         <!-- Stats row -->
         <div class="mets" id="dash-metrics">
@@ -2924,6 +3017,23 @@ body.dark select.fi option { background: var(--surface2) !important; color: var(
           </div>
         </div>
 
+      </div>
+
+      <!-- PRICES — secondary context, shown after pools -->
+      <div class="pp">
+        <div class="pp-h">
+          <div><span class="pp-t">Market Prices</span><span class="pp-st" id="priceStatus">Loading…</span></div>
+          <button class="btn btn-outline btn-sm" onclick="fetchPrices()">↻ Refresh</button>
+        </div>
+        <div class="pg" id="pricesGrid">
+          <div class="pc shim"><div class="pc-s">—</div><div class="pc-p">Loading</div><div class="pc-c">—</div></div>
+          <div class="pc shim"><div class="pc-s">—</div><div class="pc-p">Loading</div><div class="pc-c">—</div></div>
+          <div class="pc shim"><div class="pc-s">—</div><div class="pc-p">Loading</div><div class="pc-c">—</div></div>
+          <div class="pc shim"><div class="pc-s">—</div><div class="pc-p">Loading</div><div class="pc-c">—</div></div>
+        </div>
+        <div style="margin-top:8px;padding:6px 2px;font-size:9px;color:var(--muted);line-height:1.5;border-top:1px solid var(--border)">
+          Quotes are not sourced from all markets and may be delayed up to 20 minutes. Information is provided 'as is' and solely for informational purposes, not for trading purposes or advice.
+        </div>
       </div>
 
       <div id="dash-picks" style="display:none">
@@ -3926,7 +4036,7 @@ body.dark select.fi option { background: var(--surface2) !important; color: var(
 
 <!-- SIGN IN MODAL -->
 <!-- ══ LOGIN MODAL ══ -->
-<div class="ov" id="ov-login">
+<div class="ov" id="ov-login" role="dialog" aria-modal="true" aria-label="Log in to Openbell">
   <div class="modal" style="width:420px;padding:0;overflow:hidden">
     <div style="padding:28px 28px 20px;border-bottom:1px solid var(--border)">
       <div style="display:flex;justify-content:space-between;align-items:center">
@@ -3966,12 +4076,13 @@ body.dark select.fi option { background: var(--surface2) !important; color: var(
     </div>
     <div style="padding:0 28px 22px;text-align:center;font-size:12px;color:var(--muted)">
       No account? <span style="color:var(--accent,#00c087);font-weight:600;cursor:pointer" onclick="cm('login');openSignup()">Sign up for free</span>
+      &nbsp;·&nbsp;<span style="color:var(--muted);cursor:pointer;text-decoration:underline" onclick="openForgotPassword()">Forgot password?</span>
     </div>
   </div>
 </div>
 
 <!-- ══ SIGNUP MODAL ══ -->
-<div class="ov" id="ov-signup">
+<div class="ov" id="ov-signup" role="dialog" aria-modal="true" aria-label="Create your Openbell account">
   <div class="modal" style="width:460px;padding:0;overflow:hidden;border-radius:14px;max-height:92vh;display:flex;flex-direction:column">
     <div style="height:4px;background:var(--accent);flex-shrink:0"></div>
     <!-- Header -->
@@ -4420,7 +4531,7 @@ body.dark select.fi option { background: var(--surface2) !important; color: var(
 
 <!-- SIGN IN MODAL -->
 <!-- ══ LOGIN MODAL ══ -->
-<div class="ov" id="ov-login">
+<div class="ov" id="ov-login" role="dialog" aria-modal="true" aria-label="Log in to Openbell">
   <div class="modal" style="width:420px;padding:0;overflow:hidden">
     <div style="padding:28px 28px 20px;border-bottom:1px solid var(--border)">
       <div style="display:flex;justify-content:space-between;align-items:center">
@@ -4460,12 +4571,13 @@ body.dark select.fi option { background: var(--surface2) !important; color: var(
     </div>
     <div style="padding:0 28px 22px;text-align:center;font-size:12px;color:var(--muted)">
       No account? <span style="color:var(--accent,#00c087);font-weight:600;cursor:pointer" onclick="cm('login');openSignup()">Sign up for free</span>
+      &nbsp;·&nbsp;<span style="color:var(--muted);cursor:pointer;text-decoration:underline" onclick="openForgotPassword()">Forgot password?</span>
     </div>
   </div>
 </div>
 
 <!-- ══ SIGNUP MODAL ══ -->
-<div class="ov" id="ov-signup">
+<div class="ov" id="ov-signup" role="dialog" aria-modal="true" aria-label="Create your Openbell account">
   <div class="modal" style="width:460px;padding:0;overflow:hidden">
     <div style="padding:28px 28px 20px;border-bottom:1px solid var(--border)">
       <div style="display:flex;justify-content:space-between;align-items:center">
@@ -6188,15 +6300,27 @@ async function submitDraft() {
   const existing = parseInt(localStorage.getItem(_dck)||'0');
   localStorage.setItem(_dck, existing+1);
 
-  // Log to Sheets + Formspree
-  await logEvent('Drafts', {
-    session_user: sessionStorage.getItem('sd_username')||'Anonymous',
-    player: myData.name||'Anonymous',
-    email: myData.email||'—',
-    slate: activeDraftLeagueId||'free', user_id: getUserId(),
-    week: getWN(),
-    picks: userPicks.join(', ')
-  });
+  // ── Persist picks to Supabase (authoritative cross-device storage) ──
+  const _sbUid   = getUserId();
+  const _sbEmail = myData.email || sessionStorage.getItem('sd_useremail') || '';
+  const _sbUser  = myData.name  || sessionStorage.getItem('sd_username')  || '';
+  if (_sbUid && activeDraftLeagueId) {
+    _dbPost('save_draft', {
+      uid: _sbUid, email: _sbEmail, username: _sbUser,
+      leagueId:   activeDraftLeagueId.split('__')[0],
+      leagueName: (getLeagues().find(l=>l.id===activeDraftLeagueId.split('__')[0])||getPublicLeagues().find(l=>l.id===activeDraftLeagueId.split('__')[0])||{}).name || activeDraftLeagueId,
+      week:       _fundWeek,
+      picks:      [...userPicks]
+    }).catch(function(){});
+    // Also save enrollment if not already recorded
+    _dbPost('save_enrollment', {
+      uid: _sbUid, email: _sbEmail, username: _sbUser,
+      leagueId:   activeDraftLeagueId.split('__')[0],
+      leagueName: (getLeagues().find(l=>l.id===activeDraftLeagueId.split('__')[0])||getPublicLeagues().find(l=>l.id===activeDraftLeagueId.split('__')[0])||{}).name || activeDraftLeagueId,
+      fee:        (_activeLeague && _activeLeague.fee) || 0,
+      week:       _fundWeek
+    }).catch(function(){});
+  }
 
   // Resolve league name BEFORE using it
   const _lName = activeDraftLeagueId ? (getLeagues().find(l=>l.id===activeDraftLeagueId)||getPublicLeagues().find(l=>l.id===activeDraftLeagueId)||{name:activeDraftLeagueId}).name : 'Free Draft';
@@ -6340,9 +6464,8 @@ async function joinLeague() {
   }
   cm('join');
   showPaymentModal(league, async () => {
-    // Deduct entry fee from balance
-    var _bal = parseFloat(localStorage.getItem(_uidKey('sd_balance'))||'0');
-    localStorage.setItem(_uidKey('sd_balance'), Math.max(0, _bal - league.fee).toFixed(2));
+    // Deduct entry fee from balance — Supabase-authoritative
+    _recordBalanceTx(-league.fee, 'pool_entry', 'Entry fee: ' + league.name, league.id, league.name);
     leagues[idx].participants.push({name:jname, email:jemail, uid:getUserId(), joined:new Date().toISOString()});
     saveLeagues(leagues);
     saveMyData({name:jname, email:jemail});
@@ -6350,7 +6473,11 @@ async function joinLeague() {
     sessionStorage.setItem('sd_useremail', jemail);
     updateNavUser();
     trackDraftSubmit && trackDraftSubmit(league ? league.name : 'unknown', league ? league.week : 0);
-    await logEvent('Pool_Joins', {session_user:jname, player:jname, email:jemail, pool_name:league.name, access_code:league.code, entry_fee:league.fee});
+    // Save enrollment to Supabase
+    _dbPost('save_enrollment', {
+      uid: getUserId(), email: jemail, username: jname,
+      leagueId: league.id, leagueName: league.name, fee: league.fee, week: league.week
+    }).catch(function(){});
     renderDashboard();
     toast(`✓ Paid & joined "${league.name}"! Now pick your 5 stocks.`);
     ['j-name','j-email','j-code'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -6646,16 +6773,79 @@ function openLeague(id, week) {
     activeDraftLeagueId = id;
   }
   if (typeof lbSortField !== 'undefined') { lbSortField = 'ret'; lbSortDir = -1; }
-  go('leaderboard'); // _goCore renders immediately with the new id
-  // Side effects after paint
-  setTimeout(() => {
-    try { loadChat(); } catch(e) {}
+  go('leaderboard'); // _goCore renders immediately with local data
+  // Side effects after paint — load real data from Supabase in background
+  setTimeout(function() {
+    try { loadChat(); startChatPolling(); } catch(e) {}
     try {
       const allL = [...getLeagues(), ...getPublicLeagues()];
       const league = allL.find(l => l.id === id);
       if (league) updateLbSidebarPerf(league);
     } catch(e) {}
+    // Enrich leaderboard with Supabase data (real cross-user picks)
+    _enrichLeaderboardFromSupabase(id, week || (_lgForLB && _lgForLB.week)).catch(function(){});
   }, 50);
+}
+
+// Pull real picks + participants for a pool from Supabase and merge into local store
+async function _enrichLeaderboardFromSupabase(leagueId, week) {
+  if (!leagueId) return;
+  // Show "Updating…" badge while enriching
+  var _lbHeader = document.querySelector('#leaderboard-view .ph, #lb-header, .lb-header');
+  var _lbBadge = document.createElement('span');
+  _lbBadge.id = 'lb-sync-badge';
+  _lbBadge.style.cssText = 'display:inline-block;font-size:9px;font-family:IBM Plex Mono,monospace;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin-left:8px;vertical-align:middle';
+  _lbBadge.textContent = 'Updating…';
+  var _existingBadge = document.getElementById('lb-sync-badge');
+  if (_existingBadge) _existingBadge.remove();
+  if (_lbHeader) _lbHeader.appendChild(_lbBadge);
+  try {
+    var res = await _dbPost('get_pool_leaderboard', { leagueId, week });
+    if (!res || !res.success || !res.players || !res.players.length) return;
+
+    // Merge into the local league object
+    var allL = getLeagues();
+    var idx  = allL.findIndex(function(l) {
+      return l.id === leagueId && (!week || String(l.week) === String(week));
+    });
+    if (idx < 0) return; // League not found locally — nothing to enrich
+
+    var league = allL[idx];
+    if (!league.picks)        league.picks        = {};
+    if (!league.participants) league.participants  = [];
+
+    var changed = false;
+    res.players.forEach(function(p) {
+      // Merge participant
+      var exists = league.participants.find(function(lp) {
+        return lp.uid === p.uid || lp.email === p.email;
+      });
+      if (!exists) {
+        league.participants.push({ name: p.username, uid: p.uid, email: p.email, joined: p.submitted_at || new Date().toISOString() });
+        changed = true;
+      }
+      // Merge picks
+      if (p.picks && p.picks.length) {
+        if (!league.picks[p.uid] || !league.picks[p.uid].length) {
+          league.picks[p.uid]       = p.picks;
+          league.picks[p.username]  = p.picks; // name-keyed fallback
+          changed = true;
+        }
+      }
+    });
+
+    if (changed) {
+      allL[idx] = league;
+      saveLeagues(allL);
+      // Re-render leaderboard with enriched data
+      renderLeaderboard(activeDraftLeagueId);
+    }
+  } catch (e) { console.warn('[Openbell] _enrichLeaderboardFromSupabase error:', e.message); }
+  finally {
+    // Always remove the updating badge
+    var badge = document.getElementById('lb-sync-badge');
+    if (badge) badge.remove();
+  }
 }
 
 // ══════════════════════════════════════════════════
@@ -6938,6 +7128,8 @@ function _goCore(view) {
 }
 function go(view) {
   try { trackPageView && trackPageView(view); } catch(e) {}
+  // Stop chat polling when leaving leaderboard
+  if (view !== 'leaderboard') { try { stopChatPolling(); } catch(e) {} }
   // Set highlight BEFORE _goCore so it's never overwritten by async calls inside _goCore
   document.querySelectorAll('.nav-r .btn-ghost').forEach(b => { b.style.color=''; b.style.fontWeight=''; b.style.background=''; });
   const navBtnId = document.getElementById('nav-btn-' + view);
@@ -7034,7 +7226,31 @@ function _setSession(data) {
   sessionStorage.setItem('sd_useremail', data.email);
   sessionStorage.setItem('sd_uid',       data.uid);
   localStorage.setItem('sd_uid',         data.uid);
+  // Persist session for 30 days so users stay logged in across tabs/browser restarts
+  var session = {
+    displayName, email: data.email, uid: data.uid,
+    firstName: data.firstName || '', lastName: data.lastName || '',
+    phone: data.phone || '', state: data.state || '',
+    age: data.age || 0, isRestricted: data.isRestricted || false,
+    expires: Date.now() + 30 * 24 * 60 * 60 * 1000
+  };
+  localStorage.setItem('sd_session', JSON.stringify(session));
 }
+
+// ── Restore session on page load (survives tab close, browser restart) ──
+(function _restoreSession() {
+  try {
+    if (sessionStorage.getItem('sd_username')) return; // already active
+    var raw = localStorage.getItem('sd_session');
+    if (!raw) return;
+    var s = JSON.parse(raw);
+    if (!s || Date.now() > s.expires) { localStorage.removeItem('sd_session'); return; }
+    sessionStorage.setItem('sd_username',  s.displayName);
+    sessionStorage.setItem('sd_useremail', s.email);
+    sessionStorage.setItem('sd_uid',       s.uid);
+    console.log('[Openbell] Session restored for', s.displayName);
+  } catch (e) {}
+})();
 
 const RESTRICTED_STATES = new Set(['Arizona','Iowa','Louisiana','Montana','Washington']);
 
@@ -7054,6 +7270,17 @@ function _calcAge(dob) {
 
 
 
+const DB = 'https://opbell-db.carsonhughes101010.workers.dev';
+
+async function _dbPost(action, data) {
+  const r = await fetch(DB, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ action, data: data || {} })
+  });
+  return r.json();
+}
+
 async function doLogin() {
   var email    = (document.getElementById('li-email')?.value||'').trim().toLowerCase();
   var password = (document.getElementById('li-password')?.value||'').trim();
@@ -7065,31 +7292,33 @@ async function doLogin() {
   if(!password){ showErr('Please enter your password'); return; }
   if(btn){ btn.disabled=true; btn.textContent='Signing in…'; }
 
-  // Check local cache first for offline support
-  var allUsers = JSON.parse(localStorage.getItem('sd_all_users')||'[]');
-  var localUser = allUsers.find(function(u){ return u.email && u.email.toLowerCase()===email; });
-
-  // Always try Supabase
+  // Always try Supabase first
   try {
-    var res = await fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'login', data:{ email:email } })
-    }).then(function(r){ return r.json(); });
-
+    var res = await _dbPost('login', { email });
     if(res && res.success && res.user) {
       var u = res.user;
+      // Verify password — support v2 (SHA-256) and v1 (legacy polynomial) for migration
+      var hashV2 = await _hashPassword(password);
+      var hashV1 = _hashPasswordLegacy(password);
+      var storedHash = u.password_hash || '';
+      var hashVersion = u.hash_version || 1;
+      var hashOk = storedHash === 'google-oauth' ||
+                   storedHash === hashV2 ||
+                   (hashVersion === 1 && storedHash === hashV1);
+      if(!hashOk) {
+        showErr('Incorrect password');
+        if(btn){ btn.disabled=false; btn.textContent='Log In →'; }
+        return;
+      }
+      // If user had v1 hash, silently upgrade to v2
+      if(hashVersion === 1 && storedHash === hashV1) {
+        _dbPost('change_password', { uid: u.uid, passwordHash: hashV2, hashVersion: 2 }).catch(()=>{});
+      }
       var userData = {
         uid: u.uid, firstName: u.first_name||'', lastName: u.last_name||'',
         email: u.email, phone: u.phone||'', dob: u.dob||'',
         state: u.state||'', age: u.age||0, isRestricted: u.is_restricted||false
       };
-      // Verify password hash
-      var hash = _hashPassword(password);
-      if(u.password_hash && u.password_hash !== 'google-oauth' && u.password_hash !== hash) {
-        showErr('Incorrect password');
-        if(btn){ btn.disabled=false; btn.textContent='Log In →'; }
-        return;
-      }
       _setSession(userData);
       if(btn){ btn.disabled=false; btn.textContent='Log In →'; }
       cm('login');
@@ -7097,19 +7326,25 @@ async function doLogin() {
       renderDashboard();
       go('dashboard');
       toast('Welcome back, ' + (u.first_name||'') + '!');
-      // Log sign-in
-      fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ action:'sign_in_log', data:{ uid:u.uid, email:email } })
-      }).catch(function(){});
+      // Background: log sign-in, sync balance + drafts
+      _dbPost('sign_in_log', { uid: u.uid, email }).catch(()=>{});
+      _syncUserDataFromSupabase(u.uid);
       return;
     }
-  } catch(e) { console.warn('[Openbell] Login fetch error:', e); }
+    if(res && res.error) {
+      console.warn('[Openbell] Login error from server:', res.error);
+    }
+  } catch(e) { console.warn('[Openbell] Login fetch error:', e.message); }
 
-  // Fallback to local
+  // Offline fallback — check local cache
+  var allUsers = JSON.parse(localStorage.getItem('sd_all_users')||'[]');
+  var localUser = allUsers.find(function(u){ return u.email && u.email.toLowerCase()===email; });
   if(localUser) {
-    var hash = _hashPassword(password);
-    if(localUser.passwordHash && localUser.passwordHash !== hash) {
+    var hashV2 = await _hashPassword(password);
+    var hashV1 = _hashPasswordLegacy(password);
+    var storedHash = localUser.passwordHash || '';
+    var hashOk = !storedHash || storedHash === hashV2 || storedHash === hashV1;
+    if(!hashOk) {
       showErr('Incorrect password');
       if(btn){ btn.disabled=false; btn.textContent='Log In →'; }
       return;
@@ -7120,23 +7355,68 @@ async function doLogin() {
     updateNavUser();
     renderDashboard();
     go('dashboard');
-    toast('Welcome back, ' + (localUser.firstName||'') + '!');
+    toast('Welcome back (offline), ' + (localUser.firstName||'') + '!');
     return;
   }
 
-  showErr('No account found with that email. Sign up instead?');
+  showErr('No account found with that email. Try signing up instead.');
   if(btn){ btn.disabled=false; btn.textContent='Log In →'; }
 }
 
-function _hashPassword(pw) {
+// ── Pull balance, drafts, enrollments from Supabase and sync to localStorage ──
+async function _syncUserDataFromSupabase(uid) {
+  if (!uid) return;
+  try {
+    // Sync balance
+    var balRes = await _dbPost('get_balance', { uid });
+    if(balRes && balRes.success && balRes.balance !== undefined) {
+      localStorage.setItem(_uidKey('sd_balance'), balRes.balance.toFixed(2));
+      updateBalanceDisplay();
+    }
+    // Sync draft history
+    var draftsRes = await _dbPost('get_user_drafts', { uid });
+    if(draftsRes && draftsRes.drafts && draftsRes.drafts.length) {
+      var localDrafts = getDrafts();
+      var changed = false;
+      draftsRes.drafts.forEach(function(d) {
+        var key = d.league_id + '_' + d.week;
+        if(!localDrafts[key] && d.picks && d.picks.length) {
+          localDrafts[key] = d.picks;
+          changed = true;
+        }
+      });
+      if(changed) saveDrafts(localDrafts);
+    }
+    // Sync enrollment list
+    var enrollRes = await _dbPost('get_user_enrollments', { uid });
+    if(enrollRes && enrollRes.enrollments && enrollRes.enrollments.length) {
+      localStorage.setItem(_uidKey('sd_remote_enrollments'), JSON.stringify(enrollRes.enrollments));
+    }
+  } catch(e) { console.warn('[Openbell] _syncUserDataFromSupabase error:', e.message); }
+}
+
+// Legacy hash (v1) — kept for migration: verifying passwords created before the SHA-256 upgrade
+function _hashPasswordLegacy(pw) {
   var h = 0;
   for (var i = 0; i < pw.length; i++) { h = Math.imul(31, h) + pw.charCodeAt(i) | 0; }
   return h.toString(36);
 }
-function doSignup() {
+// Modern hash (v2) — SHA-256 via Web Crypto
+async function _hashPassword(pw) {
+  try {
+    const encoder = new TextEncoder();
+    const data = encoder.encode('ob_v2:' + pw);
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  } catch (e) {
+    // Fallback if Web Crypto unavailable (shouldn't happen in modern browsers)
+    return _hashPasswordLegacy(pw);
+  }
+}
+async function doSignup() {
   const firstName = (document.getElementById('su-first')?.value||'').trim();
   const lastName  = (document.getElementById('su-last')?.value||'').trim();
-  const email     = (document.getElementById('su-email')?.value||'').trim();
+  const email     = (document.getElementById('su-email')?.value||'').trim().toLowerCase();
   const password  = (document.getElementById('su-password')?.value||'').trim();
   const phone     = (document.getElementById('su-phone')?.value||'').trim();
   const dob       = (document.getElementById('su-dob')?.value||'').trim();
@@ -7148,52 +7428,51 @@ function doSignup() {
   const showErr = msg => { if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; } };
   if (errEl) errEl.style.display = 'none';
 
-  if (!firstName)                       { showErr('Please enter your first name'); return; }
-  if (!lastName)                        { showErr('Please enter your last name');  return; }
-  if (!email || !email.includes('@'))   { showErr('Please enter a valid email address'); return; }
+  if (!firstName)                        { showErr('Please enter your first name'); return; }
+  if (!lastName)                         { showErr('Please enter your last name'); return; }
+  if (!email || !email.includes('@'))    { showErr('Please enter a valid email address'); return; }
   if (!password || password.length < 8)  { showErr('Password must be at least 8 characters'); return; }
-  if (!phone)                           { showErr('Please enter your phone number'); return; }
-  if (!dob)                             { showErr('Please enter your date of birth'); return; }
-  if (!state)                           { showErr('Please select your state of residence'); return; }
+  if (!phone)                            { showErr('Please enter your phone number'); return; }
+  if (!dob)                              { showErr('Please enter your date of birth'); return; }
+  if (!state)                            { showErr('Please select your state of residence'); return; }
   const age = _calcAge(dob);
-  if (age < 18)                         { showErr('You must be 18 or older to create an account. Openbell is a real-money skill competition platform.'); return; }
-  if (!terms)                           { showErr('Please agree to the Terms of Service to continue'); return; }
-
-  // Check if email already registered
-  const allUsers = JSON.parse(localStorage.getItem('sd_all_users') || '[]');
-  if (allUsers.find(u => u.email.toLowerCase() === email.toLowerCase())) {
-    showErr('An account with this email already exists. Log in instead.');
-    return;
-  }
+  if (age < 18)  { showErr('You must be 18 or older to create an account.'); return; }
+  if (!terms)    { showErr('Please agree to the Terms of Service to continue'); return; }
 
   if (btn) { btn.disabled = true; btn.textContent = 'Creating account…'; }
 
-  const uid = generateUid(); // always fresh at signup
-  const userAge = _calcAge(dob);
+  const uid = generateUid();
   const isRestricted = RESTRICTED_STATES.has(state);
-  const passwordHash = _hashPassword(password);
-  const userData = { uid, firstName, lastName, email, passwordHash, phone, dob, state, age: userAge, isRestricted, registered: new Date().toISOString() };
+  const passwordHash = await _hashPassword(password); // SHA-256
+  const userData = { uid, firstName, lastName, email, passwordHash, hashVersion: 2, phone, dob, state, age, isRestricted, registered: new Date().toISOString() };
 
-  // Store locally so login works offline
-  allUsers.push(userData);
-  localStorage.setItem('sd_all_users', JSON.stringify(allUsers));
-  // Write to Supabase
-  console.log('[Openbell] Saving to Supabase:', email);
-  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      action: 'signup',
-      data: { uid, email, firstName, lastName, passwordHash, phone, dob, state, age: userAge, isRestricted }
-    })
-  }).then(function(r) {
-    if (!r.ok) { console.warn('[Openbell] /db returned', r.status); return {}; }
-    return r.json();
-  }).then(function(res) {
-    console.log('[Openbell] Supabase result:', JSON.stringify(res));
-  }).catch(function(err) { console.warn('[Openbell] Supabase error (non-blocking):', err.message); });
+  // Write to Supabase first (server-side duplicate check)
+  try {
+    const res = await fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ action: 'signup', data: { uid, email, firstName, lastName, passwordHash, hashVersion: 2, phone, dob, state, age, isRestricted } })
+    }).then(r => r.json());
 
-  // Set session and go to dashboard
+    if (res && res.error) {
+      if (res.error.includes('already registered')) {
+        showErr('An account with this email already exists. Log in instead.');
+        if (btn) { btn.disabled = false; btn.textContent = 'Create Account →'; }
+        return;
+      }
+      console.warn('[Openbell] Signup warning:', res.error);
+    }
+  } catch (e) {
+    console.warn('[Openbell] Supabase signup error (continuing locally):', e.message);
+  }
+
+  // Cache locally for offline login fallback
+  const allUsers = JSON.parse(localStorage.getItem('sd_all_users') || '[]');
+  if (!allUsers.find(u => u.email === email)) {
+    allUsers.push(userData);
+    localStorage.setItem('sd_all_users', JSON.stringify(allUsers));
+  }
+
   _setSession(userData);
   if (btn) { btn.disabled = false; btn.textContent = 'Create Account →'; }
   cm('signup');
@@ -7201,21 +7480,155 @@ function doSignup() {
   renderDashboard();
   go('dashboard');
   toast('Welcome to Openbell, ' + firstName + '!');
+  // Log sign-in
+  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ action: 'sign_in_log', data: { uid, email } })
+  }).catch(() => {});
 }
 
 // Legacy stub so any old openLogin() calls still work
 function signIn()  { openLogin(); }
 
+function toggleMobileMenu() {
+  var drawer = document.getElementById('mob-nav-drawer');
+  if (!drawer) return;
+  var open = drawer.style.display !== 'none';
+  drawer.style.display = open ? 'none' : 'block';
+}
+// Close drawer when navigating or clicking outside
+document.addEventListener('click', function(e) {
+  var drawer = document.getElementById('mob-nav-drawer');
+  var btn = document.getElementById('mob-menu-btn');
+  if (drawer && drawer.style.display !== 'none' && !drawer.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+    drawer.style.display = 'none';
+  }
+});
+
 function doSignOut() {
   try { if (typeof window._googleSignOut === 'function') window._googleSignOut(); } catch(e){}
   sessionStorage.clear();
+  // Clear persistent session
+  localStorage.removeItem('sd_session');
   ['sd_uid','sd_mydata'].forEach(function(k){ localStorage.removeItem(k); });
   userPicks = [];
   activeDraftLeagueId = null;
+  stopChatPolling();
   document.querySelectorAll('.ov').forEach(function(el){ el.style.display='none'; });
   updateNavUser();
   go('landing');
   toast('Signed out successfully');
+}
+
+// ════════════════════════════════════════════════════════════════════
+// FORGOT PASSWORD FLOW
+// ════════════════════════════════════════════════════════════════════
+function openForgotPassword() {
+  cm('login');
+  // Show a simple modal using toast-like overlay (no new DOM needed)
+  var existing = document.getElementById('ov-forgot-pw');
+  if (existing) { existing.style.display = 'flex'; return; }
+  var div = document.createElement('div');
+  div.id = 'ov-forgot-pw';
+  div.className = 'ov';
+  div.style.display = 'flex';
+  div.innerHTML = '<div class="modal" style="width:420px;padding:0;overflow:hidden">' +
+    '<div style="padding:28px 28px 20px;border-bottom:1px solid var(--border)">' +
+      '<div style="font-family:Figtree,sans-serif;font-weight:900;font-size:24px;line-height:1;letter-spacing:-.02em;margin-bottom:6px">Reset Password</div>' +
+      '<div style="font-size:12px;color:var(--muted)">Enter your email and we\'ll send a 6-character reset code.</div>' +
+    '</div>' +
+    '<div style="padding:20px 28px;display:flex;flex-direction:column;gap:12px">' +
+      '<div><div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">Email address</div>' +
+      '<input class="fi" id="fp-email" type="email" placeholder="jake@university.edu" style="width:100%;box-sizing:border-box"></div>' +
+      '<div id="fp-error" style="display:none;background:var(--red-bg);color:var(--red);border-radius:8px;padding:10px 14px;font-size:12px"></div>' +
+      '<div id="fp-success" style="display:none;background:var(--pos-bg);color:var(--pos);border:1px solid var(--pos-bd);border-radius:8px;padding:10px 14px;font-size:12px"></div>' +
+    '</div>' +
+    '<div style="padding:0 28px 20px;display:flex;gap:10px">' +
+      '<button class="btn btn-outline" style="flex:1" onclick="document.getElementById(\'ov-forgot-pw\').style.display=\'none\'">Cancel</button>' +
+      '<button class="btn btn-primary" style="flex:2" id="fp-btn" onclick="doForgotPassword()">Send Reset Code →</button>' +
+    '</div>' +
+  '</div>';
+  document.body.appendChild(div);
+  div.addEventListener('click', function(e) { if (e.target === div) div.style.display = 'none'; });
+  setTimeout(function(){ document.getElementById('fp-email')?.focus(); }, 150);
+}
+
+async function doForgotPassword() {
+  var email  = (document.getElementById('fp-email')?.value||'').trim().toLowerCase();
+  var errEl  = document.getElementById('fp-error');
+  var succEl = document.getElementById('fp-success');
+  var btn    = document.getElementById('fp-btn');
+  if (errEl) errEl.style.display = 'none';
+  if (succEl) succEl.style.display = 'none';
+  if (!email || !email.includes('@')) {
+    if (errEl) { errEl.textContent = 'Please enter a valid email address'; errEl.style.display = 'block'; }
+    return;
+  }
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+  try {
+    await _dbPost('request_reset', { email });
+    // Always transition to code entry — prevents email enumeration
+    _showResetCodeEntry(email);
+  } catch(e) {
+    if (errEl) { errEl.textContent = 'Could not send reset email. Try again later.'; errEl.style.display = 'block'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Send Reset Code →'; }
+  }
+}
+
+function _showResetCodeEntry(email) {
+  var ov = document.getElementById('ov-forgot-pw');
+  if (!ov) return;
+  ov.querySelector('.modal').innerHTML =
+    '<div style="padding:28px 28px 20px;border-bottom:1px solid var(--border)">' +
+      '<div style="font-family:Figtree,sans-serif;font-weight:900;font-size:24px">Set New Password</div>' +
+      '<div style="font-size:12px;color:var(--muted);margin-top:4px">Check your email for a 6-character code, then set your new password.</div>' +
+    '</div>' +
+    '<div style="padding:20px 28px;display:flex;flex-direction:column;gap:12px">' +
+      '<div><div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">6-character code from email</div>' +
+      '<input class="fi" id="fp-code" type="text" maxlength="6" placeholder="A1B2C3" autocomplete="one-time-code" style="width:100%;box-sizing:border-box;font-family:monospace;letter-spacing:4px;text-transform:uppercase;font-size:20px;text-align:center"></div>' +
+      '<div><div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px">New password</div>' +
+      '<input class="fi" id="fp-newpw" type="password" placeholder="At least 8 characters" style="width:100%;box-sizing:border-box"></div>' +
+      '<div id="fp-reset-error" style="display:none;background:var(--red-bg);color:var(--red);border-radius:8px;padding:10px 14px;font-size:12px"></div>' +
+    '</div>' +
+    '<div style="padding:0 28px 20px;display:flex;gap:10px">' +
+      '<button class="btn btn-outline" style="flex:1" onclick="document.getElementById(\'ov-forgot-pw\').style.display=\'none\'">Cancel</button>' +
+      '<button class="btn btn-primary" style="flex:2" id="fp-reset-btn" onclick="doResetPassword(\'' + email.replace(/'/g,"\\'" ) + '\')">Reset Password →</button>' +
+    '</div>';
+  setTimeout(function(){ document.getElementById('fp-code')?.focus(); }, 100);
+}
+
+async function doResetPassword(email) {
+  var code   = (document.getElementById('fp-code')?.value||'').trim().toUpperCase();
+  var newPw  = (document.getElementById('fp-newpw')?.value||'').trim();
+  var errEl  = document.getElementById('fp-reset-error');
+  var btn    = document.getElementById('fp-reset-btn');
+  if (errEl) errEl.style.display = 'none';
+  if (!code || code.length < 6) { if(errEl){errEl.textContent='Enter the 6-character code from your email';errEl.style.display='block';} return; }
+  if (!newPw || newPw.length < 8) { if(errEl){errEl.textContent='Password must be at least 8 characters';errEl.style.display='block';} return; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Verifying…'; }
+  try {
+    // Step 1: verify code, get full token back
+    var verifyRes = await _dbPost('verify_reset', { email, code });
+    if (!verifyRes || !verifyRes.valid || !verifyRes.token) {
+      if(errEl){ errEl.textContent = verifyRes?.error || 'Invalid or expired code'; errEl.style.display = 'block'; }
+      if(btn){ btn.disabled = false; btn.textContent = 'Reset Password →'; }
+      return;
+    }
+    // Step 2: consume token + set new password hash
+    if (btn) btn.textContent = 'Resetting…';
+    var passwordHash = await _hashPassword(newPw);
+    var res = await _dbPost('consume_reset', { email, token: verifyRes.token, passwordHash, hashVersion: 2 });
+    if (res && res.reset) {
+      document.getElementById('ov-forgot-pw').style.display = 'none';
+      toast('Password reset. Log in with your new password.');
+      setTimeout(openLogin, 500);
+    } else {
+      if(errEl){ errEl.textContent = res?.error || 'Reset failed — try again'; errEl.style.display = 'block'; }
+    }
+  } catch(e) {
+    if(errEl){ errEl.textContent = 'Reset failed — try again'; errEl.style.display = 'block'; }
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Reset Password →'; }
 }
 
 function signOut() { doSignOut(); }
@@ -8154,6 +8567,15 @@ function renderPricesGrid() {
 // IMPROVEMENT: ENTER KEY ON SEARCH = DIRECT TICKER LOOKUP
 // ══════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => { if(typeof checkAgeGate==='function') checkAgeGate();
+  // If session was restored from localStorage, update UI and sync data from Supabase
+  if (sessionStorage.getItem('sd_username')) {
+    updateNavUser();
+    renderDashboard();
+    var _restoredUid = localStorage.getItem('sd_uid');
+    if (_restoredUid) {
+      _syncUserDataFromSupabase(_restoredUid).catch(function(){});
+    }
+  }
   // Handle Google Sign-In redirect result
   try {
     firebase.auth().getRedirectResult().then(function(result) {
@@ -8209,6 +8631,56 @@ document.addEventListener('DOMContentLoaded', () => { if(typeof checkAgeGate==='
       }
     });
   }
+
+  // ── Load live platform stats into hero section ──
+  function _setStatEl(el, value) {
+    if (!el) return;
+    el.style.animation = 'none'; // clear loading pulse
+    el.textContent = value;
+  }
+  _dbPost('get_platform_stats', {}).then(function(res) {
+    var fmtVol = (res && res.volume >= 1000) ? '$' + (res.volume/1000).toFixed(1) + 'k' : (res && res.volume > 0 ? '$' + res.volume : null);
+    var ok = res && res.success;
+    _setStatEl(document.getElementById('stat-active-pools'), ok && res.pools > 0 ? res.pools : '—');
+    _setStatEl(document.getElementById('stat-total-players'), ok && res.users > 0 ? res.users : '—');
+    _setStatEl(document.getElementById('stat-total-volume'), ok && fmtVol ? fmtVol : '—');
+    _setStatEl(document.getElementById('pub-stat-active'), ok && res.pools > 0 ? res.pools : '—');
+    _setStatEl(document.getElementById('pub-stat-players'), ok && res.users > 0 ? res.users : '—');
+    _setStatEl(document.getElementById('pub-stat-prize'), ok && fmtVol ? fmtVol : '—');
+  }).catch(function() {
+    // Error state — clear pulse, show dash
+    ['stat-active-pools','stat-total-players','stat-total-volume'].forEach(function(id) {
+      _setStatEl(document.getElementById(id), '—');
+    });
+  });
+
+  // ── Load real winners into ticker ──
+  _dbPost('get_recent_winners', {}).then(function(res) {
+    if (!res || !res.success || !res.winners || !res.winners.length) return;
+    localStorage.setItem('sd_winners_log', JSON.stringify(res.winners));
+    if (typeof renderWinnersTicker === 'function') renderWinnersTicker();
+  }).catch(function(){});
+
+  // ── Hydrate hero leaderboard widget with real pool data ──
+  _dbPost('get_hero_pool', {}).then(function(res) {
+    if (!res || !res.success || !res.pool) return;
+    var pool = res.pool;
+    var wt = document.querySelector('.wt');
+    var ws = document.querySelector('.ws');
+    if (wt) wt.textContent = pool.name + ' — Live';
+    if (ws) ws.textContent = pool.participants + ' participants · $' + pool.total.toFixed(0) + ' pool';
+    var rows = document.querySelectorAll('.wr');
+    var medals = ['g','s','b','',''];
+    pool.players.forEach(function(p, i) {
+      if (!rows[i]) return;
+      var rankEl = rows[i].querySelector('.wrn');
+      var nameEl = rows[i].querySelector('.wun');
+      var picksEl = rows[i].querySelector('.wpk');
+      if (rankEl) { rankEl.className = 'wrn' + (medals[i] ? ' ' + medals[i] : ''); rankEl.textContent = i + 1; }
+      if (nameEl) nameEl.textContent = p.name;
+      if (picksEl) picksEl.textContent = (p.picks && p.picks.length ? p.picks.slice(0,5).join(' · ') : 'No picks yet');
+    });
+  }).catch(function(){});
 });
 
 // ══════════════════════════════════════════════════
@@ -8790,22 +9262,12 @@ function showPaymentModal(league, onConfirm) {
 function confirmBalanceJoin() {
   var btn = document.getElementById('bal-confirm-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Joining…'; }
-  var _prevBal = getBalance();
   var _fee = _pendingLeagueFee || 0;
-  var newBal = Math.max(0, _prevBal - _fee);
-  localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
-  updateBalanceDisplay();
-  var _uid2 = getUserId(); var _eml2 = sessionStorage.getItem('sd_useremail')||'';
-  fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ action:'balance_tx', data:{
-      uid:_uid2, email:_eml2, type:'pool_entry',
-      amount:-parseFloat(_fee.toFixed(2)),
-      balance_before:parseFloat(_prevBal.toFixed(2)),
-      balance_after:parseFloat(newBal.toFixed(2)),
-      note:'Entry fee: '+(_pendingLeagueName||'Pool')
-    }})
-  }).catch(function(){});
+  // Authoritative debit via _recordBalanceTx
+  _recordBalanceTx(-_fee, 'pool_entry',
+    'Entry fee: ' + (_pendingLeagueName || 'Pool'),
+    _joinTargetId || null, _pendingLeagueName || null
+  );
   var overlay = document.getElementById('ov-balance-confirm');
   if (overlay) overlay.remove();
   if (typeof _pendingPaymentAction === 'function') {
@@ -8936,7 +9398,12 @@ function doJoinFundStripe() {
       stored.push(copy);
       saveLeagues(stored);
     }
-    logEvent('Pool_Joins', {player: myName, email: myEmail, pool_name: league.name, entry_fee: league.fee});
+    // Save enrollment to Supabase — cross-device leaderboard support
+    _dbPost('save_enrollment', {
+      uid: myUid, email: myEmail, username: myName,
+      leagueId: league.id, leagueName: league.name,
+      fee: league.fee || 0, week: league.week || getWN()
+    }).catch(function(){});
     renderDashboard();
     toast('✓ Joined ' + league.name + '! Now head to Draft Room.');
     setTimeout(function(){ activeDraftLeagueId = league.id; go('draft'); }, 1200);
@@ -9533,19 +10000,11 @@ function payAndJoin() {
   var prevBal = getBalance();
 
   if (prevBal >= feeAmt && feeAmt > 0) {
-    var newBal = Math.max(0, prevBal - feeAmt);
-    localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
-    updateBalanceDisplay();
-    fetch('https://opbell-db.carsonhughes101010.workers.dev', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'balance_tx', data:{
-        uid: getUserId(), email: myEmail, type:'pool_entry',
-        amount: -parseFloat(feeAmt.toFixed(2)),
-        balance_before: parseFloat(prevBal.toFixed(2)),
-        balance_after: parseFloat(newBal.toFixed(2)),
-        note: 'Entry fee: ' + (_pendingLeagueName || _joinTargetId || 'Pool')
-      }})
-    }).catch(function(){});
+    // Debit entry fee via Supabase — authoritative
+    _recordBalanceTx(-feeAmt, 'pool_entry',
+      'Entry fee: ' + (_pendingLeagueName || _joinTargetId || 'Pool'),
+      _joinTargetId, _pendingLeagueName
+    );
     setTimeout(function(){ _completeJoin(myName, myEmail, null); }, 300);
     return;
   }
@@ -9822,49 +10281,124 @@ function copyInviteLink() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// FUND CHAT
+// FUND CHAT — Supabase-backed, real messages shared across all users
+// Falls back to localStorage if pool_chats table not yet created.
 // ══════════════════════════════════════════════════════════════════
-function getChatKey() {
-  return activeDraftLeagueId ? 'sd_chat_' + activeDraftLeagueId + '_' + getWN() : null;
+var _chatPollInterval = null;
+var _chatLastCount = 0;
+
+function getChatPoolId() {
+  return activeDraftLeagueId ? activeDraftLeagueId + '_w' + getWN() : null;
 }
 
-function loadChat() {
+function _renderChatMessages(msgs) {
   const el = document.getElementById('fund-chat-msgs');
   if (!el) return;
-  const key = getChatKey();
-  if (!key) return;
-  const msgs = JSON.parse(localStorage.getItem(key) || '[]');
-  if (!msgs.length) {
+  if (!msgs || !msgs.length) {
     el.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:11px;margin:auto;padding:20px">Be the first to talk trash 🗑️</div>';
     return;
   }
+  const myUid  = getUserId();
   const myName = sessionStorage.getItem('sd_username') || '';
-  el.innerHTML = msgs.map(m => {
-    const isMe = m.name === myName;
-    return `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'}">
-      <div style="max-width:75%;background:${isMe?'var(--orange)':'var(--paper)'};color:${isMe?'#fff':'var(--ink)'};border-radius:${isMe?'12px 12px 2px 12px':'12px 12px 12px 2px'};padding:7px 11px;font-size:12px">${m.msg}</div>
-      <div style="font-size:9px;color:var(--muted);margin-top:2px">${isMe?'You':m.name} · ${_timeAgo(m.ts)}</div>
-    </div>`;
+  el.innerHTML = msgs.map(function(m) {
+    var isMe = m.uid === myUid || m.username === myName || m.name === myName;
+    var name  = m.username || m.name || 'Player';
+    var text  = m.message || m.msg || '';
+    var ts    = m.created_at ? new Date(m.created_at).getTime() : (m.ts || Date.now());
+    return '<div style="display:flex;flex-direction:column;align-items:' + (isMe?'flex-end':'flex-start') + ';margin-bottom:6px">' +
+      '<div style="max-width:75%;background:' + (isMe?'var(--red)':'var(--surface2)') + ';color:' + (isMe?'#fff':'var(--ink)') + ';border-radius:' + (isMe?'12px 12px 2px 12px':'12px 12px 12px 2px') + ';padding:7px 11px;font-size:12px">' + _escHtml(text) + '</div>' +
+      '<div style="font-size:9px;color:var(--muted);margin-top:2px">' + (isMe?'You':_escHtml(name)) + ' · ' + _timeAgo(ts) + '</div>' +
+    '</div>';
   }).join('');
   el.scrollTop = el.scrollHeight;
 }
 
-function sendChatMsg() {
-  const input = document.getElementById('chat-input');
+function _escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function loadChat() {
+  const poolId = getChatPoolId();
+  if (!poolId) return;
+  // Try Supabase first
+  try {
+    var res = await _dbPost('get_chat', { poolId });
+    if (res && res.success && res.messages) {
+      // Cache locally
+      localStorage.setItem('sd_chat_' + poolId, JSON.stringify(res.messages));
+      _chatLastCount = res.messages.length;
+      _renderChatMessages(res.messages);
+      return;
+    }
+  } catch(e) { /* fall through to localStorage */ }
+  // Fallback: localStorage (offline or table not yet created)
+  var cached = JSON.parse(localStorage.getItem('sd_chat_' + poolId) || '[]');
+  _renderChatMessages(cached);
+}
+
+async function sendChatMsg() {
+  const input  = document.getElementById('chat-input');
   if (!input) return;
-  const msg = input.value.trim();
+  const msg    = input.value.trim();
   if (!msg) return;
   const myName = sessionStorage.getItem('sd_username') || '';
+  const myUid  = getUserId();
   if (!myName) { toast('Sign in to chat'); openLogin(); return; }
-  const key = getChatKey();
-  if (!key) { toast('Select a pool first'); return; }
-  const msgs = JSON.parse(localStorage.getItem(key) || '[]');
-  msgs.push({ name: myName, uid: getUserId(), msg, ts: Date.now() });
-  if (msgs.length > 100) msgs.shift();
-  localStorage.setItem(key, JSON.stringify(msgs));
+  const poolId = getChatPoolId();
+  if (!poolId) { toast('Select a pool first'); return; }
+
+  // Optimistic: add to local cache immediately
+  var cached = JSON.parse(localStorage.getItem('sd_chat_' + poolId) || '[]');
+  var tempMsg = { uid: myUid, username: myName, message: msg, created_at: new Date().toISOString() };
+  cached.push(tempMsg);
+  if (cached.length > 200) cached.shift();
+  localStorage.setItem('sd_chat_' + poolId, JSON.stringify(cached));
   input.value = '';
-  loadChat();
-  logActivity('draft', { msg: `Sent a message in ${activeDraftLeagueId}` });
+  _renderChatMessages(cached);
+
+  // Persist to Supabase — rollback optimistic update on failure
+  try {
+    var res = await _dbPost('send_chat', { poolId, uid: myUid, username: myName, message: msg });
+    if (res && res.success) {
+      loadChat(); // authoritative state from server
+    } else {
+      // Remove the optimistic message and restore input
+      var reverted = JSON.parse(localStorage.getItem('sd_chat_' + poolId) || '[]');
+      reverted = reverted.filter(function(m) { return m !== tempMsg; });
+      localStorage.setItem('sd_chat_' + poolId, JSON.stringify(reverted));
+      _renderChatMessages(reverted);
+      input.value = msg;
+      toast('Message failed to send — try again');
+    }
+  } catch(e) {
+    // Network error — rollback
+    var reverted2 = JSON.parse(localStorage.getItem('sd_chat_' + poolId) || '[]');
+    reverted2 = reverted2.filter(function(m) { return m !== tempMsg; });
+    localStorage.setItem('sd_chat_' + poolId, JSON.stringify(reverted2));
+    _renderChatMessages(reverted2);
+    input.value = msg;
+    toast('Message failed to send — check your connection');
+  }
+}
+
+// Poll for new chat messages every 8 seconds while on leaderboard
+function startChatPolling() {
+  stopChatPolling();
+  _chatPollInterval = setInterval(function() {
+    var poolId = getChatPoolId();
+    if (!poolId) return;
+    _dbPost('get_chat', { poolId }).then(function(res) {
+      if (res && res.success && res.messages && res.messages.length !== _chatLastCount) {
+        _chatLastCount = res.messages.length;
+        localStorage.setItem('sd_chat_' + poolId, JSON.stringify(res.messages));
+        _renderChatMessages(res.messages);
+      }
+    }).catch(function(){});
+  }, 8000);
+}
+
+function stopChatPolling() {
+  if (_chatPollInterval) { clearInterval(_chatPollInterval); _chatPollInterval = null; }
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -10285,16 +10819,16 @@ function renderWinnersTicker() {
   const el = document.getElementById('winners-ticker');
   if (!el) return;
   const log = JSON.parse(localStorage.getItem('sd_winners_log') || '[]');
-  // Seed with example data if empty
-  const items = log.length ? log : [
-    {name:'Alex R.',fund:'High Roller',won:240,ret:'+4.2%'},
-    {name:'Priya K.',fund:'Open Board',won:96,ret:'+3.8%'},
-    {name:'Jordan M.',fund:'Rookie Board',won:38,ret:'+2.9%'},
-    {name:'Sam T.',fund:'Momentum Hunters',won:120,ret:'+5.1%'},
-  ];
-  const html = [...items,...items].map(w =>
-    `<span style="margin:0 28px;font-size:11px;white-space:nowrap">🏆 <strong>${w.name}</strong> won <strong style="color:var(--orange)">$${w.won}</strong> in ${w.fund} (${w.ret})</span>`
-  ).join('');
+  if (!log.length) {
+    el.innerHTML = '<span style="font-size:11px;color:var(--muted);padding:0 20px">Be the first to win a pool &rarr; <a href="#" onclick="go(\'public\');return false;" style="color:var(--accent);text-decoration:none;font-weight:600">Browse public pools</a></span>';
+    return;
+  }
+  const html = [...log, ...log].map(w => {
+    const name = w.name || 'Player';
+    const fund = w.fund || 'Pool';
+    const won  = parseFloat(w.won || 0).toFixed(0);
+    return `<span style="margin:0 28px;font-size:11px;white-space:nowrap">&#x1F3C6; <strong>${name}</strong> won <strong style="color:var(--orange)">$${won}</strong> in ${fund}</span>`;
+  }).join('');
   el.innerHTML = `<div style="display:inline-flex;animation:tickerScroll 28s linear infinite">${html}</div>`;
 }
 
@@ -10635,20 +11169,37 @@ function getBalance() {
   return parseFloat(localStorage.getItem(_uidKey('sd_balance')) || '0');
 }
 
-function addToBalance(amount) {
-  var current = getBalance();
-  var newBal = current + parseFloat(amount);
+// ── Authoritative balance write: localStorage + Supabase ──
+async function _recordBalanceTx(amount, type, description, poolId, poolName) {
+  var uid   = getUserId();
+  var email = sessionStorage.getItem('sd_useremail') || '';
+  var name  = sessionStorage.getItem('sd_username') || '';
+  if (!uid) return;
+  // Update localStorage immediately (optimistic)
+  var cur = getBalance();
+  var newBal = Math.max(0, cur + parseFloat(amount));
   localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
   updateBalanceDisplay();
-  logEvent('BALANCE', {
-    user_id:  getUserId(),
-    name:     sessionStorage.getItem('sd_username') || '',
-    email:    sessionStorage.getItem('sd_useremail') || '',
-    action:   'credit',
-    amount:   amount,
-    balance:  newBal,
-    ts:       new Date().toISOString()
-  }).catch(function(){});
+  // Write to Supabase in background
+  try {
+    var res = await _dbPost('balance_tx', {
+      uid, email, username: name,
+      amount: parseFloat(amount),
+      type: type || 'credit',
+      description: description || '',
+      poolId: poolId || null,
+      poolName: poolName || null
+    });
+    // Reconcile with authoritative server balance
+    if (res && res.success && res.balance !== undefined) {
+      localStorage.setItem(_uidKey('sd_balance'), res.balance.toFixed(2));
+      updateBalanceDisplay();
+    }
+  } catch (e) { console.warn('[Openbell] balance_tx error:', e.message); }
+}
+
+function addToBalance(amount, description, poolId, poolName) {
+  _recordBalanceTx(parseFloat(amount), 'deposit', description || 'Deposit', poolId, poolName);
 }
 
 function updateBalanceDisplay() {
@@ -10664,7 +11215,7 @@ function updateBalanceDisplay() {
   if (mWins) mWins.textContent = formatted;
 }
 
-function requestWithdraw() {
+async function requestWithdraw() {
   var amountEl  = document.getElementById('wd-amount');
   var errEl     = document.getElementById('wd-error');
   var btn       = document.getElementById('wd-btn');
@@ -10684,21 +11235,8 @@ function requestWithdraw() {
 
   if (btn) { btn.disabled = true; btn.textContent = 'Processing…'; }
 
-  // Deduct from balance
-  var newBal = balance - amount;
-  localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
-  updateBalanceDisplay();
-
-  // Log to Google Sheet WITHDRAWALS tab
-  logEvent('WITHDRAWALS', {
-    user_id:  getUserId(),
-    name:     sessionStorage.getItem('sd_username') || '',
-    email:    sessionStorage.getItem('sd_useremail') || '',
-    amount:   amount,
-    balance_after: newBal,
-    status:   'pending',
-    ts:       new Date().toISOString()
-  }).catch(function(){});
+  // Record withdrawal as a negative balance transaction in Supabase
+  await _recordBalanceTx(-amount, 'withdrawal', 'Withdrawal request — pending processing');
 
   setTimeout(function() {
     cm('withdraw');
@@ -12110,7 +12648,7 @@ function _refreshSearch() {
 </script>
 
 <!-- ══ DEPOSIT MODAL ══ -->
-<div class="ov" id="ov-deposit">
+<div class="ov" id="ov-deposit" role="dialog" aria-modal="true" aria-label="Deposit cash to your Openbell balance">
   <div class="modal" style="width:420px;padding:0;overflow:hidden;border-radius:14px">
     <div style="height:4px;background:var(--accent)"></div>
     <div style="padding:22px 24px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
@@ -12131,6 +12669,15 @@ function _refreshSearch() {
       <div style="position:relative;margin-bottom:16px">
         <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-family:IBM Plex Mono,monospace;font-weight:700;font-size:16px;color:var(--muted);pointer-events:none">$</span>
         <input class="fi" id="deposit-custom-amt" type="number" min="5" max="1000" placeholder="Custom amount" style="width:100%;box-sizing:border-box;padding-left:32px;font-family:IBM Plex Mono,monospace;font-weight:700;font-size:16px" oninput="_depositAmt=parseFloat(this.value)||0;updateDepositSummary()">
+      </div>
+      <!-- Trust signals — reduces drop-off on real-money deposit -->
+      <div style="display:flex;gap:16px;margin-bottom:12px;padding:10px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="5" width="10" height="7" rx="1.5" stroke="var(--pos)" stroke-width="1.2"/><path d="M3.5 5V3.5a2.5 2.5 0 0 1 5 0V5" stroke="var(--pos)" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <span style="color:var(--pos);font-weight:600">Secured by Stripe</span>
+        </div>
+        <div style="font-size:10px;color:var(--muted)">5% fee only — no hidden charges</div>
+        <div style="font-size:10px;color:var(--muted)">Withdraw anytime</div>
       </div>
       <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:8px;font-family:IBM Plex Mono,monospace;text-transform:uppercase;letter-spacing:.08em">Card details</div>
       <div id="deposit-card-element" style="padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface2);margin-bottom:6px;min-height:44px"></div>
@@ -12247,23 +12794,13 @@ async function confirmDeposit() {
 }
 
 function creditBalance(amt) {
-  var newBal = getBalance() + parseFloat(amt);
-  localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
-  updateBalanceDisplay();
+  // Record as Supabase deposit + update localStorage
+  _recordBalanceTx(parseFloat(amt), 'deposit', 'Deposit via Stripe');
   cm('deposit');
-  // Reset button for next use
   var btn = document.getElementById('deposit-confirm-btn');
   if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
   toast('✓ $' + parseFloat(amt).toFixed(2) + ' added to your balance!');
   renderDashboard();
-}
-
-function updateBalanceDisplay() {
-  var bal = getBalance();
-  ['sb-wins','wd-balance'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.textContent = '$' + bal.toFixed(2);
-  });
 }
 
 // ════════════════════════════════
@@ -12649,25 +13186,9 @@ async function confirmDeposit() {
   }
 }
 
-function creditBalance(amt) {
-  var newBal = getBalance() + parseFloat(amt);
-  localStorage.setItem(_uidKey('sd_balance'), newBal.toFixed(2));
-  updateBalanceDisplay();
-  cm('deposit');
-  // Reset button for next use
-  var btn = document.getElementById('deposit-confirm-btn');
-  if (btn) { btn.disabled = false; btn.textContent = 'Deposit →'; }
-  toast('✓ $' + parseFloat(amt).toFixed(2) + ' added to your balance!');
-  renderDashboard();
-}
+// creditBalance — second definition intentionally overrides earlier stubs
+// All real balance logic is in _recordBalanceTx (defined earlier)
 
-function updateBalanceDisplay() {
-  var bal = getBalance();
-  ['sb-wins','wd-balance'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.textContent = '$' + bal.toFixed(2);
-  });
-}
 </script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
